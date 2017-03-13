@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>0d2309c2-2b94-49c7-94db-5e5f434366cc</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>app.js</StartupFile>
+    <StartupFile>main.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -28,9 +28,50 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="app.js" />
+    <Compile Include="main.js" />
+    <Compile Include="src\Cephalon.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\ClusterManager.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\Command.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\CommandHandler.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\commands\Core\Test.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\Logger.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\Member.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\settings\Database.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\WorldStateCache.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="src\resources\Ranks.json">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="swarmbot.json">
+      <SubType>Code</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+    <Folder Include="src\commands\" />
+    <Folder Include="src\commands\Core\" />
+    <Folder Include="src\commands\Database\" />
+    <Folder Include="src\resources\" />
+    <Folder Include="src\settings\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

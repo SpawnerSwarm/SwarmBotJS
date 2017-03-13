@@ -1,0 +1,39 @@
+﻿[
+  {},
+  {
+    "name": "Recruit",
+    "id": 1
+  },
+  {
+    "name": "Member",
+    "id": 2
+  },
+  {
+    "name": "Member II",
+    "id": 3
+  },
+  {
+    "name": "Veteran",
+    "id": 4,
+    "color": "0xf1c40f",
+    "colorSeries": [ 241, 196, 15 ]
+  },
+  {
+    "name": "Officer",
+    "id": 5,
+    "color": "0x34a2db",
+    "colorSeries": [ 52, 162, 219 ]
+  },
+  {
+    "name": "General",
+    "id": 6,
+    "color": "0x1abc9c",
+    "colorSeries": [ 26, 188, 156 ]
+  },
+  {
+    "name": "Guild Master",
+    "id": 7,
+    "color": "0xe91e63",
+    "colorSeries": [ 233, 30, 99 ]
+  }
+]
