@@ -63,7 +63,7 @@ class Database {
     }
 
     getPrefix() {
-        return new Promise((resolve) => { resolve(process.env.prefix); });
+        return new Promise((resolve) => { resolve(this.bot.prefix); });
     }
 
     /**
