@@ -92,6 +92,10 @@ class GetMember extends Command {
                     }).then((date) => this.checkReadyForRankup(date, member, embed))
                         .then(() => this.messageManager.embed(message, embed));
                 });
+            })
+            .catch((err) => {
+                this.bot.logger.error(err);
+                this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
             });
         }
     }

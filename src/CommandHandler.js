@@ -111,6 +111,9 @@ class CommandHandler {
                 } else {
                     message.channel.sendMessage('You lack the privileges to perform that action.');
                 }
+            }).catch((err) => {
+                this.logger.error(err);
+                this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
             });
         });
     }
