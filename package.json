@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "SwarmBotJS",
   "main": "main.js",
+  "scripts": {
+    "test": "eslint src/"
+  },
   "author": {
     "name": "Sumner"
   },

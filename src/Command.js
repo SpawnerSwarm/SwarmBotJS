@@ -71,7 +71,7 @@ class Command {
         /**
          * @type {MessageManager}
         */
-        this.messageManager = bot.messageManager
+        this.messageManager = bot.messageManager;
     }
 
     /**

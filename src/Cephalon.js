@@ -5,6 +5,7 @@ const Discord = require('discord.js');
 const md = require('node-md-config');
 const WorldStateCache = require('./WorldStateCache.js');
 const Database = require('./settings/Database.js');
+const MessageManager = require('./settings/MessageManager');
 
 /**
  * @typedef {Object.<string>} MarkdownSettings
@@ -120,6 +121,8 @@ class Cephalon {
          * @type {Object.<WorldStateCache>}
         */
         this.worldState = new WorldStateCache(worldStateTimeout);
+
+        this.messageManager = new MessageManager(this);
 
         this.commandHandler.loadCommands();
 

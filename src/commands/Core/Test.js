@@ -2,8 +2,6 @@
 
 const Command = require('../../Command.js');
 
-const Member = require('../../Member.js');
-
 class Test extends Command {
     /**
      * @param {Cephalon} bot
@@ -21,6 +19,7 @@ class Test extends Command {
         /**
          * @type {Member}
          */
+        //eslint-disable-next-line no-unused-vars
         const member = this.bot.settings.getMember(message.author.id, this.bot).then((member) => {
             message.channel.sendMessage(`
 ${member.ID}

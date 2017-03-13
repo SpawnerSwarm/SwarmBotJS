@@ -36,7 +36,7 @@ class WorldStateCache {
         }).catch((err) => {
             this.updating = null;
             throw err;
-            });
+        });
         return this.updating;
     }
 

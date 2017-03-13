@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 const SQL = require('sql-template-strings');
 const Promise = require('bluebird');
 
@@ -11,6 +11,17 @@ const Promise = require('bluebird');
  * @property {string} user
  * @property {string} password
  * @property {string} database
+*/
+
+/**
+ * @typedef {Object} Member
+ * @property {number} ID
+ * @property {string} Name
+ * @property {number} Rank
+ * @property {string} WarframeName
+ * @property {string} SpiralKnightsName
+ * @property {string} SteamName
+ * @property {number} FormaDonated
 */
 
 class Database {
@@ -25,7 +36,7 @@ class Database {
             Promise,
         };
         Object.assign(opts, dbOptions);
-        this.db = mysql.createPool(opts);
+        this.db = mysql.createConnection(opts);
         this.bot = bot;
         bot.logger.debug(opts.host);
 
@@ -52,33 +63,38 @@ class Database {
     }
 
     getPrefix() {
-        return new Promise((resolve) => { resolve(process.env.prefix) });
+        return new Promise((resolve) => { resolve(process.env.prefix); });
+    }
+
+    /**
+     * @param {string} id
+     * @returns {Member}
+     */
+    getMember(id) {
+        return new Promise((resolve, reject) => {
+            this.db.query(SQL`SELECT * FROM MEMBERS WHERE ID=${id}`, function (err, results) {
+                if (results.length !== 0) {
+                    resolve(results[0]);
+                } else {
+                    reject('Member not found');
+                }
+            });
+        });
     }
 
     /**
      * @param {string} id
      */
-    getRankForMember(id) {
-        let bot = this.bot;
-        return new Promise((resolve) => {
-            this.db.execute(SQL`SELECT Rank FROM MEMBERS WHERE ID=${id}`, function(err, results, fields) {
-                resolve(results[0].Rank);
-            })
-        });
-    }
-    /**
-     * @param {string} id
-     */
-    getMember(id) {
-        return new Promise((resolve) => {
-            this.db.execute(SQL`SELECT * FROM MEMBERS WHERE ID=${id}`, function(err, results, fields) {
+    getRankups(id) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM RANKS WHERE ID=${id}`, function (err, results) {
                 if (results.length !== 0) {
                     resolve(results[0]);
                 } else {
-                    reject("Member not found");
+                    reject('Member not found');
                 }
-            })
-        })
+            });
+        });
     }
 }
 

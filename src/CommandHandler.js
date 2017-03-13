@@ -3,7 +3,6 @@
 const fs = require('fs');
 const path = require('path');
 const decache = require('decache');
-const ranks = require('./resources/Ranks.json');
 
 class CommandHandler {
     /**
@@ -14,7 +13,7 @@ class CommandHandler {
         this.logger = bot.logger;
 
         /**
-         * @type {Array <Command>}
+         * @type {Array<Command>}
          * @private
         */
         this.commands = [];
@@ -63,7 +62,7 @@ class CommandHandler {
      * @param {Message} message
     */
     handleCommand(message) {
-        let content = message.cleanContent;
+        let content = message.content;
         const botping = `@${this.bot.client.user.username}`;
         this.bot.settings.getPrefix()
             .then((prefix) => {
@@ -87,7 +86,8 @@ class CommandHandler {
                                     this.logger.debug(`Matched ${command.id}`);
                                     command.run(messageWithStrippedContent);
                                 }
-                            });
+                            })
+                            .catch(this.logger.error);
                     }
                 });
             })
@@ -101,17 +101,17 @@ class CommandHandler {
     */
     checkCanAct(command, message) {
         return new Promise((resolve) => {
-            this.bot.settings.getRankForMember(message.author.id).then((rank) => {
-                if (command.requiredRank <= rank) {
+            this.bot.settings.getMember(message.author.id).then((member) => {
+                if (command.requiredRank <= member.Rank) {
                     if (!command.ownerOnly) {
                         resolve(true);
                     } else {
-                        message.channel.sendMessage("This command is restricted to the bot owner.");
+                        message.channel.sendMessage('This command is restricted to the bot owner.');
                     }
                 } else {
-                    message.channel.sendMessage("You lack the privileges to perform that action.");
+                    message.channel.sendMessage('You lack the privileges to perform that action.');
                 }
-            })
+            });
         });
     }
 }

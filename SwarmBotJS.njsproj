@@ -44,13 +44,19 @@
     <Compile Include="src\commands\Core\Test.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="src\commands\Database\GetMember.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\Logger.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\Member.js">
+    <Compile Include="src\resources\Ranks.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\settings\Database.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\settings\MessageManager.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\WorldStateCache.js">
@@ -58,9 +64,6 @@
     </Compile>
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <Content Include="src\resources\Ranks.json">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="swarmbot.json">
       <SubType>Code</SubType>
     </Content>

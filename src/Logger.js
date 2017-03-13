@@ -1,4 +1,5 @@
 ﻿'use strict';
+/*eslint-disable no-console*/
 
 /**
  * @typedef {Object.<function>} Logger
@@ -25,7 +26,7 @@ const levels = [
 
 levels.forEach((level) => {
     //eslint-disable-next-line func-names
-    Logger.prototype[level.toLowerCase()] = function(message) {
+    Logger.prototype[level.toLowerCase()] = function (message) {
         if (levels.indexOf(level) >= levels.indexOf(logLevel)) {
             //eslint-disable-next-line no-console
             console.log(`[${level}] ${message}`);
@@ -38,7 +39,7 @@ levels.forEach((level) => {
             //TODO: Neural Sentry
             console.log(`${message}`);
         }
-    }
+    };
 });
 
 module.exports = Logger;
