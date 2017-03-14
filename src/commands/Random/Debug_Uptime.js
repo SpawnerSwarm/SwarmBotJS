@@ -10,6 +10,8 @@ class Uptime extends Command {
         super(bot, 'random.debug.uptime', 'uptime', 'Returns uptime.');
 
         this.regex = new RegExp('^(?:uptime|time)$');
+
+        this.requiredRank = 0;
     }
 
     run(message) {

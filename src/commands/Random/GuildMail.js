@@ -10,6 +10,8 @@ class GuildMail extends Command {
         super(bot, 'random.debug.guildmail', 'guildmail', 'Returns guildmail.');
 
         this.regex = new RegExp('^(?:guildmail|mail|gm)$');
+
+        this.requiredRank = 0;
     }
 
     run(message) {

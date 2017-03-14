@@ -170,7 +170,7 @@ class Cephalon {
     */
     onMessage(message) {
         if (this.readyToExecute && !message.author.bot) {
-            if (message.channel.id === "137991656547811328" || message.channel.id === "165649798551175169" || message.channel.id === "157978818466807808") {
+            if (message.channel.id === '137991656547811328' || message.channel.id === '165649798551175169' || message.channel.id === '157978818466807808') {
                 if (message.attachments.array().length > 0 || message.embeds.length > 0) {
                     if (message.member.roles.find('name', 'Certified Weeb') !== undefined) {
                         message.react(message.guild.emojis.find('name', 'Weeb'));
