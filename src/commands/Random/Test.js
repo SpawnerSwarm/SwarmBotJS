@@ -7,9 +7,10 @@ class Test extends Command {
      * @param {Cephalon} bot
     */
     constructor(bot) {
-        super(bot, 'core.test', 'test', 'Test');
+        super(bot, 'random.debug.test', 'test', 'Test');
 
         this.requiredRank = 7;
+        this.ownerOnly = true;
     }
 
     /**

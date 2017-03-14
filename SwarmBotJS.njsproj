@@ -41,7 +41,13 @@
     <Compile Include="src\CommandHandler.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\commands\Core\Test.js">
+    <Compile Include="src\commands\Core\TagMe.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\commands\Core\UnTagMe.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\commands\Random\Test.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\commands\Database\GetMember.js">
@@ -51,6 +57,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\commands\Random\Debug_Uptime.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\commands\Random\Source.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\DiscordTags.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\Logger.js">

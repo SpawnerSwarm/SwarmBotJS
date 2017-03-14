@@ -9,6 +9,7 @@
   "author": {
     "name": "Sumner"
   },
+  "repository": "https://github.com/SpawnerSwarm/SwarmBotJS",
   "dependencies": {
     "bluebird": "^3.4.7",
     "decache": "^4.1.0",

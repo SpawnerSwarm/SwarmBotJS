@@ -86,12 +86,12 @@ class CommandHandler {
                                     this.logger.debug(`Matched ${command.id}`);
                                     command.run(messageWithStrippedContent);
                                 }
-                            })
-                            .catch(this.logger.error);
+                            });
+                        //.catch(this.logger.error);
                     }
                 });
-            })
-            .catch(this.logger.error);
+            });
+            //.catch(this.logger.error);
     }
 
     /**
@@ -103,7 +103,7 @@ class CommandHandler {
         return new Promise((resolve) => {
             this.bot.settings.getMember(message.author.id).then((member) => {
                 if (command.requiredRank <= member.Rank) {
-                    if (!command.ownerOnly) {
+                    if (!command.ownerOnly || message.author.id === this.bot.owner) {
                         resolve(true);
                     } else {
                         message.channel.sendMessage('This command is restricted to the bot owner.');

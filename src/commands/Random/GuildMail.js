@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const Command = require('../../Command.js')
+const Command = require('../../Command.js');
 
 class GuildMail extends Command {
     /**
@@ -9,7 +9,7 @@ class GuildMail extends Command {
     constructor(bot) {
         super(bot, 'random.debug.guildmail', 'guildmail', 'Returns guildmail.');
 
-        this.regex = new RegExp('^(?:guildmail|mail|gm)$')
+        this.regex = new RegExp('^(?:guildmail|mail|gm)$');
     }
 
     run(message) {

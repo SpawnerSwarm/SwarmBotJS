@@ -22,7 +22,7 @@ class GetMember extends Command {
     }
 
     run(message) {
-        const messageMatch = message.strippedContent.match(this.regex);
+        const messageMatch = message.strippedContent.match(this.regex, 'i');
         let verbose = messageMatch[2];
         if (!messageMatch[1]) {
             message.channel.sendMessage('Syntax incorrect');

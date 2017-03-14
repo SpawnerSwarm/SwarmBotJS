@@ -9,7 +9,7 @@ class Uptime extends Command {
     constructor(bot) {
         super(bot, 'random.debug.uptime', 'uptime', 'Returns uptime.');
 
-        this.regex = new RegExp("^(?:uptime|time)$");
+        this.regex = new RegExp('^(?:uptime|time)$');
     }
 
     run(message) {
