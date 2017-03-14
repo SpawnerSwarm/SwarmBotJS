@@ -26,7 +26,7 @@ class DiscordTags {
      * @param {string} roleName
      */
     static addRoleToMember(member, roleName) {
-        let role = member.guild.roles.filter((x) => { return x.name === roleName; }).first();
+        let role = member.guild.roles.find('name', roleName);
 
         member.addRole(role);
     }
@@ -36,7 +36,7 @@ class DiscordTags {
      * @param {string} roleName
     */
     static removeRoleFromMember(member, roleName) {
-        let role = member.guild.roles.filter((x) => { return x.name === roleName; }).first();
+        let role = member.guild.roles.find('name', roleName);
 
         member.removeRole(role);
     }
