@@ -47,6 +47,12 @@
     <Compile Include="src\commands\Database\GetMember.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="src\commands\Random\GuildMail.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\commands\Random\Debug_Uptime.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\Logger.js">
       <SubType>Code</SubType>
     </Compile>
@@ -73,6 +79,7 @@
     <Folder Include="src\commands\" />
     <Folder Include="src\commands\Core\" />
     <Folder Include="src\commands\Database\" />
+    <Folder Include="src\commands\Random\" />
     <Folder Include="src\resources\" />
     <Folder Include="src\settings\" />
   </ItemGroup>

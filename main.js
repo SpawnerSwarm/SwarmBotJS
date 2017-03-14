@@ -29,7 +29,7 @@ if (cluster.isMaster) {
 } else {
     const totalShards = parseInt(process.env.SHARDS);
     const shard = new SwarmBot(process.env.TOKEN, logger, {
-        shardId: parseInt(process.env.shard_id),
+        shardId: parseInt(process.env.shard_id, 10),
         shardCount: totalShards,
         prefix: process.env.PREFIX,
         logger,

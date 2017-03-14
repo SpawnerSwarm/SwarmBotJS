@@ -127,6 +127,8 @@ class Cephalon {
         this.commandHandler.loadCommands();
 
         this.setupHandlers();
+
+        this.guildMailURL = process.env.GM_URL;
     }
 
     setupHandlers() {
