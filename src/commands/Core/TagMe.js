@@ -1,5 +1,4 @@
 ﻿'use strict';
-/*eslint-disable indent*/
 
 const Command = require('../../Command.js');
 
@@ -32,12 +31,14 @@ class TagMe extends Command {
             });
         }
         else {
+            /*eslint-disable indent*/
             switch (tag) {
                 case 'overwatch': DiscordTags.addRoleToMember(message.member, 'Overwatch'); break;
                 case 'warframe': DiscordTags.addRoleToMember(message.member, 'Warframe'); break;
                 case 'sk': DiscordTags.addRoleToMember(message.member, 'Spiral Knights'); break;
                 case 'bot': DiscordTags.addRoleToMember(message.member, 'Bot Notifications'); break;
             }
+            /*eslint-enable indent*/
         }
         this.bot.messageManager.sendMessage(message, `Successfully gave you the ${tag} tag!`);
         this.bot.logger.debug(`Added ${tag} tag to member ${message.author.username}`);

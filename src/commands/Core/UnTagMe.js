@@ -1,5 +1,4 @@
 ﻿'use strict';
-/*eslint-disable indent*/
 
 const Command = require('../../Command.js');
 
@@ -25,12 +24,14 @@ class UnTagMe extends Command {
             this.bot.messageManager.sendMessage(message, 'Error: Argument invalid. Correct format is \'!tagme overwatch/warframe/sk/bot)\''); return;
         }
         tag = tag.toLowerCase();
+        /*eslint-disable indent*/
         switch (tag) {
             case 'overwatch': DiscordTags.removeRoleFromMember(message.member, 'Overwatch'); break;
             case 'warframe': DiscordTags.removeRoleFromMember(message.member, 'Warframe'); break;
             case 'sk': DiscordTags.removeRoleFromMember(message.member, 'Spiral Knights'); break;
             case 'bot': DiscordTags.removeRoleFromMember(message.member, 'Bot Notifications'); break;
         }
+        /*eslint-enable indent*/
         this.bot.messageManager.sendMessage(message, `Successfully removed the ${tag} tag!`);
         this.bot.logger.debug(`Removed ${tag} tag from member ${message.author.username}`);
     }
