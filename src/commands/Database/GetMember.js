@@ -37,7 +37,7 @@ class GetMember extends Command {
                         type: 'rich',
                         description: 'foo',
                         author: {
-                            iconURL: user.avatarURL,
+                            icon_url: user.avatarURL,
                             name: member.Name,
                         },
                         color: Ranks[member.Rank].color,

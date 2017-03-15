@@ -23,6 +23,7 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "react/jsx-sort-prop-types": "off"
     }
 }
