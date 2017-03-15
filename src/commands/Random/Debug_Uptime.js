@@ -15,7 +15,7 @@ class Uptime extends Command {
     }
 
     run(message) {
-        this.bot.messageManager.sendMessage(message, `SwarmBot has been online continuously for ${Math.ceil((this.bot.client.uptime / 3600000) * 100) / 100} hours.`);
+        this.bot.messageManager.sendMessage(message, `${this.bot.client.user.username} has been online continuously for ${Math.ceil((this.bot.client.uptime / 3600000) * 100) / 100} hours.`);
     }
 }
 
