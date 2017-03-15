@@ -24,6 +24,12 @@
             "error",
             "always"
         ],
-        "react/jsx-sort-prop-types": "off"
+        "react/jsx-sort-prop-types": "off",
+        "no-invalid-regexp": "error",
+        "no-extra-parens": "error",
+        "no-extra-semi": "error",
+        "no-regex-spaces": "warn",
+        "no-unreachable": "error",
+        "no-unexpected-multiline": "error"
     }
 }
