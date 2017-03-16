@@ -20,6 +20,8 @@ class UserSpecificEmote extends Command {
         }
         regex += ')$';
         this.regex = new RegExp(regex, 'i');
+
+        this.requiredRank = 0;
     }
 
     /**

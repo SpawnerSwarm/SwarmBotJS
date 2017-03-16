@@ -12,6 +12,8 @@ class Alerts extends Command {
         super(bot, 'warframe.alerts', 'wfalerts');
 
         this.regex = new RegExp('^(?:warframe ?|wf ?)?alerts ?(?:list)?$');
+
+        this.requiredRank = 0;
     }
 
     /**

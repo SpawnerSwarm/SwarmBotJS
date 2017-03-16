@@ -11,6 +11,8 @@ class Source extends Command {
         super(bot, 'random.source', 'source', 'Post a link to the bot\'s source');
 
         this.regex = new RegExp('^(?:source|code|sourcecode|github)$');
+
+        this.requiredRank = 0;
     }
 
     run(message) {

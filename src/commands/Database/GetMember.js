@@ -19,6 +19,8 @@ class GetMember extends Command {
         this.regex = new RegExp('^(?:getMember|member(?: get)?) <@!?(\\d+)> ?(.+)?$', 'i');
 
         this.allowDM = false;
+
+        this.requiredRank = 0;
     }
 
     run(message) {

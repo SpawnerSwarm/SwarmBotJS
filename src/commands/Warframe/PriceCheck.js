@@ -14,6 +14,8 @@ class PriceCheck extends Command {
         this.regex = new RegExp('^(?:priceCheck|pc) ?(.+)?$');
 
         this.nexusQuerier = new Nexus();
+
+        this.requiredRank = 0;
     }
 
     run(message) {

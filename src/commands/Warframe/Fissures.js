@@ -12,6 +12,8 @@ class Fissures extends Command {
         super(bot, 'warframe.fissures', 'wffissures');
 
         this.regex = new RegExp('^(?:warframe ?|wf ?)?fissures ?(?:list)?$');
+
+        this.requiredRank = 0;
     }
 
     /**
