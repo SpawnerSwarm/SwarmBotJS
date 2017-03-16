@@ -1,6 +1,6 @@
 'use strict';
 
-const pkg = require('../../../package.json');
+const pkg = require('../../package.json');
 
 class FissuresEmbed {
     /**
@@ -15,7 +15,7 @@ class FissuresEmbed {
             text: 'Data evaluated by warframe-worldstate-parser | Warframe Community Developers',
         };
         this.thumbnail = {
-            url: `${pkg.repository}/master/src/resources/fissure.png`,
+            url: `${pkg.repository.replace('github', 'raw.githubusercontent')}/master/src/resources/fissure.png`,
         };
     }
 
