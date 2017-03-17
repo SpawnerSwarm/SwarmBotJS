@@ -32,7 +32,7 @@ class GetMember extends Command {
             /**
              * @type {Boolean}
              */
-            let iVerbose = (verbose === '-v' || verbose === '--verbose');
+            let iVerbose = verbose === '-v' || verbose === '--verbose';
             this.bot.settings.getMember(messageMatch[1]).then((member) => {
                 this.bot.client.fetchUser(messageMatch[1]).then((user) => {
                     var embed = {

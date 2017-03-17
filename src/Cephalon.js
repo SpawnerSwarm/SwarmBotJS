@@ -149,8 +149,8 @@ class Cephalon {
 
     start() {
         this.client.login(this.token)
-        .then((t) => {
-            this.logger.debug(`Logged in with token ${t}`);
+        .then(() => {
+            this.logger.debug('Logged in!');
         }).catch((e) => {
             this.logger.error(e.message);
             this.logger.fatal(e);

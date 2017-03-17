@@ -1,6 +1,8 @@
 ﻿'use strict';
 /*eslint-disable no-console*/
 
+const request = require('request');
+
 /**
  * @typedef {Object.<function>} Logger
  * @property {function} debug
@@ -11,8 +13,8 @@
 */
 
 class Logger {
-    constructor() {
-
+    constructor(legacy) {
+        this.requestDisabled = legacy;
     }
 }
 const logLevel = process.env.LOG_LEVEL;
@@ -29,7 +31,8 @@ levels.forEach((level) => {
     Logger.prototype[level.toLowerCase()] = function (message) {
         if (levels.indexOf(level) >= levels.indexOf(logLevel)) {
             //eslint-disable-next-line no-console
-            console.log(`[${level}] ${message}`);
+            request.post('http://localhost:3000/console/swarmbot', {form: {message: message, level: level}});
+            //console.log(`[${level}] ${message}`);
         }
         if (level === 'fatal') {
             //TODO: Neural Sentry
@@ -39,6 +42,7 @@ levels.forEach((level) => {
             //TODO: Neural Sentry
             console.log(`${message}`);
         }
+        if(!this.requestDisabled) {setTimeout(() => {request.post(process.env.NEURAL_SENTRY_URL, {form: {message: message, level: level}});}, 200);}
     };
 });
 
