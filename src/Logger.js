@@ -31,8 +31,7 @@ levels.forEach((level) => {
     Logger.prototype[level.toLowerCase()] = function (message) {
         if (levels.indexOf(level) >= levels.indexOf(logLevel)) {
             //eslint-disable-next-line no-console
-            request.post('http://localhost:3000/console/swarmbot', {form: {message: message, level: level}});
-            //console.log(`[${level}] ${message}`);
+            console.log(`[${level}] ${message}`);
         }
         if (level === 'fatal') {
             //TODO: Neural Sentry
