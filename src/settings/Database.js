@@ -96,6 +96,37 @@ class Database {
             });
         });
     }
+
+    /**
+     * @param {string} ref
+     */
+    getEmote(ref) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM EMOTES WHERE Reference=${ref}`, function (err, results) {
+                if(results.length !== 0) {
+                    resolve(results[0]);
+                } else {
+                    reject('Emote not found');
+                }
+            });
+        });
+    }
+
+    /**
+     * @param {number} page
+     */
+    getEmoteList(page) {
+        return new Promise((resolve, reject) => {
+            page = page > 0 ? page - 1 : page;
+            this.db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page * 5}, 4`, function(err, results) {
+                if(results.length !== 0) {
+                    resolve(results);
+                } else {
+                    reject('Unable to get emotes at that page');
+                }
+            });
+        });
+    }
 }
 
 module.exports = Database;

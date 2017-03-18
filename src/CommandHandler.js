@@ -91,7 +91,7 @@ class CommandHandler {
                     }
                 });
             });
-            //.catch(this.logger.error);
+        //.catch(this.logger.error);
     }
 
     /**
@@ -101,23 +101,28 @@ class CommandHandler {
     */
     checkCanAct(command, message) {
         return new Promise((resolve) => {
-            if (!command.ownerOnly || message.author.id === this.bot.owner) {
-                if (command.requiredRank === 0) {
-                    resolve(true);
+            if (message.channel.type === 'dm' && command.allowDM) {
+                if (!command.ownerOnly || message.author.id === this.bot.owner) {
+                    if (command.requiredRank === 0) {
+                        resolve(true);
+                    } else {
+                        this.bot.settings.getMember(message.author.id).then((member) => {
+                            if (command.requiredRank <= member.Rank) {
+                                resolve(true);
+                            } else {
+                                message.channel.sendMessage('You lack the privileges to perform that action');
+                            }
+                        }).catch((err) => {
+                            this.logger.error(err);
+                            this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
+                        });
+                    }
                 } else {
-                    this.bot.settings.getMember(message.author.id).then((member) => {
-                        if (command.requiredRank <= member.Rank) {
-                            resolve(true);
-                        } else {
-                            message.channel.sendMessage('You lack the privileges to perform that action');
-                        }
-                    }).catch((err) => {
-                        this.logger.error(err);
-                        this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
-                    });
+                    message.channel.sendMessage('This command is restricted to the bot owner.');
                 }
-            } else {
-                message.channel.sendMessage('This command is restricted to the bot owner.');
+            }
+            else {
+                message.channel.sendMessage('This command cannot be perofrmed in DMs');
             }
         });
     }
