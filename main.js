@@ -13,7 +13,7 @@ const SwarmBot = require('./src/Cephalon.js');
 */
 const Logger = require('./src/Logger.js');
 
-const logger = new Logger(process.env.LEGACY_LOGGER || true);
+const logger = new Logger(process.env.LEGACY_LOGGER == null ? false : process.env.LEGACY_LOGGER);
 
 /**
 @type {Function}
