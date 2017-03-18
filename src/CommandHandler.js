@@ -101,7 +101,7 @@ class CommandHandler {
     */
     checkCanAct(command, message) {
         return new Promise((resolve) => {
-            if (message.channel.type === 'dm' && command.allowDM) {
+            if (message.channel.type === 'text' || (message.channel.type === 'dm' && command.allowDM)) {
                 if (!command.ownerOnly || message.author.id === this.bot.owner) {
                     if (command.requiredRank === 0) {
                         resolve(true);
