@@ -41,7 +41,7 @@ levels.forEach((level) => {
             //TODO: Neural Sentry
             console.log(`${message}`);
         }
-        if(!this.requestDisabled) {setTimeout(() => {request.post(process.env.NEURAL_SENTRY_URL, {form: {message: message, level: level}});}, 200);}
+        if(this.requestDisabled === 'false') {request.post(process.env.NEURAL_SENTRY_URL, {form: {message: message, level: level}});}
     };
 });
 
