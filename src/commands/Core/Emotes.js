@@ -80,7 +80,7 @@ class Emotes extends Command {
             })
             .catch((err) => {
                 this.bot.logger.error(err);
-                this.bot.messageManager.sendMessage(message, '`\`Error: ${err}\``');
+                this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
             });
     }
 }
