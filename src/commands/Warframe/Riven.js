@@ -13,6 +13,7 @@ class Riven extends Command {
 
     run(message) {
         if (message.attachments.array().length > 0) {
+            message.react('🔄');
             request.post(
                 'https://api.ocr.space/parse/image',
                 {
