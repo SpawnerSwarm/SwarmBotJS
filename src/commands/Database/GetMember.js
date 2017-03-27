@@ -89,7 +89,7 @@ class GetMember extends Command {
                         if (rankups[rank] === null) {
                             return;
                         }
-                        embed.fields[1].value = rankups[rank];
+                        embed.fields[1].value = new Date(rankups[rank]).toDateString();
                         return rankups[rank];
                     }).then((date) => this.checkReadyForRankup(date, member, embed))
                         .then(() => this.messageManager.embed(message, embed));
