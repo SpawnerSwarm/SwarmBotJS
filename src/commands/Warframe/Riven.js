@@ -59,10 +59,13 @@ class Riven extends Command {
             let item = split[i];
 
             //add additional filters here
-            this.bot.logger.debug(item.match(/.+/g) == '05');
             let m = item.match(/[\d ]+/g);
             if (m != null && m[0] == item.match(/.+/g)) {
                 //remove lines with only a number in them, usually the mastery rank requirement of the mod
+                continue;
+            }
+            m = item.match(/MR[\d ]+/g);
+            if (m != null && m[0] == item.match(/.+/g)) {
                 continue;
             }
             filteredText = filteredText.concat(item, '\n');
