@@ -98,12 +98,34 @@ class Database {
     }
 
     /**
+     * @param {string} id
+     */
+    createMember(id, name) {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        today = mm + '/' + dd + '/' + yyyy;
+        this.db.execute(SQL`INSERT INTO MEMBERS (\`ID\`, \`Name\`, \`Rank\`) VALUES (${id}, ${name}, '1');`);
+        this.db.execute(SQL`INSERT INTO RANKS (\`ID\`, \`Recruit\`) VALUES (${id}, ${today});`);
+    }
+
+    /**
      * @param {string} ref
      */
     getEmote(ref) {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM EMOTES WHERE Reference=${ref}`, function (err, results) {
-                if(results.length !== 0) {
+            this.db.execute(SQL`SELECT * FROM EMOTES WHERE Reference= ${ref}`, function (err, results) {
+                if (results.length !== 0) {
                     resolve(results[0]);
                 } else {
                     reject('Emote not found');
@@ -118,8 +140,8 @@ class Database {
     getEmoteList(page) {
         return new Promise((resolve, reject) => {
             page = page > 0 ? page - 1 : page;
-            this.db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page * 5}, 4`, function(err, results) {
-                if(results.length !== 0) {
+            this.db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page * 5}, 4`, function (err, results) {
+                if (results.length !== 0) {
                     resolve(results);
                 } else {
                     reject('Unable to get emotes at that page');
