@@ -4,6 +4,8 @@ const mysql = require('mysql2');
 const SQL = require('sql-template-strings');
 const Promise = require('bluebird');
 
+const Ranks = require('../resources/Ranks.js');
+
 /**
  * @typedef {Object} DbConnectionOptions
  * @property {string} [host=localhost]
@@ -117,6 +119,32 @@ class Database {
         today = mm + '/' + dd + '/' + yyyy;
         this.db.execute(SQL`INSERT INTO MEMBERS (\`ID\`, \`Name\`, \`Rank\`) VALUES (${id}, ${name}, '1');`);
         this.db.execute(SQL`INSERT INTO RANKS (\`ID\`, \`Recruit\`) VALUES (${id}, ${today});`);
+    }
+
+    /**
+     * @param {Member} member
+     * @param {number} rank
+     * @param {Date} date
+     */
+    promote(member, rank, date) {
+        var dd = date.getDate();
+        var mm = date.getMonth() + 1;
+        var yyyy = date.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        let dateStr = mm + '/' + dd + '/' + yyyy;
+
+        let rankStr = Ranks.find(x => x.id == rank).name;
+
+        this.db.execute(`UPDATE RANKS SET \`${rankStr}\`='${dateStr}' WHERE \`ID\`='${member.ID}';`);
+        this.db.execute(SQL`UPDATE MEMBERS SET \`Rank\`=${rank} WHERE \`ID\`=${member.ID};`);
     }
 
     /**

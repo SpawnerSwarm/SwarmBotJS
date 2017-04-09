@@ -2,8 +2,6 @@
 
 const Command = require('../../Command.js');
 
-const Ranks = require('../../resources/Ranks.js');
-
 class CreateMember extends Command {
     /**
      * @param {Cephalon} bot
