@@ -143,6 +143,12 @@ class Cephalon {
             process.exit(4);
         });
 
+        this.client.on('guildMemberAdd', (member) => {
+            if(member.guild.id == 137991656547811328 || member.guild.id == 157978818466807808) {
+                member.guild.channels.get(`${member.guild.id}`).sendMessage(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at https://1drv.ms/b/s!AnyOF5dOdoX0v0iXHyVMBfggyOqy and ask a Veteran or above if you have any questions!`);
+            }
+        });
+
         this.client.on('error', error => this.logger.error(error));
         this.client.on('warn', warning => this.logger.warning(warning));
     }
