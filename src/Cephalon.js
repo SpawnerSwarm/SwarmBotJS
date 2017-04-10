@@ -6,6 +6,7 @@ const md = require('node-md-config');
 const WorldStateCache = require('./WorldStateCache.js');
 const Database = require('./settings/Database.js');
 const MessageManager = require('./settings/MessageManager');
+const request = require('request');
 
 /**
  * @typedef {Object.<string>} MarkdownSettings
@@ -24,15 +25,15 @@ const MessageManager = require('./settings/MessageManager');
  */
 
 class Cephalon {
-  /**
-   * @param  {string}           discordToken         The token used to authenticate with Discord
-   * @param  {Logger}           logger               The logger object
-   * @param  {Object}           [options]            Bot options
-   * @param  {number}           [options.shardId]    The shard ID of this instance
-   * @param  {number}           [options.shardCount] The total number of shards
-   * @param  {string}           [options.prefix]     Prefix for calling the bot
-   * @param  {MarkdownSettings} [options.mdConfig]   The markdown settings
-   */
+    /**
+     * @param  {string}           discordToken         The token used to authenticate with Discord
+     * @param  {Logger}           logger               The logger object
+     * @param  {Object}           [options]            Bot options
+     * @param  {number}           [options.shardId]    The shard ID of this instance
+     * @param  {number}           [options.shardCount] The total number of shards
+     * @param  {string}           [options.prefix]     Prefix for calling the bot
+     * @param  {MarkdownSettings} [options.mdConfig]   The markdown settings
+     */
     constructor(discordToken, logger, { shardId = 0, shardCount = 1, prefix = process.env.PREFIX,
         mdConfig = md, owner = null } = {}) {
 
@@ -144,7 +145,7 @@ class Cephalon {
         });
 
         this.client.on('guildMemberAdd', (member) => {
-            if(member.guild.id == 137991656547811328 || member.guild.id == 157978818466807808) {
+            if (member.guild.id == 137991656547811328 || member.guild.id == 157978818466807808) {
                 member.guild.channels.get(`${member.guild.id}`).sendMessage(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at https://1drv.ms/b/s!AnyOF5dOdoX0v0iXHyVMBfggyOqy and ask a Veteran or above if you have any questions!`);
             }
         });
@@ -155,13 +156,13 @@ class Cephalon {
 
     start() {
         this.client.login(this.token)
-        .then(() => {
-            this.logger.debug('Logged in!');
-        }).catch((e) => {
-            this.logger.error(e.message);
-            this.logger.fatal(e);
-            process.exit(1);
-        });
+            .then(() => {
+                this.logger.debug('Logged in!');
+            }).catch((e) => {
+                this.logger.error(e.message);
+                this.logger.fatal(e);
+                process.exit(1);
+            });
     }
 
     onReady() {
@@ -182,6 +183,30 @@ class Cephalon {
                         message.react(message.guild.emojis.find('name', 'Weeb'));
                     }
                 }
+            }
+            if (message.content.match(/\[\[.+\]\]/)) {
+                let match = message.content.match(/([^ ]{1,3})?\[\[(.+)\]\]/i);
+                let wiki;
+                /*eslint-disable indent*/
+                switch (match[1]) {
+                    case 'wf': wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe'}; break;
+                    case 'ds': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1'}; break;
+                    case 'ds1': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1'}; break;
+                    case 'ds2': wiki = {url: 'http://darksouls2.wiki.fextralife.com/', name: 'Dark Souls 2'}; break;
+                    case 'ds3': wiki = {url: 'http://darksouls3.wiki.fextralife.com/', name: 'Dark Souls 3'}; break;
+                    case 'sk': wiki = {url: 'http://wiki.spiralknights.com/', name: 'Spiral Knights'}; break;
+                    case 'poe': wiki = {url: 'http://pathofexile.gamepedia.com/', name: 'Path of Exile'}; break;
+                    case 'hs': wiki = {url: 'http://hearthstone.gamepedia.com/', name: 'Hearthstone'}; break;
+                    default: wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe'}; break;
+                }
+                /*eslint-enable-indent*/
+                request.head(`${wiki.url}${match[2]}`, (error, response) => {
+                    if (response.statusCode != 404) {
+                        message.channel.sendMessage(`${wiki.url}${match[2].replace(' ', '_')}`);
+                    } else {
+                        message.channel.sendMessage(`Could not find page requested on ${wiki.name} wiki`);
+                    }
+                });
             }
             this.commandHandler.handleCommand(message);
         }
