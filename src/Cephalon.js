@@ -201,7 +201,7 @@ class Cephalon {
                 }
                 /*eslint-enable-indent*/
                 request.head(`${wiki.url}${match[2]}`, (error, response) => {
-                    if (response.statusCode != 404) {
+                    if (response.statusCode != 404 && response.statusCode != 400) {
                         message.channel.sendMessage(`${wiki.url}${match[2].replace(' ', '_')}`);
                     } else {
                         message.channel.sendMessage(`Could not find page requested on ${wiki.name} wiki`);
