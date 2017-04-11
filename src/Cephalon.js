@@ -189,20 +189,20 @@ class Cephalon {
                 let wiki;
                 /*eslint-disable indent*/
                 switch (match[1]) {
-                    case 'wf': wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe'}; break;
-                    case 'ds': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1'}; break;
-                    case 'ds1': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1'}; break;
-                    case 'ds2': wiki = {url: 'http://darksouls2.wiki.fextralife.com/', name: 'Dark Souls 2'}; break;
-                    case 'ds3': wiki = {url: 'http://darksouls3.wiki.fextralife.com/', name: 'Dark Souls 3'}; break;
-                    case 'sk': wiki = {url: 'http://wiki.spiralknights.com/', name: 'Spiral Knights'}; break;
-                    case 'poe': wiki = {url: 'http://pathofexile.gamepedia.com/', name: 'Path of Exile'}; break;
-                    case 'hs': wiki = {url: 'http://hearthstone.gamepedia.com/', name: 'Hearthstone'}; break;
-                    default: wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe'}; break;
+                    case 'wf': wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_'}; break;
+                    case 'ds': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1', char: '+'}; break;
+                    case 'ds1': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1', char: '+'}; break;
+                    case 'ds2': wiki = {url: 'http://darksouls2.wiki.fextralife.com/', name: 'Dark Souls 2', char: '+'}; break;
+                    case 'ds3': wiki = {url: 'http://darksouls3.wiki.fextralife.com/', name: 'Dark Souls 3', char: '+'}; break;
+                    case 'sk': wiki = {url: 'http://wiki.spiralknights.com/', name: 'Spiral Knights', char: '_'}; break;
+                    case 'poe': wiki = {url: 'http://pathofexile.gamepedia.com/', name: 'Path of Exile', char: '_'}; break;
+                    case 'hs': wiki = {url: 'http://hearthstone.gamepedia.com/', name: 'Hearthstone', char: '_'}; break;
+                    default: wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_'}; break;
                 }
                 /*eslint-enable-indent*/
                 request.head(`${wiki.url}${match[2]}`, (error, response) => {
                     if (response.statusCode != 404 && response.statusCode != 400) {
-                        message.channel.sendMessage(`${wiki.url}${match[2].replace(' ', '_')}`);
+                        message.channel.sendMessage(`${wiki.url}${match[2].replace(/ /g, wiki.char)}`);
                     } else {
                         message.channel.sendMessage(`Could not find page requested on ${wiki.name} wiki`);
                     }
