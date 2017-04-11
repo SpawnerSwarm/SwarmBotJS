@@ -14,6 +14,8 @@ class Promote extends Command {
         this.regex = /(?:(?:promote|member promote) <@!?(\d+)>)|(?: -?-([^ ]+) ?([^ ]+)?)/gi;
 
         this.requiredRank = 5;
+
+        this.allowDM = false;
     }
 
     run(message) {
