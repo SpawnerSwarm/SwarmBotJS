@@ -7,6 +7,7 @@ const WorldStateCache = require('./WorldStateCache.js');
 const Database = require('./settings/Database.js');
 const MessageManager = require('./settings/MessageManager');
 const request = require('request');
+const Ranks = require('./resources/Ranks.js');
 
 /**
  * @typedef {Object.<string>} MarkdownSettings
@@ -146,9 +147,11 @@ class Cephalon {
 
         this.client.on('guildMemberAdd', (member) => {
             if (member.guild.id == 137991656547811328 || member.guild.id == 157978818466807808) {
-                member.guild.channels.get(`${member.guild.id}`).sendMessage(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at https://1drv.ms/b/s!AnyOF5dOdoX0v0iXHyVMBfggyOqy and ask a Veteran or above if you have any questions!`);
+                member.guild.channels.get(`${member.guild.id}`).sendMessage(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailURL} and ask a Veteran or above if you have any questions!`);
             }
         });
+
+        this.client.on('presenceUpdate', (oldMember, newMember) => this.onPresenceUpdate(oldMember, newMember));
 
         this.client.on('error', error => this.logger.error(error));
         this.client.on('warn', warning => this.logger.warning(warning));
@@ -189,15 +192,15 @@ class Cephalon {
                 let wiki;
                 /*eslint-disable indent*/
                 switch (match[1]) {
-                    case 'wf': wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_'}; break;
-                    case 'ds': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1', char: '+'}; break;
-                    case 'ds1': wiki = {url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1', char: '+'}; break;
-                    case 'ds2': wiki = {url: 'http://darksouls2.wiki.fextralife.com/', name: 'Dark Souls 2', char: '+'}; break;
-                    case 'ds3': wiki = {url: 'http://darksouls3.wiki.fextralife.com/', name: 'Dark Souls 3', char: '+'}; break;
-                    case 'sk': wiki = {url: 'http://wiki.spiralknights.com/', name: 'Spiral Knights', char: '_'}; break;
-                    case 'poe': wiki = {url: 'http://pathofexile.gamepedia.com/', name: 'Path of Exile', char: '_'}; break;
-                    case 'hs': wiki = {url: 'http://hearthstone.gamepedia.com/', name: 'Hearthstone', char: '_'}; break;
-                    default: wiki = {url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_'}; break;
+                    case 'wf': wiki = { url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_' }; break;
+                    case 'ds': wiki = { url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1', char: '+' }; break;
+                    case 'ds1': wiki = { url: 'http://darksouls.wiki.fextralife.com/', name: 'Dark Souls 1', char: '+' }; break;
+                    case 'ds2': wiki = { url: 'http://darksouls2.wiki.fextralife.com/', name: 'Dark Souls 2', char: '+' }; break;
+                    case 'ds3': wiki = { url: 'http://darksouls3.wiki.fextralife.com/', name: 'Dark Souls 3', char: '+' }; break;
+                    case 'sk': wiki = { url: 'http://wiki.spiralknights.com/', name: 'Spiral Knights', char: '_' }; break;
+                    case 'poe': wiki = { url: 'http://pathofexile.gamepedia.com/', name: 'Path of Exile', char: '_' }; break;
+                    case 'hs': wiki = { url: 'http://hearthstone.gamepedia.com/', name: 'Hearthstone', char: '_' }; break;
+                    default: wiki = { url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_' }; break;
                 }
                 /*eslint-enable-indent*/
                 request.head(`${wiki.url}${match[2]}`, (error, response) => {
@@ -233,6 +236,42 @@ class Cephalon {
         this.settings.deleteChannel(channel).then(() => {
             return;
         }).catch(this.logger.error);
+    }
+
+    onPresenceUpdate(oldMember, newMember) {
+        if (oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
+            let checkReadyForRankup = (date, compDate, breakOnNull, member) => {
+                if (date === null && breakOnNull) {
+                    return false;
+                }
+                let one = 1000 * 60 * 60 * 24;
+                let today = new Date();
+
+                date = new Date(date);
+
+                let dateDiff = Math.floor((today - date) / one);
+                if (member.Rank === 7) {
+                    return false;
+                }
+                else if (dateDiff >= compDate) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+            this.settings.getMember(newMember.id).then((member) => {
+                this.settings.getRankups(newMember.id).then((rankups) => {
+                    if(checkReadyForRankup(rankups[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
+                        if(checkReadyForRankup(member.LastPestered, 7, false, member)) {
+                            this.logger.debug(`Sent ${member.Name} a rankup notification.`);
+                            this.client.channels.get('165649798551175169').sendMessage(`<@&137992918957817856> Sent ${member.Name} a rankup notification.\n Last pestered on ${member.LastPestered}.`);
+                            newMember.sendMessage(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!`);
+                            this.settings.setLastPestered(member.ID);
+                        }
+                    }
+                });
+            }).catch(() => null);
+        }
     }
 }
 
