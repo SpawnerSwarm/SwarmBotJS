@@ -166,6 +166,19 @@ class Database {
         this.db.execute(SQL`UPDATE MEMBERS SET \`LastPestered\`=${dateStr} WHERE \`ID\`=${id};`);
     }
 
+    getRankPopulation() {
+        return new Promise((resolve) => {
+            let res = [0];
+            for (let i = 1; i <= 7; i++) {
+                this.db.execute(SQL`SELECT * FROM MEMBERS WHERE \`Rank\`=${i};`, function (err, results) {
+                    if (res.push(results.length) == 8) {
+                        resolve(res);
+                    }
+                });
+            }
+        });
+    }
+
     /**
      * @param {string} ref
      */
