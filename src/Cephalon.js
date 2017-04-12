@@ -260,9 +260,10 @@ class Cephalon {
                 }
             };
             this.settings.getMember(newMember.id).then((member) => {
+                if (member.Rank > 3) { return; }
                 this.settings.getRankups(newMember.id).then((rankups) => {
-                    if(checkReadyForRankup(rankups[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
-                        if(checkReadyForRankup(member.LastPestered, 7, false, member)) {
+                    if (checkReadyForRankup(rankups[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
+                        if (checkReadyForRankup(member.LastPestered, 7, false, member)) {
                             this.logger.debug(`Sent ${member.Name} a rankup notification.`);
                             this.client.channels.get('165649798551175169').sendMessage(`<@&137992918957817856> Sent ${member.Name} a rankup notification.\n Last pestered on ${member.LastPestered}.`);
                             newMember.sendMessage(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!`);
