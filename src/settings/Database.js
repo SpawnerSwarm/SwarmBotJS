@@ -209,6 +209,10 @@ class Database {
             });
         });
     }
+
+    createEmote(name, reference, rank, content, creator) {
+        this.db.execute(SQL`INSERT INTO EMOTES (\`Name\`, \`Content\`, \`Reference\`, \`Rank\`, \`Creator\`) VALUES (${name}, ${content}, ${reference}, ${rank}, ${creator});`);
+    }
 }
 
 module.exports = Database;
