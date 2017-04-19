@@ -22,11 +22,11 @@ class Emotes extends Command {
         if (match[1] === ' list') {
             this.list(message, match);
         }
-        else if (match[2] !== '') {
+        else if (match[2] != undefined) {
             this.get(message, match);
         }
         else {
-            this.bot.messageManager.sendMessage('-** !{initialCommandUsed}** -- Display this text.\n-** !{initialCommandUsed}** (ref) -- Return the emote matching the ref.\n-** !{initialCommandUsed} list (page)** -- List all emotes.\n-** !{initialCommandUsed} create*/new/make* (name) (reference) (requiredRank) (content) (creator)** -- Create a new Emote.');
+            this.bot.messageManager.sendMessage(message, '-** !{initialCommandUsed}** -- Display this text.\n-** !{initialCommandUsed}** (ref) -- Return the emote matching the ref.\n-** !{initialCommandUsed} list (page)** -- List all emotes.\n-** !{initialCommandUsed} create*/new/make* (name) (reference) (requiredRank) (content) (creator)** -- Create a new Emote.');
         }
     }
 
