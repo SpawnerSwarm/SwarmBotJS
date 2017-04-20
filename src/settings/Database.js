@@ -199,14 +199,17 @@ class Database {
      */
     getEmoteList(page) {
         return new Promise((resolve, reject) => {
+            let db = this.db;
             page = page > 0 ? page - 1 : page;
             page = page * 5 == 0 ? page * 5 : page * 5 - page;
-            this.db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results) {
-                if (results.length !== 0) {
-                    resolve(results);
-                } else {
-                    reject('Unable to get emotes at that page');
-                }
+            db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results) {
+                db.execute(SQL`SELECT COUNT(*) FROM EMOTES`, function (err2, count) {
+                    if (results.length !== 0) {
+                        resolve({results: results, count: count[0]['COUNT(*)']});
+                    } else {
+                        reject('Unable to get emotes at that page');
+                    }
+                });
             });
         });
     }
@@ -222,9 +225,9 @@ class Database {
             page = page > 0 ? page - 1 : page;
             page = page * 5 == 0 ? page * 5 : page * 5 - page;
             db.execute(SQL`SELECT * FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l} LIMIT ${page}, 4`, function (err, results) {
-                db.execute(SQL`SELECT Rank FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l}`, function (err2, length) {
+                db.execute(SQL`SELECT COUNT(*) FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l}`, function (err2, count) {
                     if (results.length !== 0) {
-                        resolve({results: results, count: length.length});
+                        resolve({ results: results, count: count[0]['COUNT(*)'] });
                     } else {
                         reject('Unable to get emotes at that page');
                     }

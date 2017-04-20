@@ -42,12 +42,14 @@ class Emotes extends Command {
             page = 1;
         }
         this.bot.settings.getEmoteList(page).then((emotes) => {
+            let count = emotes.count;
+            emotes = emotes.results;
             let pageCount = page > 0 ? page - 1 : page,
                 min = pageCount * 5 - pageCount,
                 max = (pageCount + 1) * 5 - (5 - emotes.length) - pageCount;
             min = min === 0 ? min + 1 : min;
-            let text = `Page ${page}. Showing ${min}-${max} emotes.`;
-            if (max % 4 === 0) {
+            let text = `Page ${page}. Showing ${min}-${max} emotes out of ${count} emotes.`;
+            if (max != count) {
                 text = `${text} To move to the next page, use **!e list ${page + 1}**`;
             }
             let overrideAuthor = false;
@@ -171,7 +173,7 @@ class Emotes extends Command {
                     max = (pageCount + 1) * 5 - (5 - results.length) - pageCount;
                 min = min === 0 ? min + 1 : min;
                 let text = `Page ${page}. Showing ${min}-${max} emotes out of ${count} emotes.`;
-                if (max !== count) {
+                if (max != count) {
                     text = `${text} To move to the next page, use **!e find ${rematch[1]} ${page + 1}**`;
                 }
                 let overrideAuthor = false;
