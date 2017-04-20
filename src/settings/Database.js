@@ -200,7 +200,8 @@ class Database {
     getEmoteList(page) {
         return new Promise((resolve, reject) => {
             page = page > 0 ? page - 1 : page;
-            this.db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page * 5}, 4`, function (err, results) {
+            page = page * 5 == 0 ? page * 5 : page * 5 - page;
+            this.db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results) {
                 if (results.length !== 0) {
                     resolve(results);
                 } else {
@@ -212,6 +213,24 @@ class Database {
 
     createEmote(name, reference, rank, content, creator) {
         this.db.execute(SQL`INSERT INTO EMOTES (\`Name\`, \`Content\`, \`Reference\`, \`Rank\`, \`Creator\`) VALUES (${name}, ${content}, ${reference}, ${rank}, ${creator});`);
+    }
+
+    findEmotes(like, page) {
+        return new Promise((resolve, reject) => {
+            let db = this.db;
+            let l = `%${like}%`;
+            page = page > 0 ? page - 1 : page;
+            page = page * 5 == 0 ? page * 5 : page * 5 - page;
+            db.execute(SQL`SELECT * FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l} LIMIT ${page}, 4`, function (err, results) {
+                db.execute(SQL`SELECT Rank FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l}`, function (err2, length) {
+                    if (results.length !== 0) {
+                        resolve({results: results, count: length.length});
+                    } else {
+                        reject('Unable to get emotes at that page');
+                    }
+                });
+            });
+        });
     }
 }
 

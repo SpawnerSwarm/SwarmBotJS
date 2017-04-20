@@ -11,7 +11,7 @@ class Emotes extends Command {
     constructor(bot) {
         super(bot, 'core.emotes', 'emotes');
 
-        this.regex = new RegExp('^(?:emote(?:s)?|e)?( list| create| new)?( .+)?$', 'i');
+        this.regex = new RegExp('^(?:emote(?:s)?|e)?( list| create| new| search| find)?( .+)?$', 'i');
     }
 
     /**
@@ -24,6 +24,9 @@ class Emotes extends Command {
         }
         else if (match[1] === ' create' || match[1] === ' new') {
             this.create(message, match);
+        }
+        else if (match[1] === ' search' || match[1] === ' find') {
+            this.search(message, match);
         }
         else if (match[2] != undefined) {
             this.get(message, match);
@@ -39,7 +42,14 @@ class Emotes extends Command {
             page = 1;
         }
         this.bot.settings.getEmoteList(page).then((emotes) => {
-            let text = `Page ${page}. To move to the next page, use **!e list ${page + 1}**`;
+            let pageCount = page > 0 ? page - 1 : page,
+                min = pageCount * 5 - pageCount,
+                max = (pageCount + 1) * 5 - (5 - emotes.length) - pageCount;
+            min = min === 0 ? min + 1 : min;
+            let text = `Page ${page}. Showing ${min}-${max} emotes.`;
+            if (max % 4 === 0) {
+                text = `${text} To move to the next page, use **!e list ${page + 1}**`;
+            }
             let overrideAuthor = false;
             if (message.channel.type === 'dm') {
                 overrideAuthor = true;
@@ -63,18 +73,28 @@ class Emotes extends Command {
     }
 
     fetchEmoteCreators(emotes) {
+        function fetchUser(bot, id, i) {
+            return new Promise((resolve) => {
+                bot.client.fetchUser(id).then((user) => {
+                    resolve({ user: user, i: i });
+                });
+            });
+        }
         return new Promise((resolve) => {
             let creators = [];
             for (var i = 0; i < emotes.length; i++) {
-                this.bot.client.fetchUser(emotes[i].Creator).then((user) => {
-                    creators.push(user);
+                fetchUser(this.bot, emotes[i].Creator, i).then((user) => {
+                    let i = user.i;
+                    user = user.user;
+                    //creators.push(user);
+                    creators[i] = user;
                     if (creators.length == emotes.length) {
                         resolve(creators);
                     }
                 }).catch(() => {
                     this.bot.logger.error('Error: Could not find creator');
                     creators.push(this.bot.client.user);
-                    if(creators.length == emotes.length) {
+                    if (creators.length == emotes.length) {
                         resolve(creators);
                     }
                 });
@@ -134,6 +154,46 @@ class Emotes extends Command {
             this.bot.settings.createEmote(name, reference, rank, content, creator);
             this.bot.messageManager.sendMessage(message, `Created emote ${name}!`);
         });
+    }
+
+    search(message, match) {
+        let rematch = match[2].match(/(".+"|[^ ]+)(?: (\d+))?/i);
+        if (rematch[1] != undefined) {
+            let page = parseInt(rematch[2]);
+            if (isNaN(page)) {
+                page = 1;
+            }
+            this.bot.settings.findEmotes(rematch[1].replace(' ', ''), page).then((results) => {
+                let count = results.count;
+                results = results.results;
+                let pageCount = page > 0 ? page - 1 : page,
+                    min = pageCount * 5 - pageCount,
+                    max = (pageCount + 1) * 5 - (5 - results.length) - pageCount;
+                min = min === 0 ? min + 1 : min;
+                let text = `Page ${page}. Showing ${min}-${max} emotes out of ${count} emotes.`;
+                if (max !== count) {
+                    text = `${text} To move to the next page, use **!e find ${rematch[1]} ${page + 1}**`;
+                }
+                let overrideAuthor = false;
+                if (message.channel.type === 'dm') {
+                    overrideAuthor = true;
+                }
+                this.bot.messageManager.sendMessage(message, text);
+                this.fetchEmoteCreators(results).then((creators) => {
+                    for (var i = 0; i < results.length; i++) {
+                        if (overrideAuthor) {
+                            creators[i] = this.bot.client.user;
+                        }
+                        else {
+                            this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, results[i], creators[i]));
+                        }
+                    }
+                });
+            }).catch((err) => {
+                this.bot.logger.error(err);
+                this.bot.messageManager.sendMessage(message, 'http://i.imgur.com/zdMAeE9.png');
+            });
+        }
     }
 }
 

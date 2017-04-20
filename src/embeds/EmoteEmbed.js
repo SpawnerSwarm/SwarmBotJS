@@ -18,6 +18,9 @@ class EmoteEmbed {
      * @param {User} author
      */
     constructor(bot, emote, creator) {
+        if(creator == undefined) {
+            creator = bot.client.user;
+        }
         this.author = {
             icon_url: creator.avatarURL,
             name: creator.username
