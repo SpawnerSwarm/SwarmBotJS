@@ -62,9 +62,7 @@ class Emotes extends Command {
                     if (overrideAuthor) {
                         creators[i] = this.bot.client.user;
                     }
-                    else {
-                        this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, emotes[i], creators[i]));
-                    }
+                    this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, emotes[i], creators[i]));
                 }
             });
         })
@@ -186,9 +184,7 @@ class Emotes extends Command {
                         if (overrideAuthor) {
                             creators[i] = this.bot.client.user;
                         }
-                        else {
-                            this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, results[i], creators[i]));
-                        }
+                        this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, results[i], creators[i]));
                     }
                 });
             }).catch((err) => {
