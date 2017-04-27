@@ -61,6 +61,13 @@ class GetMember extends Command {
                             },
                         ],
                     };
+                    if(member.Banned) {
+                        embed.fields.push({
+                            name: 'BANNED',
+                            value: 'BANNED',
+                            inline: false,
+                        });
+                    }
                     if (iVerbose) {
                         if (member.WarframeName) {
                             embed.fields.push({

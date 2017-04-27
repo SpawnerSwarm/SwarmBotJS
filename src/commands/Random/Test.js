@@ -29,7 +29,9 @@ ${member.Rank}
 ${member.WarframeName}
 ${member.SpiralKnightsName}
 ${member.SteamName}
-${member.FormaDonated}`);
+${member.FormaDonated}
+${member.Ally}
+${member.Banned}`);
         });
     }
 }

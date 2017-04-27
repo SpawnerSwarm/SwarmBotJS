@@ -235,6 +235,13 @@ class Database {
             });
         });
     }
+
+    setBanned(id, banned) {
+        if(banned !== 1 && banned !== 0) {
+            throw 'Invalid Banned State';
+        }
+        this.db.execute(SQL`UPDATE MEMBERS SET Banned=${banned} WHERE ID=${id}`);
+    }
 }
 
 module.exports = Database;

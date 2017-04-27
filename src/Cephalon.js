@@ -260,7 +260,7 @@ class Cephalon {
                 }
             };
             this.settings.getMember(newMember.id).then((member) => {
-                if (member.Rank > 3 || member.Ally === 1) { return; }
+                if (member.Rank > 3 || member.Ally === 1 || member.Banned === 1) { return; }
                 this.settings.getRankups(newMember.id).then((rankups) => {
                     if (checkReadyForRankup(rankups[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
                         if (checkReadyForRankup(member.LastPestered, 7, false, member)) {
