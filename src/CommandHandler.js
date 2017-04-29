@@ -80,13 +80,15 @@ class CommandHandler {
                 this.logger.debug(`Handling \`${content}\``);
                 this.commands.forEach((command) => {
                     if (command.regex.test(content)) {
-                        this.checkCanAct(command, messageWithStrippedContent)
-                            .then((canAct) => {
-                                if (canAct) {
-                                    this.logger.debug(`Matched ${command.id}`);
-                                    command.run(messageWithStrippedContent);
-                                }
-                            });
+                        if (command.mandatoryWords == undefined || command.mandatoryWords.test(content)) {
+                            this.checkCanAct(command, messageWithStrippedContent)
+                                .then((canAct) => {
+                                    if (canAct) {
+                                        this.logger.debug(`Matched ${command.id}`);
+                                        command.run(messageWithStrippedContent);
+                                    }
+                                });
+                        }
                         //.catch(this.logger.error);
                     }
                 });

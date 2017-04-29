@@ -11,6 +11,8 @@ class Promote extends Command {
 
         this.bot = bot;
 
+        this.mandatoryWords = /promote/;
+
         this.regex = /(?:(?:promote|member promote) <@!?(\d+)>)|(?: -?-([^ ]+) ?([^ ]+)?)/gi;
 
         this.requiredRank = 5;
