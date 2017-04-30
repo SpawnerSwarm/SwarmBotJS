@@ -27,11 +27,12 @@ class Kick extends Command {
                             content += `\n**User:** ${user.user.username}#${user.user.discriminator} (${user.id})`;
                             content += `\n**Moderator:** ${author.Name}`;
                             let reason = 'No reason given.';
-                            if(match[2] != undefined) {
+                            if (match[2] != undefined) {
                                 reason = match[2];
                             }
                             content += `\n**Reason:** ${reason}`;
                             user.guild.channels.get('274687008406765568').sendMessage(content);
+                            user.sendMessage(`Hello ${member.Name}, this is an automated message from the Spawner Swarm to inform you that you have been kicked for '${reason}'.  If you want to re-enter the Swarm, please contact an Officer for a re-invite. You will still be subject to the same rules, however.`)
                         }
                         user.kick();
                         this.bot.logger.info(`${author.Name} kicked ${member.Name} from the server`);
