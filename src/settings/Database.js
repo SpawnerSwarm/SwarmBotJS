@@ -242,6 +242,10 @@ class Database {
         }
         this.db.execute(SQL`UPDATE MEMBERS SET Banned=${banned} WHERE ID=${id}`);
     }
+
+    updateWF(id, WarframeName) {
+        this.db.execute(SQL`UPDATE MEMBERS SET WarframeName=${WarframeName} WHERE ID=${id}`);
+    }
 }
 
 module.exports = Database;
