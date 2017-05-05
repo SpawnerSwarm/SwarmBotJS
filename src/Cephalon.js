@@ -141,7 +141,7 @@ class Cephalon {
         this.client.on('channelDelete', channel => this.onChannelDelete(channel));
 
         this.client.on('disconnect', (event) => {
-            this.logger.debug(`Disconnected with close event: ${event.code}`);
+            this.logger.fatal(`Disconnected with close event: ${event.code}`);
             process.exit(4);
         });
 
@@ -160,7 +160,7 @@ class Cephalon {
     start() {
         this.client.login(this.token)
             .then(() => {
-                this.logger.debug('Logged in!');
+                this.logger.info('Logged in!');
             }).catch((e) => {
                 this.logger.error(e.message);
                 this.logger.fatal(e);
@@ -169,8 +169,8 @@ class Cephalon {
     }
 
     onReady() {
-        this.logger.debug(`${this.client.user.username} ready!`);
-        this.logger.debug(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
+        this.logger.info(`${this.client.user.username} ready!`);
+        this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
         this.client.user.setGame(this.statusMessage);
         this.readyToExecute = true;
     }
