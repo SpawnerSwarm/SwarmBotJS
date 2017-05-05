@@ -89,11 +89,10 @@ class CommandHandler {
                                     }
                                 });
                         }
-                        //.catch(this.logger.error);
                     }
                 });
-            });
-        //.catch(this.logger.error);
+            })
+        .catch(this.logger.error);
     }
 
     /**
