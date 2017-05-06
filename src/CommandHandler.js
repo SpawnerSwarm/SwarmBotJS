@@ -107,6 +107,7 @@ class CommandHandler {
                     if (!command.ownerOnly || message.author.id === this.bot.owner) {
                         if (member.Banned === 1) {
                             message.channel.sendMessage('You are currently banned from using commands. Please contact Mardan to rectify this.');
+                            this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
                         }
                         else {
                             if (command.requiredRank === 0) {
@@ -116,6 +117,7 @@ class CommandHandler {
                                     resolve(true);
                                 } else {
                                     message.channel.sendMessage('You lack the privileges to perform that action');
+                                    this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is too low of rank.`);
                                 }
 
                             }
@@ -130,6 +132,7 @@ class CommandHandler {
             }
             else {
                 message.channel.sendMessage('This command cannot be perofrmed in DMs');
+                this.bot.logger.warning(`User ${message.author.username} tried to use command ${command.id} but it is disallowed in DMs`);
             }
         });
     }

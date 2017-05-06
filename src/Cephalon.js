@@ -211,6 +211,14 @@ class Cephalon {
                     }
                 });
             }
+            if(message.content.match(/@everyone/)) {
+                if(message.channel.id === '137996862211751936' || message.channel.id === '250077586695258122' || message.channel.id == '137996873913860097') {
+                    let title = message.channel.name.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+                    
+                    message.channel.sendMessage(`You seem to be using an 'everyone' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
+                    this.logger.info(`Warned ${message.author.username} against using the @everyone mention in #${message.channel.name}`);
+                }
+            }
             this.commandHandler.handleCommand(message);
         }
     }

@@ -19,7 +19,7 @@ class Kick extends Command {
                 this.bot.settings.getMember(match[1]).then((member) => {
                     if (member.Rank >= author.Rank) {
                         message.channel.sendMessage('You cannot kick a member of higher or equal rank!');
-                        this.bot.logger.error(`${author.Name} tried to kick ${member.Name} but was too low of rank`);
+                        this.bot.logger.warning(`${author.Name} tried to kick ${member.Name} but was too low of rank`);
                     } else {
                         this.bot.settings.setBanned(member.ID, 1);
                         if (user.guild.id == '137991656547811328') {
@@ -43,8 +43,9 @@ class Kick extends Command {
                         this.bot.logger.error(`Error in !kick: ${err}`);
                     });
             });
-        }).catch(() => {
+        }).catch((err) => {
             message.channel.sendMessage('Could not find user or was unable to kick them.');
+            this.bot.logger.error(`Error in !kick: ${err}`);
         });
     }
 }
