@@ -137,9 +137,6 @@ class Cephalon {
         this.client.on('ready', () => this.onReady());
         this.client.on('message', message => this.onMessage(message));
 
-        this.client.on('channelCreate', channel => this.onChannelCreate(channel));
-        this.client.on('channelDelete', channel => this.onChannelDelete(channel));
-
         this.client.on('disconnect', (event) => {
             this.logger.fatal(`Disconnected with close event: ${event.code}`);
             process.exit(4);
@@ -221,29 +218,6 @@ class Cephalon {
             }
             this.commandHandler.handleCommand(message);
         }
-    }
-
-    /**
-     * @param {Channel} channel
-    */
-    onChannelCreate(channel) {
-        if (channel.type === 'voice') {
-            return;
-        }
-        if (channel.type === 'text') {
-            return;
-        } else {
-            return;
-        }
-    }
-
-    onChannelDelete(channel) {
-        if (channel.type === 'voice') {
-            return;
-        }
-        this.settings.deleteChannel(channel).then(() => {
-            return;
-        }).catch(this.logger.error);
     }
 
     onPresenceUpdate(oldMember, newMember) {
