@@ -19,9 +19,9 @@ class UnTagMe extends Command {
     run(message) {
         let tag = message.strippedContent.match(this.regex, 'i')[1];
         if (tag === undefined) {
-            this.bot.messageManager.sendMessage(message, 'Error: Argument blank. Correct format is \'!tagme overwatch/warframe/sk/bot)\''); return;
+            this.bot.messageManager.sendMessage(message, 'Error: Argument blank. Correct format is \'!tagme (overwatch/warframe/sk/bot)\''); return;
         } else if (!tag.match('^(?:overwatch|warframe|sk|bot)$', 'i')) {
-            this.bot.messageManager.sendMessage(message, 'Error: Argument invalid. Correct format is \'!tagme overwatch/warframe/sk/bot)\''); return;
+            this.bot.messageManager.sendMessage(message, 'Error: Argument invalid. Correct format is \'!tagme (overwatch/warframe/sk/bot)\''); return;
         }
         tag = tag.toLowerCase();
         /*eslint-disable indent*/

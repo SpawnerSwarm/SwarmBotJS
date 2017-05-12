@@ -40,7 +40,6 @@ class Database {
         Object.assign(opts, dbOptions);
         this.db = mysql.createConnection(opts);
         this.bot = bot;
-        bot.logger.debug(opts.host);
 
         this.defaults = {
             prefix: '!',
