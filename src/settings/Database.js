@@ -245,6 +245,10 @@ class Database {
     updateWF(id, WarframeName) {
         this.db.execute(SQL`UPDATE MEMBERS SET WarframeName=${WarframeName} WHERE ID=${id}`);
     }
+
+    updateSK(id, SpiralKnightsName) {
+        this.db.execute(SQL`UPDATE MEMBERS SET SpiralKnightsName=${SpiralKnightsName} WHERE ID=${id}`);
+    }
 }
 
 module.exports = Database;
