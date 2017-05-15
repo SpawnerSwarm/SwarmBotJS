@@ -8,6 +8,7 @@ const Database = require('./settings/Database.js');
 const MessageManager = require('./settings/MessageManager');
 const request = require('request');
 const Ranks = require('./resources/Ranks.js');
+const SKEmotes = require('./resources/SpiralKnightsEmotes.js');
 
 /**
  * @typedef {Object.<string>} MarkdownSettings
@@ -215,6 +216,23 @@ class Cephalon {
                     message.channel.sendMessage(`You seem to be using an 'everyone' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
                     this.logger.info(`Warned ${message.author.username} against using the @everyone mention in #${message.channel.name}`);
                 }
+            }
+            else if(message.content.startsWith('/')) {
+                let msg = message.content.substring('1');
+                SKEmotes.forEach(function (x) {
+                    let regex = new RegExp(`(?:${x.command})(?: (.+))?`, 'i');
+                    let match = msg.match(regex);
+                    if(!match) {
+                        return false;
+                    } else {
+                        if(match[1]) {
+                            message.channel.sendMessage(x.partner.replace('%1', message.author.username).replace('%2', match[1]));
+                        } else {
+                            message.channel.sendMessage(x.content.replace('%1', message.author.username));
+                        }
+                        message.delete();
+                    }
+                }.bind(this));
             }
             this.commandHandler.handleCommand(message);
         }
