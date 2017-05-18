@@ -65,7 +65,7 @@ module.exports = [
     },
     {
         command: 'dance',
-        content: '%1 has the urge do dance!',
+        content: '%1 has the urge to dance!',
         partner: '%1 asks %2 to dance.'
     },
     {
@@ -159,7 +159,7 @@ module.exports = [
         partner: '%1 blows a kiss at %2. Mwah!'
     },
     {
-        command: 'laughs|lol|haha',
+        command: 'laughs?|lol|haha',
         content: '%1 laughs.',
         partner: '%1 laughs at %2.'
     },
