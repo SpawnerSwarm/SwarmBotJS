@@ -11,15 +11,16 @@ class Help extends Command {
 
         this.requiredRank = 1;
 
-        this.regex = /(?:help|man(?:ual)?|docs?) (.+)/i;
+        this.regex = /(?:help|man(?:ual)?|docs?|what) (.+)/i;
     }
 
     run(message) {
         let match = message.strippedContent.match(this.regex);
         this.bot.logger.debug(match[1]);
-        if (fs.existsSync(`./docs/${match[1]}.md`)) {
+        let name = match[1].toLowerCase();
+        if (fs.existsSync(`./docs/${name}.md`)) {
             try {
-                fs.readFile(`./docs/${match[1]}.md`, function (err, data) {
+                fs.readFile(`./docs/${name}.md`, function (err, data) {
                     if (err) throw err;
                     this.author.send(data.toString());
                     this.react('✅');
