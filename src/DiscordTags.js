@@ -6,9 +6,13 @@ class DiscordTags {
     /**
      * @param {Message} message
      * @param {number} rank
+     * @param {GuildMember} discordMember
      */
-    static assignRankTagsToMember(message, rank) {
+    static assignRankTagsToMember(message, rank, discordMember) {
         let member = message.member;
+        if(discordMember) {
+            member = discordMember;
+        }
         new Promise((resolve) => {
             for (let i = 1; i <= rank; i++) {
                 DiscordTags.addRoleToMember(member, Ranks[i].name);

@@ -2,6 +2,8 @@
 
 const Command = require('../../Command.js');
 
+const DiscordTags = require('../../DiscordTags.js');
+
 class Promote extends Command {
     /**
      * @param {Cephalon} bot
@@ -73,6 +75,9 @@ class Promote extends Command {
                 if (author.Rank != 7 && rank >= author.Rank) { message.channel.sendMessage('```xl\nSorry, you don\'t have permission to perform that action'); return; }
 
                 this.bot.settings.promote(member, rank, date);
+                message.guild.fetchMember(member.ID).then((discordMember) => {
+                    DiscordTags.assignRankTagsToMember(message, rank, discordMember);
+                });
                 message.channel.sendMessage('Member promoted');
             });
         });
