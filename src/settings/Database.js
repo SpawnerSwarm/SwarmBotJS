@@ -169,7 +169,7 @@ class Database {
         return new Promise((resolve) => {
             let res = [0];
             for (let i = 1; i <= 7; i++) {
-                this.db.execute(SQL`SELECT * FROM MEMBERS WHERE \`Rank\`=${i};`, function (err, results) {
+                this.db.execute(SQL`SELECT * FROM MEMBERS WHERE \`Rank\`=${i} AND \`Banned\`=0;`, function (err, results) {
                     if (res.push(results.length) == 8) {
                         resolve(res);
                     }
