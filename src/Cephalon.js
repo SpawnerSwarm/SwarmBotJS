@@ -221,7 +221,7 @@ class Cephalon {
                 let msg = message.content.substring('1');
                 try {
                     SKEmotes.forEach(function (x) {
-                        let regex = new RegExp(`(?:${x.command})(?: (.+))?`, 'i');
+                        let regex = new RegExp(`^(?:${x.command})(?: (.+))?`, 'i');
                         let match = msg.match(regex);
                         if (!match) {
                             return false;
