@@ -73,22 +73,12 @@ class Database {
      */
     getMember(id) {
         return new Promise((resolve, reject) => {
-            this.db.query(SQL`SELECT * FROM MEMBERS WHERE ID=${id}`, function (err, results) {
-                if (results.length !== 0) {
-                    resolve(results[0]);
-                } else {
-                    reject('Member not found');
-                }
-            });
-        });
-    }
-
-    /**
-     * @param {string} id
-     */
-    getRankups(id) {
-        return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM RANKS WHERE ID=${id}`, function (err, results) {
+            this.db.query(SQL`SELECT MEMBERS.*, RANKS.*
+FROM MEMBERS
+INNER JOIN RANKS
+ON MEMBERS.ID=RANKS.ID
+WHERE MEMBERS.ID=${id}
+ORDER BY -Rank`, function (err, results) {
                 if (results.length !== 0) {
                     resolve(results[0]);
                 } else {

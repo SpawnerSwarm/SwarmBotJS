@@ -61,13 +61,6 @@ class GetMember extends Command {
                             },
                         ],
                     };
-                    if(member.Banned) {
-                        embed.fields.push({
-                            name: 'BANNED',
-                            value: 'BANNED',
-                            inline: false,
-                        });
-                    }
                     if (iVerbose) {
                         if (member.WarframeName) {
                             embed.fields.push({
@@ -91,13 +84,27 @@ class GetMember extends Command {
                             });
                         }
                     }
-                    this.bot.settings.getRankups(messageMatch[1]).then((rankups) => {
+                    if(member.Banned) {
+                        embed.fields.push({
+                            name: 'BANNED',
+                            value: 'BANNED',
+                            inline: member.Ally,
+                        });
+                    }
+                    if(member.Ally) {
+                        embed.fields.push({
+                            name: 'ALLY',
+                            value: 'ALLY',
+                            inline: member.Banned
+                        });
+                    }
+                    new Promise((resolve) => {
                         let rank = Ranks[member.Rank].name;
-                        if (rankups[rank] === null) {
+                        if (member[rank] === null) {
                             return;
                         }
-                        embed.fields[1].value = new Date(rankups[rank]).toDateString();
-                        return rankups[rank];
+                        embed.fields[1].value = new Date(member[rank]).toDateString();
+                        resolve(member[rank]);
                     }).then((date) => this.checkReadyForRankup(date, member, embed))
                         .then(() => this.messageManager.embed(message, embed));
                 });
