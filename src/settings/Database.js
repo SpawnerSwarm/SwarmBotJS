@@ -79,12 +79,12 @@ INNER JOIN RANKS
 ON MEMBERS.ID=RANKS.ID
 WHERE MEMBERS.ID=${id}
 ORDER BY -Rank`, function (err, results) {
-                if (results.length !== 0) {
-                    resolve(results[0]);
-                } else {
-                    reject('Member not found');
-                }
-            });
+                    if (results.length !== 0) {
+                        resolve(results[0]);
+                    } else {
+                        reject('Member not found');
+                    }
+                });
         });
     }
 
@@ -194,7 +194,7 @@ ORDER BY -Rank`, function (err, results) {
             db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results) {
                 db.execute(SQL`SELECT COUNT(*) FROM EMOTES`, function (err2, count) {
                     if (results.length !== 0) {
-                        resolve({results: results, count: count[0]['COUNT(*)']});
+                        resolve({ results: results, count: count[0]['COUNT(*)'] });
                     } else {
                         reject('Unable to get emotes at that page');
                     }
@@ -226,7 +226,7 @@ ORDER BY -Rank`, function (err, results) {
     }
 
     setBanned(id, banned) {
-        if(banned !== 1 && banned !== 0) {
+        if (banned !== 1 && banned !== 0) {
             throw 'Invalid Banned State';
         }
         this.db.execute(SQL`UPDATE MEMBERS SET Banned=${banned} WHERE ID=${id}`);
@@ -238,6 +238,105 @@ ORDER BY -Rank`, function (err, results) {
 
     updateSK(id, SpiralKnightsName) {
         this.db.execute(SQL`UPDATE MEMBERS SET SpiralKnightsName=${SpiralKnightsName} WHERE ID=${id}`);
+    }
+
+    //Bazaar
+
+    /**
+     * @param {number} ListingID 
+     */
+    getOffers(ListingID) {
+        return new Promise((resolve) => {
+            this.db.execute(SQL`SELECT * FROM BZ_OFFERS WHERE ListingID=${ListingID}`, function (err, results) {
+                resolve(results);
+            });
+        });
+    }
+
+    /**
+     * @param {number} ListingID 
+     */
+    getListing(ListingID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM BAZAAR WHERE ID=${ListingID}`, function (err, results) {
+                if (results.length !== 0) {
+                    this.getOffers(ListingID).then((offers) => {
+                        results = results[0];
+                        results.offers = offers;
+                        resolve(results);
+                    });
+                } else {
+                    reject('Unable to retrieve Listing');
+                }
+            }.bind(this));
+        });
+    }
+
+    /**
+     * @param {number} ListingID
+     * @param {string} Type
+     * @param {number} NonNegotiable
+     * @param {number} Price 
+     * @param {string} Currency 
+     * @param {string} Item 
+     * @param {string} Bazaar 
+     */
+    createListing(ListingID, Type, NonNegotiable, Price, Currency, Item, Bazaar) {
+        this.db.execute(SQL`INSERT INTO BAZAAR VALUES(${ListingID}, ${Type}, ${NonNegotiable}, ${Price}, ${Currency}, ${Item}, ${Bazaar}, 0)`, function (err) {
+            if (err) this.bot.logger.error(err);
+        }.bind(this));
+    }
+
+    /**
+     * @param {number} ListingID 
+     * @param {number} ID 
+     */
+    createOffer(ListingID, ID) {
+        this.db.execute(SQL`INSERT INTO BZ_OFFERS VALUES(${ListingID}, ${ID})`, function (err) {
+            if (err) this.bot.logger.error(err);
+        }.bind(this));
+    }
+
+    /**
+     * @param {number} ListingID
+     */
+    closeListing(ListingID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`DELETE FROM BAZAAR WHERE ID=${ListingID};`, function (err) {
+                if (err) reject(err);
+                this.db.execute(SQL`DELETE FROM BZ_OFFERS WHERE ListingID=${ListingID}`, function (err) {
+                    if (err) reject(err);
+                    resolve();
+                }.bind(this));
+            }.bind(this));
+        });
+    }
+
+    /**
+     * @param {number} UserID
+     */
+    closeOffer(ListingID, UserID) {
+        this.db.execute(SQL`DELETE FROM BZ_OFFERS WHERE ID=${UserID} AND ListingID=${ListingID};`, function (err) {
+            if (err) this.bot.logger.error(err);
+            this.db.execute(SQL`UPDATE BAZAAR SET OfferCount = OfferCount - 1 WHERE ID=${ListingID};`, function (err) {
+                if (err) this.bot.logger.error(err);
+            }.bind(this));
+        }.bind(this));
+    }
+
+    /**
+     * @param {number} ListingID
+     * @param {string} Type
+     * @param {number} NonNegotiable
+     * @param {number} Price 
+     * @param {string} Currency 
+     * @param {string} Item 
+     * @param {string} Bazaar 
+     */
+    updateListing(ListingID, Type, NonNegotiable, Price, Currency, Item, Bazaar) {
+        this.db.execute(SQL`UPDATE BAZAAR SET Type=${Type}, NonNegotiable=${NonNegotiable}, Price=${Price}, Currency=${Currency}, Item=${Item}, Bazaar=${Bazaar} WHERE ID=${ListingID};`, function (err) {
+            if (err) this.bot.logger.error(err);
+        });
     }
 }
 

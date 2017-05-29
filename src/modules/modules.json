@@ -1,0 +1,6 @@
+{
+    "root": "./modules",
+    "modules": [
+        "/Bazaar/Haven.js"
+    ]
+}
