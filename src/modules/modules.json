@@ -1,6 +1,7 @@
 {
     "root": "./modules",
     "modules": [
-        "/Bazaar/Haven.js"
+        "/Bazaar/Haven.js",
+        "/Bazaar/Maroo.js"
     ]
 }
