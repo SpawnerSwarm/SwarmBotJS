@@ -130,10 +130,10 @@ This message is being sent to inform you that the listing price has been marked 
                 let nn = null;
                 if (match[2] == '[NN] ') nn = 1;
                 this.bot.settings.updateListing(newMessage.id, match[1], nn, match[3], match[4], match[5].substring(1), 'haven');
-                this.bot.settings.getOffers(newMessage.ID).then((offers) => {
+                this.bot.settings.getOffers(newMessage.id).then((offers) => {
                     offers.forEach((offer) => {
                         newMessage.guild.fetchMember(offer.ID).then((member) => {
-                            member.sendMessage(`${newMessage.author.username} has updated one of their listings you previously made an offer on. Please take a moment and review your offers`);
+                            member.send(`${newMessage.author.username} has updated one of their listings you previously made an offer on. Please take a moment and review your offers`);
                         });
                     });
                 });

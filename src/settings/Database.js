@@ -336,7 +336,7 @@ ORDER BY -Rank`, function (err, results) {
     updateListing(ListingID, Type, NonNegotiable, Price, Currency, Item, Bazaar) {
         this.db.execute(SQL`UPDATE BAZAAR SET Type=${Type}, NonNegotiable=${NonNegotiable}, Price=${Price}, Currency=${Currency}, Item=${Item}, Bazaar=${Bazaar} WHERE ID=${ListingID};`, function (err) {
             if (err) this.bot.logger.error(err);
-        });
+        }.bind(this));
     }
 }
 

@@ -106,7 +106,7 @@ class CommandHandler {
                 this.bot.settings.getMember(message.author.id).then((member) => {
                     if (!command.ownerOnly || message.author.id === this.bot.owner) {
                         if (member.Banned === 1) {
-                            message.channel.sendMessage('You are currently banned from using commands. Please contact Mardan to rectify this.');
+                            message.channel.send('You are currently banned from using commands. Please contact Mardan to rectify this.');
                             this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
                         }
                         else {
@@ -116,14 +116,14 @@ class CommandHandler {
                                 if (command.requiredRank <= member.Rank) {
                                     resolve(true);
                                 } else {
-                                    message.channel.sendMessage('You lack the privileges to perform that action');
+                                    message.channel.send('You lack the privileges to perform that action');
                                     this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is too low of rank.`);
                                 }
 
                             }
                         }
                     } else {
-                        message.channel.sendMessage('This command is restricted to the bot owner.');
+                        message.channel.send('This command is restricted to the bot owner.');
                     }
                 }).catch((err) => {
                     this.logger.error(err);
@@ -131,7 +131,7 @@ class CommandHandler {
                 });
             }
             else {
-                message.channel.sendMessage('This command cannot be perofrmed in DMs');
+                message.channel.send('This command cannot be perofrmed in DMs');
                 this.bot.logger.warning(`User ${message.author.username} tried to use command ${command.id} but it is disallowed in DMs`);
             }
         });
