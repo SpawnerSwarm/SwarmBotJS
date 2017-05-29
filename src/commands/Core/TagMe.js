@@ -19,9 +19,9 @@ class TagMe extends Command {
     run(message) {
         let tag = message.strippedContent.match(this.regex, 'i')[1];
         if (tag === undefined) {
-            this.bot.messageManager.sendMessage(message, 'Error: Argument blank. Correct format is \'!tagme (overwatch/warframe/sk/bot/rank)\''); return;
+            message.channel.send('Error: Argument blank. Correct format is \'!tagme (overwatch/warframe/sk/bot/rank)\''); return;
         } else if (!tag.match(/^(?:overwatch|warframe|sk|bot|rank)$/i)) {
-            this.bot.messageManager.sendMessage(message, 'Error: Argument invalid. Correct format is \'!tagme (overwatch/warframe/sk/bot/rank)\''); return;
+            message.channel.send('Error: Argument invalid. Correct format is \'!tagme (overwatch/warframe/sk/bot/rank)\''); return;
         }
         tag = tag.toLowerCase();
         
@@ -40,7 +40,7 @@ class TagMe extends Command {
             }
             /*eslint-enable indent*/
         }
-        this.bot.messageManager.sendMessage(message, `Successfully gave you the ${tag} tag!`);
+        message.channel.send(`Successfully gave you the ${tag} tag!`);
         this.bot.logger.debug(`Added ${tag} tag to member ${message.author.username}`);
     }
 }

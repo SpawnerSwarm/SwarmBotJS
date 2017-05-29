@@ -5,10 +5,10 @@ const Discord = require('discord.js');
 const md = require('node-md-config');
 const WorldStateCache = require('./WorldStateCache.js');
 const Database = require('./settings/Database.js');
-const MessageManager = require('./settings/MessageManager');
 const request = require('request');
 const Ranks = require('./resources/Ranks.js');
 const SKEmotes = require('./resources/SpiralKnightsEmotes.js');
+const Modules = require('./modules/modules.json');
 
 /**
  * @typedef {Object.<string>} MarkdownSettings
@@ -125,13 +125,15 @@ class Cephalon {
         */
         this.worldState = new WorldStateCache(worldStateTimeout);
 
-        this.messageManager = new MessageManager(this);
-
         this.commandHandler.loadCommands();
 
         this.setupHandlers();
 
         this.guildMailURL = process.env.GM_URL;
+
+        this.modulePaths = Modules.modules;
+
+        this.modules = [];
     }
 
     setupHandlers() {
@@ -145,7 +147,7 @@ class Cephalon {
 
         this.client.on('guildMemberAdd', (member) => {
             if (member.guild.id == 137991656547811328 || member.guild.id == 157978818466807808) {
-                member.guild.channels.get(`${member.guild.id}`).sendMessage(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailURL} and ask a Veteran or above if you have any questions!`);
+                member.guild.channels.get(`${member.guild.id}`).send(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailURL} and ask a Veteran or above if you have any questions!`);
             }
         });
 
@@ -171,6 +173,12 @@ class Cephalon {
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
         this.client.user.setGame(this.statusMessage);
         this.readyToExecute = true;
+        for(let i = 0; i < this.modulePaths.length; i++) {
+            const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`);
+            let Module = new ModuleClass(this);
+            Module.start();
+            this.modules.push(Module);
+        }
     }
 
     /**
@@ -203,9 +211,9 @@ class Cephalon {
                 /*eslint-enable-indent*/
                 request.head(`${wiki.url}${match[2]}`, (error, response) => {
                     if (response.statusCode != 404 && response.statusCode != 400) {
-                        message.channel.sendMessage(`${wiki.url}${match[2].replace(/ /g, wiki.char)}`);
+                        message.channel.send(`${wiki.url}${match[2].replace(/ /g, wiki.char)}`);
                     } else {
-                        message.channel.sendMessage(`Could not find page requested on ${wiki.name} wiki`);
+                        message.channel.send(`Could not find page requested on ${wiki.name} wiki`);
                     }
                 });
             }
@@ -213,7 +221,7 @@ class Cephalon {
                 if (message.channel.id === '137996862211751936' || message.channel.id === '250077586695258122' || message.channel.id == '137996873913860097') {
                     let title = message.channel.name.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 
-                    message.channel.sendMessage(`You seem to be using an 'everyone' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
+                    message.channel.send(`You seem to be using an 'everyone' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
                     this.logger.info(`Warned ${message.author.username} against using the @everyone mention in #${message.channel.name}`);
                 }
             }
@@ -227,9 +235,9 @@ class Cephalon {
                             return false;
                         } else {
                             if (match[1] && x.partner) {
-                                message.channel.sendMessage(x.partner.replace('%1', message.author.username).replace('%2', match[1]));
+                                message.channel.send(x.partner.replace('%1', message.author.username).replace('%2', match[1]));
                             } else {
-                                message.channel.sendMessage(x.content.replace('%1', message.author.username));
+                                message.channel.send(x.content.replace('%1', message.author.username));
                             }
                             message.delete();
                         }
@@ -268,9 +276,9 @@ class Cephalon {
                 if (member.Rank > 3 || member.Ally === 1 || member.Banned === 1) { return; }
                 if (checkReadyForRankup(member[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
                     if (checkReadyForRankup(member.LastPestered, 7, false, member)) {
-                        newMember.sendMessage(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!`);
+                        newMember.send(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!`);
                         this.settings.setLastPestered(member.ID);
-                        this.client.channels.get('165649798551175169').sendMessage(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
+                        this.client.channels.get('165649798551175169').send(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
                         this.logger.debug(`Sent ${member.Name} a rankup notification.`);
                     }
                 }

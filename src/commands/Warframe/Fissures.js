@@ -23,7 +23,7 @@ class Fissures extends Command {
         this.bot.worldState.getData()
         .then((ws) => {
             const fissures = ws.fissures.sort((a, b) => { return a.tierNum > b.tierNum; });
-            this.bot.messageManager.embed(message, new FissuresEmbed(this.bot, fissures));
+            message.channel.send('', {embed: new FissuresEmbed(this.bot, fissures)});
         })
         .catch(this.logger.error);
     }

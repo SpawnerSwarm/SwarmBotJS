@@ -32,7 +32,7 @@ class Emotes extends Command {
             this.get(message, match);
         }
         else {
-            this.bot.messageManager.sendMessage(message, '-** !{initialCommandUsed}** -- Display this text.\n-** !{initialCommandUsed}** (ref) -- Return the emote matching the ref.\n-** !{initialCommandUsed} list (page)** -- List all emotes.\n-** !{initialCommandUsed} create*/new* (name) (reference) (requiredRank) (content) (creator)** -- Create a new Emote.');
+            message.channel.send('-** !{initialCommandUsed}** -- Display this text.\n-** !{initialCommandUsed}** (ref) -- Return the emote matching the ref.\n-** !{initialCommandUsed} list (page)** -- List all emotes.\n-** !{initialCommandUsed} create*/new* (name) (reference) (requiredRank) (content) (creator)** -- Create a new Emote.');
         }
     }
 
@@ -56,19 +56,19 @@ class Emotes extends Command {
             if (message.channel.type === 'dm') {
                 overrideAuthor = true;
             }
-            this.bot.messageManager.sendMessage(message, text);
+            message.channel.send(text);
             this.fetchEmoteCreators(emotes).then((creators) => {
                 for (var i = 0; i < emotes.length; i++) {
                     if (overrideAuthor) {
                         creators[i] = this.bot.client.user;
                     }
-                    this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, emotes[i], creators[i]));
+                    message.channel.send('', {embed: new EmoteEmbed(this.bot, emotes[i], creators[i])});
                 }
             });
         })
             .catch((err) => {
                 this.bot.logger.error(err);
-                this.bot.messageManager.sendMessage(message, 'http://i.imgur.com/zdMAeE9.png');
+                message.channel.send('http://i.imgur.com/zdMAeE9.png');
             });
     }
 
@@ -109,30 +109,30 @@ class Emotes extends Command {
                 this.bot.settings.getMember(message.author.id)
                     .then((member) => {
                         if (emote.Rank <= member.Rank) {
-                            this.bot.messageManager.sendMessage(message, emote.Content);
+                            message.channel.send(emote.Content);
                         }
                     })
                     .catch((err) => {
                         this.bot.logger.error(err);
-                        this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
+                        message.channel.send(`\`Error: ${err}\``);
                     });
             })
             .catch((err) => {
                 this.bot.logger.error(err);
-                this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
+                message.channel.send(`\`Error: ${err}\``);
             });
     }
 
     create(message, match) {
         this.bot.settings.getMember(message.author.id).then((member) => {
             if (member.Rank != 7) {
-                this.bot.messageManager.sendMessage(message, 'Sorry, you don\'t have permission to create emotes');
+                message.channel.send('Sorry, you don\'t have permission to create emotes');
                 return;
             }
             let regex = / (".+"|[^ ]+)/ig;
             let m = match[2].match(regex);
             if (m.length < 4 || m.length > 5) {
-                this.bot.messageManager.sendMessage(message, 'Too many parameters');
+                message.channel.send('Too many parameters');
             }
 
             let name = m[0].replace(' ', ''),
@@ -152,7 +152,7 @@ class Emotes extends Command {
                 creator = '137976237292388353';
             }
             this.bot.settings.createEmote(name, reference, rank, content, creator);
-            this.bot.messageManager.sendMessage(message, `Created emote ${name}!`);
+            message.channel.send(`Created emote ${name}!`);
         });
     }
 
@@ -178,18 +178,18 @@ class Emotes extends Command {
                 if (message.channel.type === 'dm') {
                     overrideAuthor = true;
                 }
-                this.bot.messageManager.sendMessage(message, text);
+                message.channel.send(text);
                 this.fetchEmoteCreators(results).then((creators) => {
                     for (var i = 0; i < results.length; i++) {
                         if (overrideAuthor) {
                             creators[i] = this.bot.client.user;
                         }
-                        this.bot.messageManager.embed(message, new EmoteEmbed(this.bot, results[i], creators[i]));
+                        message.channel.send('', {embed: new EmoteEmbed(this.bot, results[i], creators[i])});
                     }
                 });
             }).catch((err) => {
                 this.bot.logger.error(err);
-                this.bot.messageManager.sendMessage(message, 'http://i.imgur.com/zdMAeE9.png');
+                message.channel.send('http://i.imgur.com/zdMAeE9.png');
             });
         }
     }

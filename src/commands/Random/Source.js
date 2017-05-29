@@ -16,7 +16,7 @@ class Source extends Command {
     }
 
     run(message) {
-        this.bot.messageManager.sendMessage(message, pkg.repository);
+        message.channel.send(pkg.repository);
     }
 }
 

@@ -27,7 +27,7 @@ class GetMember extends Command {
         const messageMatch = message.strippedContent.match(this.regex, 'i');
         let verbose = messageMatch[2];
         if (!messageMatch[1]) {
-            message.channel.sendMessage('Syntax incorrect');
+            message.channel.send('Syntax incorrect');
         } else {
             /**
              * @type {Boolean}
@@ -106,12 +106,12 @@ class GetMember extends Command {
                         embed.fields[1].value = new Date(member[rank]).toDateString();
                         resolve(member[rank]);
                     }).then((date) => this.checkReadyForRankup(date, member, embed))
-                        .then(() => this.messageManager.embed(message, embed));
+                        .then(() => message.channel.send('', {embed: embed}));
                 });
             })
             .catch((err) => {
                 this.bot.logger.error(err);
-                this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
+                message.channel.send(`\`Error: ${err}\``);
             });
         }
     }

@@ -23,7 +23,7 @@ class Alerts extends Command {
         this.bot.worldState.getData()
         .then((ws) => {
             const alerts = ws.alerts.filter(a => !a.getExpired());
-            this.bot.messageManager.embed(message, new AlertsEmbed(this.bot, alerts));
+            message.channel.send('', {embed: new AlertsEmbed(this.bot, alerts)});
         })
         .catch(this.logger.error);
     }

@@ -127,7 +127,7 @@ class CommandHandler {
                     }
                 }).catch((err) => {
                     this.logger.error(err);
-                    this.bot.messageManager.sendMessage(message, `\`Error: ${err}\``);
+                    message.channel.send(`\`Error: ${err}\``);
                 });
             }
             else {

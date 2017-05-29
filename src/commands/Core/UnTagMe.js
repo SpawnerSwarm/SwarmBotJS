@@ -19,9 +19,9 @@ class UnTagMe extends Command {
     run(message) {
         let tag = message.strippedContent.match(this.regex, 'i')[1];
         if (tag === undefined) {
-            this.bot.messageManager.sendMessage(message, 'Error: Argument blank. Correct format is \'!tagme (overwatch/warframe/sk/bot)\''); return;
+            message.channel.send('Error: Argument blank. Correct format is \'!tagme (overwatch/warframe/sk/bot)\''); return;
         } else if (!tag.match(/^(?:overwatch|warframe|sk|bot)$/i)) {
-            this.bot.messageManager.sendMessage(message, 'Error: Argument invalid. Correct format is \'!tagme (overwatch/warframe/sk/bot)\''); return;
+            message.channel.send('Error: Argument invalid. Correct format is \'!tagme (overwatch/warframe/sk/bot)\''); return;
         }
         tag = tag.toLowerCase();
         /*eslint-disable indent*/
@@ -32,7 +32,7 @@ class UnTagMe extends Command {
             case 'bot': DiscordTags.removeRoleFromMember(message.member, 'Bot Notifications'); break;
         }
         /*eslint-enable indent*/
-        this.bot.messageManager.sendMessage(message, `Successfully removed the ${tag} tag!`);
+        message.channel.send(`Successfully removed the ${tag} tag!`);
         this.bot.logger.debug(`Removed ${tag} tag from member ${message.author.username}`);
     }
 }

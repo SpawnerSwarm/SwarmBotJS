@@ -67,11 +67,6 @@ class Command {
          * @type {Boolean}
         */
         this.allowDM = true;
-
-        /**
-         * @type {MessageManager}
-        */
-        this.messageManager = bot.messageManager;
     }
 
     /**

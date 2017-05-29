@@ -23,7 +23,7 @@ class MemberList extends Command {
                 str += `${Ranks[i].name}: ${res[i]} out of ${Ranks[i].max}\n`;
             }
             str += '\n```';
-            message.channel.sendMessage(str);
+            message.channel.send(str);
         });
     }
 }

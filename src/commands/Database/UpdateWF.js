@@ -18,7 +18,7 @@ class UpdateWF extends Command {
 
         this.bot.settings.updateWF(match[1], match[2]);
 
-        message.channel.sendMessage('Changed Warframe ID!');
+        message.channel.send('Changed Warframe ID!');
 
         this.bot.logger.debug(`${message.author.username} updated Warframe ID of ${match[1]} to ${match[2]}`);
     }

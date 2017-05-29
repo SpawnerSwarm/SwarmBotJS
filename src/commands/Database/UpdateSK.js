@@ -18,7 +18,7 @@ class UpdateSK extends Command {
 
         this.bot.settings.updateSK(match[1], match[2]);
 
-        message.channel.sendMessage('Changed Spiral Knights ID!');
+        message.channel.send('Changed Spiral Knights ID!');
 
         this.bot.logger.debug(`${message.author.username} updated Spiral Knights ID of ${match[1]} to ${match[2]}`);
     }

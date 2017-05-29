@@ -15,7 +15,7 @@ class GuildMail extends Command {
     }
 
     run(message) {
-        this.bot.messageManager.sendMessage(message, this.bot.guildMailURL);
+        message.channel.send(this.bot.guildMailURL);
     }
 }
 

@@ -30,7 +30,7 @@ class Promote extends Command {
 
         let date = null;
         if (!messageMatch[0]) {
-            message.channel.sendMessage('Syntax incorrect');
+            message.channel.send('Syntax incorrect');
             return;
         }
 
@@ -47,7 +47,7 @@ class Promote extends Command {
                     if (validRanks.includes(argMatch[2])) {
                         rank = validRanks.indexOf(argMatch[2]) + 1;
                     } else {
-                        this.bot.messageManager.sendMessage(message, 'Error: Invalid Rank');
+                        message.channel.send('Error: Invalid Rank');
                         this.bot.logger.error(`Unable to parse rank ${argMatch[2]} in !promote`);
                         return;
                     }
@@ -56,7 +56,7 @@ class Promote extends Command {
                     if (argMatch[2].match(/\d?\d\/\d?\d\/\d\d\d\d/)) {
                         date = new Date(argMatch[2]);
                     } else {
-                        this.bot.messageManager.sendMessage(message, 'Error: Invalid Date');
+                        message.channel.send('Error: Invalid Date');
                         this.bot.logger.error(`Unable to parse date ${argMatch[2]} in !promote`);
                         return;
                     }
@@ -69,16 +69,16 @@ class Promote extends Command {
         }
         this.bot.settings.getMember(memberID).then((member) => {
             this.bot.settings.getMember(message.author.id).then((author) => {
-                if (author.ID == member.ID && author.Rank != 7) { message.channel.sendMessage('```xl\nSorry, you can\'t promote yourself!\n```'); return; }
-                if (member.Rank == 7 && rank == null) { message.channel.sendMessage('```xl\nCan\'t promote ' + member.name + ' because they are already at maximum rank.\n```'); return; }
+                if (author.ID == member.ID && author.Rank != 7) { message.channel.send('```xl\nSorry, you can\'t promote yourself!\n```'); return; }
+                if (member.Rank == 7 && rank == null) { message.channel.send('```xl\nCan\'t promote ' + member.name + ' because they are already at maximum rank.\n```'); return; }
                 if (rank == null) { rank = member.Rank + 1; }
-                if (author.Rank != 7 && rank >= author.Rank) { message.channel.sendMessage('```xl\nSorry, you don\'t have permission to perform that action'); return; }
+                if (author.Rank != 7 && rank >= author.Rank) { message.channel.send('```xl\nSorry, you don\'t have permission to perform that action'); return; }
 
                 this.bot.settings.promote(member, rank, date);
                 message.guild.fetchMember(member.ID).then((discordMember) => {
                     DiscordTags.assignRankTagsToMember(message, rank, discordMember);
                 });
-                message.channel.sendMessage('Member promoted');
+                message.channel.send('Member promoted');
             });
         });
     }

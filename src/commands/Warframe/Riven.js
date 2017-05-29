@@ -32,14 +32,14 @@ class Riven extends Command {
                         let text = this.filterText(JSON.parse(body).ParsedResults[0].ParsedText);
                         this.bot.logger.debug(text);
                         let hasWarned = false;
-                        message.channel.sendMessage(
+                        message.channel.send(
                             '**Rank 8**'.concat(
                                 '\n\n',
                                 text.replace(/[-]?(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?:[eE][-+]?[0-9]+)?/g, (n) => {
                                     let m = +n * 9;
                                     if (m >= 500 && !hasWarned) {
                                         hasWarned = true;
-                                        this.bot.messageManager.sendMessage(message, 'These stats look a bit too high, make sure your screenshot is of a **Rank 0** mod and has no interference');
+                                        message.channel.send('These stats look a bit too high, make sure your screenshot is of a **Rank 0** mod and has no interference');
                                     }
                                     return Math.floor(m);
                                 })));
@@ -48,7 +48,7 @@ class Riven extends Command {
             );
         }
         else {
-            this.bot.messageManager.sendMessage(message, 'Send a Rank 0 riven screenshot and be returned the stats at max rank');
+            message.channel.send('Send a Rank 0 riven screenshot and be returned the stats at max rank');
         }
     }
 

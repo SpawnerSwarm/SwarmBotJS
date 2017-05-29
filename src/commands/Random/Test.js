@@ -22,7 +22,7 @@ class Test extends Command {
          */
         //eslint-disable-next-line no-unused-vars
         const member = this.bot.settings.getMember(message.author.id, this.bot).then((member) => {
-            message.channel.sendMessage(`
+            message.channel.send(`
 ${member.ID}
 ${member.Name}
 ${member.Rank}

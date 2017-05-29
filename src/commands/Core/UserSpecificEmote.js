@@ -34,7 +34,7 @@ class UserSpecificEmote extends Command {
             this.executeSimpleEmote(emote, message);
         } else {
             emote.function(message.author.id).then((content) => {
-                this.bot.messageManager.sendMessage(message, content);
+                message.channel.send(content);
             });
         }
     }
@@ -45,9 +45,9 @@ class UserSpecificEmote extends Command {
      */
     executeSimpleEmote(emote, message) {
         if(message.author.id === emote.user) {
-            this.bot.messageManager.sendMessage(message, emote.content);
+            message.channel.send(emote.content);
         } else {
-            this.bot.messageManager.sendMessage(message, 'This command is restricted to a specific user');
+            message.channel.send('This command is restricted to a specific user');
         }
     }
 }

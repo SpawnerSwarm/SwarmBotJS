@@ -19,22 +19,22 @@ class CreateMember extends Command {
     run(message) {
         const messageMatch = message.strippedContent.match(this.regex, 'i');
         if (!messageMatch[1]) {
-            message.channel.sendMessage('Syntax incorrect');
+            message.channel.send('Syntax incorrect');
         } else {
             /**
              * @type {Boolean}
              */
             this.bot.settings.getMember(messageMatch[1]).then(() => {
-                message.channel.sendMessage('Member already exists');
+                message.channel.send('Member already exists');
                 return;
             }).catch((err) => {
                 if (err == 'Member not found') {
                     message.guild.fetchMember(messageMatch[1]).then((member) => {
                         this.bot.settings.createMember(messageMatch[1], member.user.username);
-                        message.channel.sendMessage('Member created');
+                        message.channel.send('Member created');
                     });
                 } else {
-                    message.channel.sendMessage(message, `\`Error: ${err}\``);
+                    message.channel.send(message, `\`Error: ${err}\``);
                 }
             });
         }

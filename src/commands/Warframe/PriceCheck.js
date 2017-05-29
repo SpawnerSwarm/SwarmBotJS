@@ -21,11 +21,11 @@ class PriceCheck extends Command {
     run(message) {
         const match = message.strippedContent.match(this.regex);
         if(!match[1]) {
-            message.channel.sendMessage('Syntax incorrect. Please provide an item to price check.');
+            message.channel.send('Syntax incorrect. Please provide an item to price check.');
         } else {
             this.nexusQuerier.priceCheckQueryAttachment(match[1])
             .then((result) => {
-                this.bot.messageManager.embed(message, new NexusEmbed(this.bot, result, match[1]));
+                message.channel.send('', {embed: new NexusEmbed(this.bot, result, match[1])});
             })
             .catch(this.logger.error);
         }
