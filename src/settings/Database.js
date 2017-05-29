@@ -338,6 +338,20 @@ ORDER BY -Rank`, function (err, results) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
     }
+
+    /**
+     * @param {string} Name
+     */
+    getModule(Name) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM MODULES WHERE Name=${Name}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    resolve(results[0]);
+                }
+            }.bind(this));
+        }).catch(e => this.bot.logger.error(e));
+    }
 }
 
 module.exports = Database;
