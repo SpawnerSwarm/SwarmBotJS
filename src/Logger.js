@@ -42,7 +42,7 @@ levels.forEach((level) => {
             console.log(`${message}`);
         }
         if(this.requestDisabled === 'false') {request.post(process.env.NEURAL_SENTRY_URL, {form: {message: message, level: level}});}
-    }.bind(this);
+    };
 });
 
 module.exports = Logger;
