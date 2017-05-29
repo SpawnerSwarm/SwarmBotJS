@@ -136,6 +136,10 @@ class Module {
 
     }
 
+    onGuildMemberAdd() {
+
+    }
+
     onPresenceUpdate() {
 
     }
@@ -149,6 +153,18 @@ class Module {
     }
 
     onMessageReactionRemoveAll() {
+        
+    }
+
+    onMessageDelete() {
+
+    }
+
+    onMessageDeleteBulk() {
+
+    }
+
+    onMessageUpdate() {
         
     }
 
