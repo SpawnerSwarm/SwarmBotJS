@@ -18,10 +18,11 @@ class Haven extends Bazaar {
 
     onMessage(message) {
         if (!message.author.bot) {
-            if (message.content.startsWith(this.prefix) || message.content.startsWith(this.bot.prefix)) {
-                message.delete();
-            }
-            else if (message.channel.id == '318504337393451008') {
+            if (message.channel.id == '318504337393451008') {
+                if (message.content.startsWith(this.prefix) || message.content.startsWith(this.bot.prefix)) {
+                    message.delete();
+                    return;
+                }
                 let match = message.content.match(this.regex);
                 if (match) {
                     let nn = null;
