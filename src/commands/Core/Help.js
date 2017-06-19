@@ -22,8 +22,17 @@ class Help extends Command {
             try {
                 fs.readFile(`./docs/${name}.md`, function (err, data) {
                     if (err) throw err;
-                    this.author.send(data.toString());
                     this.react('✅');
+                    let str = data.toString();
+                    let formattedStr = str.split('\\split');
+                    if(formattedStr.length > 0) {
+                        for(let i = 0; i < formattedStr.length; i++) {
+                            this.author.send(formattedStr[i].replace('\\split', ''));
+                        }
+                    }
+                    else {
+                        this.author.send(data.toString());
+                    }
                 }.bind(message));
             } catch (err) {
                 this.bot.logger.error(err);
