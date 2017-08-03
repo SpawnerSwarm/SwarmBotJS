@@ -78,13 +78,14 @@ FROM MEMBERS
 INNER JOIN RANKS
 ON MEMBERS.ID=RANKS.ID
 WHERE MEMBERS.ID=${id}
-ORDER BY -Rank`, function (err, results) {
-                    if (results.length !== 0) {
-                        resolve(results[0]);
-                    } else {
-                        reject('Member not found');
-                    }
-                });
+ORDER BY -Rank`, 
+            function (err, results) {
+                if (results.length !== 0) {
+                    resolve(results[0]);
+                } else {
+                    reject('Member not found');
+                }
+            });
         });
     }
 
@@ -132,7 +133,7 @@ ORDER BY -Rank`, function (err, results) {
 
         let rankStr = Ranks.find(x => x.id == rank).name;
 
-        this.db.execute(`UPDATE RANKS SET \`${rankStr}\`='${dateStr}' WHERE \`ID\`='${member.ID}';`);
+        this.db.execute(`UPDATE RANKS SET \`${rankStr}\`='${dateStr}', \`LastPesteredIndex\`=0 WHERE \`ID\`='${member.ID}';`);
         this.db.execute(SQL`UPDATE MEMBERS SET \`Rank\`=${rank} WHERE \`ID\`=${member.ID};`);
     }
 
@@ -152,7 +153,7 @@ ORDER BY -Rank`, function (err, results) {
 
         let dateStr = mm + '/' + dd + '/' + yyyy;
 
-        this.db.execute(SQL`UPDATE MEMBERS SET \`LastPestered\`=${dateStr} WHERE \`ID\`=${id};`);
+        this.db.execute(SQL`UPDATE MEMBERS SET \`LastPestered\`=${dateStr}, \`LastPesteredIndex\`=\`LastPesteredIndex\`+1 WHERE \`ID\`=${id};`);
     }
 
     getRankPopulation() {

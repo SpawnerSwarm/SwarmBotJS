@@ -173,7 +173,7 @@ class Cephalon {
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
         this.client.user.setGame(this.statusMessage);
         this.readyToExecute = true;
-        for(let i = 0; i < this.modulePaths.length; i++) {
+        for (let i = 0; i < this.modulePaths.length; i++) {
             const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`);
             let Module = new ModuleClass(this);
             Module.start();
@@ -276,10 +276,12 @@ class Cephalon {
                 if (member.Rank > 3 || member.Ally === 1 || member.Banned === 1) { return; }
                 if (checkReadyForRankup(member[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
                     if (checkReadyForRankup(member.LastPestered, 7, false, member)) {
-                        newMember.send(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!`);
-                        this.settings.setLastPestered(member.ID);
-                        this.client.channels.get('165649798551175169').send(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
-                        this.logger.debug(`Sent ${member.Name} a rankup notification.`);
+                        if (member.LastPesteredIndex < 3) {
+                            newMember.send(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!\nThis message will only be sent 3 times for each pending rank.`);
+                            this.settings.setLastPestered(member.ID);
+                            this.client.channels.get('165649798551175169').send(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
+                            this.logger.debug(`Sent ${member.Name} a rankup notification.`);
+                        }
                     }
                 }
             }).catch(() => null);
