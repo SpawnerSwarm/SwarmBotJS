@@ -16,24 +16,24 @@
     "discord.js": "^11.0.0",
     "erlpack": "github:hammerandchisel/erlpack#master",
     "json-fetch-cache": "0.0.5",
-    "mysql2": "^1.1.2",
+    "mysql2": "^1.4.0",
     "node-md-config": "^2.0.1",
     "ping": "^0.2.1",
-    "request": "latest",
-    "request-promise": "^4.1.1",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
     "sql-template-strings": "^2.2.2",
-    "uws": "^0.12.0",
+    "uws": "^8.14.1",
     "warframe-location-query": "^0.0.3",
     "warframe-nexus-query": "^0.0.9",
-    "warframe-worldstate-parser": "^1.3.2"
+    "warframe-worldstate-parser": "^1.7.6"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "eslint": "^3.9.1",
+    "eslint": "^3.19.0",
     "eslint-config-defaults": "latest",
-    "mocha": "^3.1.0",
+    "mocha": "^3.5.0",
     "rewire": "^2.5.2",
     "sinon": "^1.17.6",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.12.0"
   }
 }

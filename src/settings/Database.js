@@ -48,6 +48,14 @@ class Database {
         };
     }
 
+    getVersion() {
+        return new Promise((resolve) => {
+            this.db.query(SQL`SELECT @@version`, function (err, results) {
+                resolve(results[0]['@@version']);
+            });
+        });
+    }
+
     /**
      * @param {User} user
      * @param {Date} date
@@ -78,14 +86,14 @@ FROM MEMBERS
 INNER JOIN RANKS
 ON MEMBERS.ID=RANKS.ID
 WHERE MEMBERS.ID=${id}
-ORDER BY -Rank`, 
-            function (err, results) {
-                if (results.length !== 0) {
-                    resolve(results[0]);
-                } else {
-                    reject('Member not found');
-                }
-            });
+ORDER BY -Rank`,
+                function (err, results) {
+                    if (results.length !== 0) {
+                        resolve(results[0]);
+                    } else {
+                        reject('Member not found');
+                    }
+                });
         });
     }
 
