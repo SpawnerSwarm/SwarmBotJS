@@ -235,9 +235,9 @@ class Cephalon {
                             return false;
                         } else {
                             if (match[1] && x.partner) {
-                                message.channel.send(x.partner.replace('%1', message.author.username).replace('%2', match[1]));
+                                message.channel.send(x.partner.replace('%1', message.author.username).replace('%2', match[1]).replace('@', '@ '));
                             } else {
-                                message.channel.send(x.content.replace('%1', message.author.username));
+                                message.channel.send(x.content.replace('%1', message.author.username).replace('@', '@ '));
                             }
                             message.delete();
                         }
