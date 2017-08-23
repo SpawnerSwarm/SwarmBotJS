@@ -226,7 +226,7 @@ class Cephalon {
                 }
             }
             else if (message.content.startsWith('/')) {
-                let msg = message.content.substring('1');
+                let msg = message.cleanContent.substring('1');
                 try {
                     SKEmotes.forEach(function (x) {
                         let regex = new RegExp(`^(?:${x.command})(?: (.+)|$)`, 'i');
