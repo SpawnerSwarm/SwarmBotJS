@@ -311,5 +311,10 @@ module.exports = [
         command: 'yes|agree|nod',
         content: 'Yes! %1 agrees.',
         partner: 'Yes! %1 agrees with %2.'
+    },
+    {
+        command: 'me|e|emote',
+        content: 'https://github.com/SpawnerSwarm/SwarmBotJS/blob/master/src/resources/SpiralKnightsEmotes.js',
+        partner: '*%1 %2*'
     }
 ]
