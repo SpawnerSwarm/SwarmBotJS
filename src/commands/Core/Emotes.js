@@ -11,7 +11,7 @@ class Emotes extends Command {
     constructor(bot) {
         super(bot, 'core.emotes', 'emotes');
 
-        this.regex = new RegExp('^(?:emote(?:s)?|e)?( list| create| new| search| find)?( .+)?$', 'i');
+        this.regex = new RegExp('^(?:emote(?:s)?|e)(?: ?(list|create|new|search|find)?)( .+)?$', 'i');
     }
 
     /**
