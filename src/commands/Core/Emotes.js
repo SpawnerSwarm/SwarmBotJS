@@ -11,7 +11,7 @@ class Emotes extends Command {
     constructor(bot) {
         super(bot, 'core.emotes', 'emotes');
 
-        this.regex = new RegExp('^(?:emote(?:s)?|e)(?: ?(list|create|new|search|find)?)( .+)?$', 'i');
+        this.regex = new RegExp('^(?:emote(?:s)?|e)(?: (list|create|new|search|find)? ?)?(.+)?$', 'i');
     }
 
     /**
@@ -19,13 +19,13 @@ class Emotes extends Command {
      */
     run(message) {
         let match = message.strippedContent.match(this.regex);
-        if (match[1] === ' list') {
+        if (match[1] === 'list') {
             this.list(message, match);
         }
-        else if (match[1] === ' create' || match[1] === ' new') {
+        else if (match[1] === 'create' || match[1] === 'new') {
             this.create(message, match);
         }
-        else if (match[1] === ' search' || match[1] === ' find') {
+        else if (match[1] === 'search' || match[1] === 'find') {
             this.search(message, match);
         }
         else if (match[2] != undefined) {
