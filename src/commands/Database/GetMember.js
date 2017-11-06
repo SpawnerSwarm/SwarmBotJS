@@ -101,7 +101,7 @@ class GetMember extends Command {
                     new Promise((resolve) => {
                         let rank = Ranks[member.Rank].name;
                         if (member[rank] === null) {
-                            return;
+                            resolve(null);
                         }
                         embed.fields[1].value = new Date(member[rank]).toDateString();
                         resolve(member[rank]);
