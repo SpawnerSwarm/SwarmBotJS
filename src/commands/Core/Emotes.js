@@ -33,7 +33,7 @@ class Emotes extends Command {
         }
         else {
             let initialCommandUsed = message.strippedContent.match('^(emotes?|e)')[1];
-            message.channel.send(`-** !${initialCommandUsed}** -- Display this text.\n-** !${initialCommandUsed}** (ref) -- Return the emote matching the ref.\n-** !${initialCommandUsed} list (page)** -- List all emotes.\n-** !${initialCommandUsed} create*/new* (name) (reference) (requiredRank) (content) (creator)** -- Create a new Emote.`);
+            message.channel.send(`-** !${initialCommandUsed}** -- Display this text.\n-** !${initialCommandUsed}** (ref) -- Return the emote matching the ref.\n-** !${initialCommandUsed} list (page)** -- List all emotes.\n-** !${initialCommandUsed} create*/new* "(name)" (reference) (requiredRank) (content) (creator)** -- Create a new Emote.`);
         }
     }
 
