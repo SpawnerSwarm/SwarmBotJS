@@ -2,6 +2,7 @@
 /*eslint-disable no-console*/
 
 const request = require('request');
+const io = require('socket.io-client');
 
 /**
  * @typedef {Object.<function>} Logger
@@ -15,6 +16,13 @@ const request = require('request');
 class Logger {
     constructor(legacy) {
         this.requestDisabled = legacy;
+        if(this.requestDisabled == 'false') {
+            this.socket = io(process.env.MAGNIFY_URL);
+            this.socket.on('connect', function() {
+                console.log('Connected to Magnify');
+            });
+            this.socket.emit('join', 'console');
+        }
     }
 }
 const logLevel = process.env.LOG_LEVEL;
@@ -41,7 +49,7 @@ levels.forEach((level) => {
             //TODO: Neural Sentry
             console.log(`${message}`);
         }
-        if(this.requestDisabled === 'false') {request.post(process.env.NEURAL_SENTRY_URL, {form: {message: message, level: level}});}
+        if(this.requestDisabled == 'false') {this.socket.emit('console log', {message: message, level: level});}
     };
 });
 
