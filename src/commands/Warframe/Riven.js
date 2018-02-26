@@ -26,7 +26,9 @@ class Riven extends Command {
                 },
                 (error, response, body) => {
                     if (error) {
-                        this.bot.logger.error(error);
+                        this.bot.logger.error('Unable to connect to OCR server:');
+                        message.channel.send('Unable to connect to OCR server. Please try again later.');
+                        this.bot.logger.error(error.toString());
                     }
                     else {
                         let text = this.filterText(JSON.parse(body).ParsedResults[0].ParsedText);
@@ -42,7 +44,10 @@ class Riven extends Command {
                                         message.channel.send('These stats look a bit too high, make sure your screenshot is of a **Rank 0** mod and has no interference');
                                     }
                                     return Math.floor(m);
-                                })));
+                                }
+                            )
+                        )
+                    );
                     }
                 }
             );
