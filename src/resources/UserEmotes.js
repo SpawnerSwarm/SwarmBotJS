@@ -19,6 +19,12 @@ module.exports = [
         call: "etest"
     },
     {
+        isSimple: true,
+        user: "138043934143152128",
+        content: "Funks go e y y man kill zucchini angst",
+        call: "gecko"
+    },
+    {
         isSimple: false,
         function: (id) => {
             return new Promise((resolve) => {
