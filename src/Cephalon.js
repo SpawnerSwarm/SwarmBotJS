@@ -299,7 +299,7 @@ class Cephalon {
         }
         let r = Math.floor(Math.random() * Math.floor(10));
         this.logger.debug(r);
-        if(r >= 5) {
+        if(r == 0) {
             this.client.channels.get('137996862211751936').send('', {files: ['./src/resources/k.png']}).then((message) => {
                 message.delete(1000);
             }).catch((err) => this.logger.error(err));
