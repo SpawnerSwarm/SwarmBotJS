@@ -9,6 +9,7 @@ const request = require('request');
 const Ranks = require('./resources/Ranks.js');
 const SKEmotes = require('./resources/SpiralKnightsEmotes.js');
 const Modules = require('./modules/modules.json');
+const pkg = require('../package.json');
 
 /**
  * @typedef {Object.<string>} MarkdownSettings
@@ -171,7 +172,7 @@ class Cephalon {
     onReady() {
         this.logger.info(`${this.client.user.username} ready!`);
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
-        this.client.user.setGame(this.statusMessage);
+        this.client.user.setActivity(this.statusMessage, {url: pkg.repository, type: Discord.ActivityType.LISTENING});
         this.readyToExecute = true;
         for (let i = 0; i < this.modulePaths.length; i++) {
             const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`);
@@ -295,6 +296,13 @@ class Cephalon {
                     }
                 }
             }).catch(() => null);
+        }
+        let r = Math.floor(Math.random() * Math.floor(10));
+        this.logger.debug(r);
+        if(r >= 5) {
+            this.client.channels.get('360774256730177536').send('', {files: ['./src/resources/k.png']}).then((message) => {
+                message.delete(1000);
+            }).catch((err) => this.logger.error(err));
         }
     }
 }
