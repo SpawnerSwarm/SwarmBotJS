@@ -263,7 +263,7 @@ class Cephalon {
     }
 
     onPresenceUpdate(oldMember, newMember) {
-        if (oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
+        if (process.env.SHOULD_PESTER && oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
             let checkReadyForRankup = (date, compDate, breakOnNull, member) => {
                 if (date === null && breakOnNull) {
                     return false;
@@ -298,7 +298,6 @@ class Cephalon {
             }).catch(() => null);
         }
         let r = Math.floor(Math.random() * Math.floor(10));
-        this.logger.debug(r);
         if(r == 0) {
             this.client.channels.get('137996862211751936').send('', {files: ['./src/resources/k.png']}).then((message) => {
                 message.delete(1000);
