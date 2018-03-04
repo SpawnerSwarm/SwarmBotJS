@@ -172,7 +172,14 @@ class Cephalon {
     onReady() {
         this.logger.info(`${this.client.user.username} ready!`);
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
-        this.client.user.setActivity(this.statusMessage, {url: pkg.repository, type: Discord.ActivityType.LISTENING});
+        this.client.user.setPresence({
+            status: 'online',
+            afk: false,
+            game: {
+                name: this.statusMessage,
+                url: pkg.repository
+            }
+        });
         this.readyToExecute = true;
         for (let i = 0; i < this.modulePaths.length; i++) {
             const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`);
@@ -300,7 +307,7 @@ class Cephalon {
         let r = Math.floor(Math.random() * Math.floor(10));
         if(r == 0) {
             this.client.channels.get('137996862211751936').send('', {files: ['./src/resources/k.png']}).then((message) => {
-                message.delete(1000);
+                message.delete(3000);
             }).catch((err) => this.logger.error(err));
         }
     }
