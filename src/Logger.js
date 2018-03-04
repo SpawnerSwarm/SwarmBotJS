@@ -42,11 +42,9 @@ levels.forEach((level) => {
             console.log(`[${level}] ${message}`);
         }
         if (level === 'fatal') {
-            //TODO: Neural Sentry
             console.log(`${message}`);
         }
         if (level === 'error') {
-            //TODO: Neural Sentry
             console.log(`${message}`);
         }
         if(this.requestDisabled == 'false') {this.socket.emit('console log', {message: message, level: level});}

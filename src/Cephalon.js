@@ -207,7 +207,7 @@ class Cephalon {
                 let regex = /([^ ]{1,3})?\[\[([^\]]+)\]\]/g;
                 let i = 0;
                 while((match = regex.exec(message.content)) !== null && i < 5) {
-                    this.logger.debug(`Found match in message, ${i}: ${match[2]}`);
+                    this.logger.debug(`Found wiki match in message, ${i}: ${match[2]}`);
                     let wiki;
                     /*eslint-disable indent*/
                     switch (match[1]) {
@@ -298,7 +298,7 @@ class Cephalon {
                             newMember.send(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!\nThis message will only be sent 3 times for each pending rank.`);
                             this.settings.setLastPestered(member.ID);
                             this.client.channels.get('165649798551175169').send(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
-                            this.logger.debug(`Sent ${member.Name} a rankup notification.`);
+                            this.logger.info(`Sent ${member.Name} a rankup notification.`);
                         }
                     }
                 }

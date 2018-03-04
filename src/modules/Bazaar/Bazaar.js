@@ -166,7 +166,7 @@ This message is being sent to inform you that the listing price has been marked 
                     }
                 }
             })
-            .catch(this.bot.logger.error);
+            .catch((error) => this.bot.logger.error(error));
         this.client.user.setStatus('invisible');
     }
 }

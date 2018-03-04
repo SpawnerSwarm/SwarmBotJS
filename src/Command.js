@@ -77,9 +77,7 @@ class Command {
             .then((msg) => {
                 this.logger.debug(`Sent ${msg}`);
             })
-            .catch((error) => {
-                this.logger.error(`Error: ${error}`);
-            });
+            .catch((error) => this.logger.error(`Error: ${error}`));
     }
 }
 

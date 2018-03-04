@@ -41,7 +41,7 @@ class TagMe extends Command {
             /*eslint-enable indent*/
         }
         message.channel.send(`Successfully gave you the ${tag} tag!`);
-        this.bot.logger.debug(`Added ${tag} tag to member ${message.author.username}`);
+        this.bot.logger.info(`Added ${tag} tag to member ${message.author.username}`);
     }
 }
 

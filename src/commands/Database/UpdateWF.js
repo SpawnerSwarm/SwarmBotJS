@@ -20,7 +20,7 @@ class UpdateWF extends Command {
 
         message.channel.send('Changed Warframe ID!');
 
-        this.bot.logger.debug(`${message.author.username} updated Warframe ID of ${match[1]} to ${match[2]}`);
+        this.bot.logger.info(`${message.author.username} updated Warframe ID of ${match[1]} to ${match[2]}`);
     }
 }
 

@@ -33,7 +33,7 @@ class UnTagMe extends Command {
         }
         /*eslint-enable indent*/
         message.channel.send(`Successfully removed the ${tag} tag!`);
-        this.bot.logger.debug(`Removed ${tag} tag from member ${message.author.username}`);
+        this.bot.logger.info(`Removed ${tag} tag from member ${message.author.username}`);
     }
 }
 

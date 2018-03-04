@@ -34,6 +34,7 @@ class CreateMember extends Command {
                         message.channel.send('Member created');
                     });
                 } else {
+                    this.bot.logger.error(err);
                     message.channel.send(message, `\`Error: ${err}\``);
                 }
             });
