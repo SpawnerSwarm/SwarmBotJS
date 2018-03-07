@@ -25,7 +25,6 @@
     "sql-template-strings": "^2.2.2",
     "uws": "^8.14.1",
     "warframe-location-query": "^0.0.3",
-    "warframe-nexus-query": "^0.0.9",
     "warframe-worldstate-parser": "^1.7.6"
   },
   "devDependencies": {
