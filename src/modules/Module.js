@@ -126,7 +126,13 @@ class Module {
         this.logger.info(`${this.client.user.username} ready!`);
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
         if (this.statusMessage) {
-            this.client.user.setGame(this.statusMessage);
+            this.client.user.setPresence({
+                status: 'online',
+                afk: false,
+                game: {
+                    name: this.statusMessage
+                }
+            });
         }
         this.readyToExecute = true;
         this.onReadyExtra();

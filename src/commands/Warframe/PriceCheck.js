@@ -1,8 +1,8 @@
 'use strict';
 
 const Command = require('../../Command.js');
-const Nexus = require('warframe-nexus-query');
 const NexusEmbed = require('../../embeds/NexusEmbed.js');
+const request = require('request-promise');
 
 class PriceCheck extends Command {
     /**
@@ -13,21 +13,33 @@ class PriceCheck extends Command {
 
         this.regex = new RegExp('^(?:priceCheck|pc) ?(.+)?$');
 
-        this.nexusQuerier = new Nexus();
-
         this.requiredRank = 0;
     }
 
     run(message) {
         const match = message.strippedContent.match(this.regex);
-        if(!match[1]) {
+        if (!match[1]) {
             message.channel.send('Syntax incorrect. Please provide an item to price check.');
         } else {
-            this.nexusQuerier.priceCheckQueryAttachment(match[1])
-            .then((result) => {
-                message.channel.send('', {embed: new NexusEmbed(this.bot, result, match[1])});
-            })
-            .catch(this.logger.error);
+            const item = match[1];
+            message.react('🔄').then((reaction) => {
+                request({
+                    uri: `https://api.warframestat.us/pricecheck/attachment/${item}`,
+                    json: true,
+                    rejectUnauthorized: false
+                }).then((res) => {
+                    message.channel.send('', { embed: new NexusEmbed(this.bot, res, match[1]) });
+                    reaction.remove().then(() => {
+                        message.react('✅');
+                    });
+                }).catch((e) => {
+                    this.bot.logger.error(e);
+                    message.channel.send('An Error occured. Please try again later.');
+                    reaction.remove().then(() => {
+                        message.react('🆘');
+                    });
+                });
+            });
         }
     }
 }
