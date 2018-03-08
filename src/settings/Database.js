@@ -141,8 +141,8 @@ ORDER BY -Rank`,
 
         let rankStr = Ranks.find(x => x.id == rank).name;
 
-        this.db.execute(`UPDATE RANKS SET \`${rankStr}\`='${dateStr}', \`LastPesteredIndex\`=0 WHERE \`ID\`='${member.ID}';`);
-        this.db.execute(SQL`UPDATE MEMBERS SET \`Rank\`=${rank} WHERE \`ID\`=${member.ID};`);
+        this.db.execute(`UPDATE RANKS SET \`${rankStr}\`='${dateStr}' WHERE \`ID\`='${member.ID}';`);
+        this.db.execute(SQL`UPDATE MEMBERS SET \`Rank\`=${rank}, \`LastPesteredIndex\`=0 WHERE \`ID\`=${member.ID};`);
     }
 
     setLastPestered(id) {
