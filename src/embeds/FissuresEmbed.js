@@ -12,7 +12,7 @@ class FissuresEmbed {
         this.title = 'Fissures';
         this.footer = {
             icon_url: 'https://avatars1.githubusercontent.com/u/24436369',
-            text: 'Data evaluated by warframe-worldstate-parser | Warframe Community Developers',
+            text: 'Data evaluated by api.warframestat.us | Warframe Community Developers',
         };
         this.thumbnail = {
             url: `${pkg.repository.replace('github', 'raw.githubusercontent')}/master/src/resources/fissure.png`,
@@ -26,7 +26,7 @@ class FissuresEmbed {
     parseFissure(fissure) {
         var embed = {
             name: `${fissure.missionType} ${fissure.tier}`,
-            value: `[${fissure.getETAString()}] ${fissure.node} against ${fissure.enemy}`,
+            value: `[${fissure.eta}] ${fissure.node} against ${fissure.enemy}`,
         };
         return embed;
     }

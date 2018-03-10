@@ -24,8 +24,7 @@
     "socket.io-client": "^2.0.4",
     "sql-template-strings": "^2.2.2",
     "uws": "^9.14.0",
-    "warframe-location-query": "^0.0.3",
-    "warframe-worldstate-parser": "^1.7.6"
+    "warframe-location-query": "^0.0.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",

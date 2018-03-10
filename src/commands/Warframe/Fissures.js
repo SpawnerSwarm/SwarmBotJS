@@ -25,7 +25,7 @@ class Fissures extends Command {
             const fissures = ws.fissures.sort((a, b) => { return a.tierNum > b.tierNum; });
             message.channel.send('', {embed: new FissuresEmbed(this.bot, fissures)});
         })
-        .catch(this.logger.error);
+        .catch((err) => this.logger.error(err));
     }
 }
 

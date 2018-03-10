@@ -11,7 +11,7 @@ class AlertsEmbed {
         this.title = 'Alerts';
         this.footer = {
             icon_url: 'https://avatars1.githubusercontent.com/u/24436369',
-            text: 'Data evaluated by warframe-worldstate-parser | Warframe Community Developers',
+            text: 'Data evaluated by api.warframestat.us | Warframe Community Developers',
         };
     }
 
@@ -22,9 +22,9 @@ class AlertsEmbed {
     parseAlert(alert) {
         var embed = {
             name: `${alert.mission.faction} ${alert.mission.type} on ${alert.mission.node}\n`,
-            value: `${alert.getReward().toString().replace(/^1\s/, '')}\n` +
+            value: `${alert.mission.reward.asString}\n` +
             `Level ${alert.mission.minEnemyLevel} - ${alert.mission.maxEnemyLevel}` +
-            `${alert.getETAString()} remaining`,
+            `${alert.eta} remaining`,
         };
         return embed;
     }

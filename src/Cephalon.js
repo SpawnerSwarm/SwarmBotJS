@@ -124,7 +124,7 @@ class Cephalon {
         /**
          * @type {Object.<WorldStateCache>}
         */
-        this.worldState = new WorldStateCache(worldStateTimeout);
+        this.worldState = new WorldStateCache(worldStateTimeout, logger);
 
         this.commandHandler.loadCommands();
 
