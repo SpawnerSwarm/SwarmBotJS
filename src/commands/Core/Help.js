@@ -18,6 +18,7 @@ class Help extends Command {
         let match = message.strippedContent.match(this.regex);
         this.bot.logger.debug(match[1]);
         let name = match[1].toLowerCase();
+        if (name == 'about-this-server') return;
         if (fs.existsSync(`./docs/${name}.md`)) {
             try {
                 fs.readFile(`./docs/${name}.md`, function (err, data) {
