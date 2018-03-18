@@ -304,12 +304,12 @@ class Cephalon {
                 }
             }).catch(() => null);
         }
-        let r = Math.floor(Math.random() * Math.floor(50));
+        /*let r = Math.floor(Math.random() * Math.floor(200));
         if(r == 0) {
             this.client.channels.get('137996862211751936').send('', {files: ['./src/resources/k.png']}).then((message) => {
                 message.delete(3000);
             }).catch((err) => this.logger.error(err));
-        }
+        }*/
     }
 }
 
