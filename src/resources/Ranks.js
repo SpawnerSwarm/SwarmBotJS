@@ -10,13 +10,13 @@ module.exports = [
     {
         "name": "Member",
         "id": 2,
-        "last": 7,
+        "last": 14,
         "max": 100
     },
     {
         "name": "Member II",
         "id": 3,
-        "last": 14,
+        "last": 28,
         "max": 20
     },
     {
