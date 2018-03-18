@@ -11,13 +11,17 @@ class Help extends Command {
 
         this.requiredRank = 1;
 
-        this.regex = /(?:help|man(?:ual)?|docs?|what) (.+)/i;
+        this.regex = /(?:help|man(?:ual)?|docs?|what)(?: (.+))?/i;
     }
 
     run(message) {
         let match = message.strippedContent.match(this.regex);
         this.bot.logger.debug(match[1]);
-        let name = match[1].toLowerCase();
+        let name;
+        
+        if(!match[1]) name = '_';
+        else name = match[1].toLowerCase();
+        
         if (name == 'about-this-server') return;
         if (fs.existsSync(`./docs/${name}.md`)) {
             try {
