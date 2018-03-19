@@ -10,6 +10,7 @@ class PlainsCycle extends Command {
     }
 
     run(message) {
+        message.react('✅');
         //From Genesis: https://github.com/wfcd/genesis/blob/master/src/commands/Worldstate/EarthCycle.js
         this.bot.worldState.getData()
         .then((ws) => {
