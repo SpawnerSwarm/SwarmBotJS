@@ -6,7 +6,7 @@ const PlainsCycleEmbed = require('../../embeds/PlainsCycleEmbed.js');
 class PlainsCycle extends Command {
     constructor(bot) {
         super(bot, 'warframe.cycle', 'cycle');
-        this.regex = /cycle|plains/i;
+        this.regex = /^(?:cycle|plains)$/i;
     }
 
     run(message) {
