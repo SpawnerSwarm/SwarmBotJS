@@ -130,13 +130,13 @@ class Emotes extends Command {
                 message.channel.send('Sorry, you don\'t have permission to create emotes');
                 return;
             }
-            let regex = / (".+"|[^ ]+)/ig;
+            let regex = /(".+"|[^ ]+)/ig;
             let m = match[2].match(regex);
             if (m.length < 4 || m.length > 5) {
                 message.channel.send('Too many parameters');
             }
 
-            let name = m[0].replace(' ', ''),
+            let name = m[0].includes('"') ? m[0].replace(/"/g, '') : m[0].replace(' ', ''),
                 reference = m[1].replace(' ', ''),
                 rank = m[2].replace(' ', ''),
                 content = m[3].replace(' ', '').replace(/"/g, ''),
