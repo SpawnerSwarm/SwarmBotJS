@@ -6,6 +6,8 @@ const Promise = require('bluebird');
 
 const Ranks = require('../resources/Ranks.js');
 
+const exec = require('child_process').exec;
+
 /**
  * @typedef {Object} DbConnectionOptions
  * @property {string} [host=localhost]
@@ -247,6 +249,21 @@ ORDER BY -Rank`,
 
     updateSK(id, SpiralKnightsName) {
         this.db.execute(SQL`UPDATE MEMBERS SET SpiralKnightsName=${SpiralKnightsName} WHERE ID=${id}`);
+    }
+
+    saveCSVData() {
+        return new Promise((resolve, reject) => {
+            exec(`mysql ${process.env.MYSQL_DB} < ${process.env.SQL_CSV_REQUESTS} | sed 's/\\t/,/g' > ${process.env.SQL_CSV_OUT}`,
+                function (error) {
+                    if (error) {
+                        this[1](error);
+                    }
+                    else {
+                        this[0]();
+                    }
+                }.bind([resolve, reject])
+            );
+        });
     }
 
     //Bazaar

@@ -1,7 +1,6 @@
 ﻿'use strict';
 /*eslint-disable no-console*/
 
-const request = require('request');
 const io = require('socket.io-client');
 
 /**
