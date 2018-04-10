@@ -6,7 +6,7 @@ class UpdateWF extends Command {
     constructor(bot) {
         super(bot, 'database.updatewf', 'updateWF');
 
-        this.regex = /^updatewf <@!?(\\d+)> (.+)$/i;
+        this.regex = /^updatewf <@!?(\d+)> (.+)$/i;
 
         this.requiredRank = 5;
 

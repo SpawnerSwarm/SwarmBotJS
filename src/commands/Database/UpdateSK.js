@@ -6,7 +6,7 @@ class UpdateSK extends Command {
     constructor(bot) {
         super(bot, 'database.updatesk', 'updateSK');
 
-        this.regex = /^updatesk <@!?(\\d+)> (.+)$/i;
+        this.regex = /^updatesk <@!?(\d+)> (.+)$/i;
 
         this.requiredRank = 5;
 
