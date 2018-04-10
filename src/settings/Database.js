@@ -254,14 +254,14 @@ ORDER BY -Rank`,
     saveCSVData() {
         return new Promise((resolve, reject) => {
             exec(`mysql ${process.env.MYSQL_DB} < ${process.env.SQL_CSV_REQUESTS} | sed 's/\\t/,/g' > ${process.env.SQL_CSV_OUT}`,
-                function (error) {
+                (error) => {
                     if (error) {
-                        this[1](error);
+                        reject(error);
                     }
                     else {
-                        this[0]();
+                        resolve();
                     }
-                }.bind([resolve, reject])
+                }
             );
         });
     }
