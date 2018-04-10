@@ -26,7 +26,6 @@ class ViewDatabase extends Command {
                 str = encodeURI(str);
                 let url = `${process.env.GOOGLE_URL}?key=${process.env.GOOGLE_KEY}&csv=${str}`;
 
-                console.log(url);
                 request.get(url, function(err, httpResponse, body) {
                     this.channel.send(body);
                 }.bind(this));

@@ -253,7 +253,7 @@ ORDER BY -Rank`,
 
     saveCSVData() {
         return new Promise((resolve, reject) => {
-            exec(`mysql ${process.env.MYSQL_DB} < ${process.env.SQL_CSV_REQUESTS} | sed 's/\\t/,/g' > ${process.env.SQL_CSV_OUT}`,
+            exec(`mysql ${process.env.MYSQL_DB} --password=${process.env.MYSQL_PASSWORD} --user=${process.env.MYSQL_USER} < ${process.env.SQL_CSV_REQUESTS} | sed 's/\t/,/g' > ${process.env.SQL_CSV_OUT}`,
                 (error) => {
                     if (error) {
                         reject(error);
