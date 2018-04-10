@@ -24,9 +24,10 @@ class ViewDatabase extends Command {
             fs.readFile(process.env.SQL_CSV_OUT, function (err, data) {
                 let str = data.toString();
                 str = encodeURI(str);
-                //let url = `${process.env.GOOGLE_URL}?key=${process.env.GOOGLE_KEY}&csv=${str}`;
+                let url = `${process.env.GOOGLE_URL}?key=${process.env.GOOGLE_KEY}&csv=${str}`;
 
-                request.post({url: process.env.GOOGLE_URL, form: { key: process.env.GOOGLE_KEY, csv: str }}, function(err, httpResponse, body) {
+                console.log(url);
+                request.get(url, function(err, httpResponse, body) {
                     this.channel.send(body);
                 }.bind(this));
             }.bind(message));
