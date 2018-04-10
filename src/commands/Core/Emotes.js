@@ -143,7 +143,7 @@ class Emotes extends Command {
                 creator = m[4];
 
             if (creator != undefined) {
-                creator = creator.match(/<@(.+)>/i);
+                creator = creator.match(/<@!?(\\d+)>/i);
                 if (creator == null || creator[1] == null) {
                     creator = '137976237292388353';
                 } else {
