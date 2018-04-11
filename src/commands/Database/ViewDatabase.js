@@ -30,6 +30,10 @@ class ViewDatabase extends Command {
                     this.channel.send(body);
                 }.bind(this));
             }.bind(message));
+        })
+        .catch((err) => {
+            this.bot.logger.error(err);
+            message.channel.send(`\`Error: ${err}\``);
         });
     }
 }
