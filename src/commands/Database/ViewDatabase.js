@@ -20,20 +20,28 @@ class ViewDatabase extends Command {
     }
 
     run(message) {
-        this.bot.settings.saveCSVData().then(() => {
-            fs.readFile(process.env.SQL_CSV_OUT, function (err, data) {
-                let str = data.toString();
-                str = encodeURI(str);
-                let url = `${process.env.GOOGLE_URL}?key=${process.env.GOOGLE_KEY}&csv=${str}`;
+        message.react('🔄').then((reaction) => {
+            this.bot.settings.saveCSVData().then(() => {
+                fs.readFile(process.env.SQL_CSV_OUT, function (err, data) {
+                    let str = data.toString();
+                    str = encodeURI(str);
+                    let url = `${process.env.GOOGLE_URL}?key=${process.env.GOOGLE_KEY}&csv=${str}`;
 
-                request.get(url, function(err, httpResponse, body) {
-                    this.channel.send(body);
-                }.bind(this));
-            }.bind(message));
-        })
-        .catch((err) => {
-            this.bot.logger.error(err);
-            message.channel.send(`\`Error: ${err}\``);
+                    request.get(url, function (err, httpResponse, body) {
+                        this.message.channel.send(body);
+                        this.reaction.remove().then(() => {
+                            this.message.react('✅');
+                        });
+                    }.bind({message: message, reaction: reaction}));
+                }.bind({message: message, reaction: reaction}));
+            })
+            .catch((err) => {
+                this.bot.logger.error(err);
+                message.channel.send(`\`Error: ${err}\``);
+                reaction.remove().then(() => {
+                    message.react('🆘');
+                });
+            });
         });
     }
 }
