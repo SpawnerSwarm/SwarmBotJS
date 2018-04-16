@@ -23,7 +23,7 @@ class AlertsEmbed {
         var embed = {
             name: `${alert.mission.faction} ${alert.mission.type} on ${alert.mission.node}\n`,
             value: `${alert.mission.reward.asString}\n` +
-            `Level ${alert.mission.minEnemyLevel} - ${alert.mission.maxEnemyLevel}` +
+            `Level ${alert.mission.minEnemyLevel} - ${alert.mission.maxEnemyLevel}\n` +
             `${alert.eta} remaining`,
         };
         return embed;
