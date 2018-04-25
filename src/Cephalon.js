@@ -243,6 +243,21 @@ class Cephalon {
                     this.logger.info(`Warned ${message.author.username} against using the @everyone mention in #${message.channel.name}`);
                 }
             }
+            if (message.content.match(/<@&438837282783363092>|@wfhere/i)) {
+                if(message.guild && message.guild.roles.has('138054399950848000')) {
+                    message.guild.members.fetchMembers().then((guild) => {
+                        let members = guild.roles.get('138054399950848000').members
+                            .filter(member => member.presence.status == 'online' || member.presence.status == 'idle');
+                        let reducer = (accumulator, member) => {
+                            if(!member.bot) {
+                                accumulator += ` <@${member.id}>`;
+                            }
+                        };
+                        let msg = `Mentioning currently-online Warframe members:${members.reduce(reducer)}`;
+                        message.channel.send(msg);
+                    });
+                }
+            }
             else if (message.content.startsWith('/')) {
                 let msg = message.cleanContent.substring('1');
                 try {
