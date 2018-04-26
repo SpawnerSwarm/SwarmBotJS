@@ -206,7 +206,7 @@ class Cephalon {
                 let match;
                 let regex = /([^ ]{1,3})?\[\[([^\]]+)\]\]/g;
                 let i = 0;
-                while((match = regex.exec(message.content)) !== null && i < 5) {
+                while ((match = regex.exec(message.content)) !== null && i < 5) {
                     this.logger.debug(`Found wiki match in message, ${i}: ${match[2]}`);
                     let wiki;
                     /*eslint-disable indent*/
@@ -231,7 +231,7 @@ class Cephalon {
                     }.bind(match[2]));
                     i++;
                 }
-                if(i >= 5) {
+                if (i >= 5) {
                     message.channel.send('Messages cannot contain more than 5 wiki calls');
                 }
             }
@@ -244,13 +244,13 @@ class Cephalon {
                 }
             }
             if (message.content.match(/<@&438837282783363092>|@wfhere/i)) {
-                if(message.guild && message.guild.roles.has('138054399950848000')) {
+                if (message.guild && message.guild.roles.has('138054399950848000')) {
                     message.guild.fetchMembers().then((guild) => {
                         let members = guild.roles.get('138054399950848000').members
                             .filter(member => member.presence.status == 'online' || member.presence.status == 'idle');
                         let memberMap = members.map(member => ` <@${member.id}>`);
-			let reducer = (accumulator, currentValue) => {
-			    return accumulator.concat(currentValue);
+                        let reducer = (accumulator, currentValue) => {
+                            return accumulator.concat(currentValue);
                         };
                         let msg = `Mentioning currently-online Warframe members${memberMap.reduce(reducer, ':')}`;
                         message.channel.send(msg);
