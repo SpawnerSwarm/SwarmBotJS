@@ -243,6 +243,18 @@ class Cephalon {
                     this.logger.info(`Warned ${message.author.username} against using the @everyone mention in #${message.channel.name}`);
                 }
             }
+            if (message.content.match(/@here/)) {
+                if(message.channel.id === '137996862211751936') {
+                    let title;
+                    switch(message.channel.name) {
+                        case 'warframe':
+                            title = 'wfhere';
+                    }
+
+                    message.channel.send(`You seem to be using a 'here' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
+                    this.logger.info(`Warned ${message.author.username} against using the @here mention in #${message.channel.name}`);
+                }
+            }
             if (message.content.match(/<@&438837282783363092>|@wfhere/i)) {
                 if (message.guild && message.guild.roles.has('138054399950848000')) {
                     message.guild.fetchMembers().then((guild) => {
