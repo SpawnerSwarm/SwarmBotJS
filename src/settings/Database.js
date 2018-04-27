@@ -421,7 +421,7 @@ ORDER BY -Rank`,
             this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived} WHERE MessageID=${MessageID}`, function(err) {
                 if(err) reject(err);
             }).catch(e => this.bot.logger.error(e));
-        })
+        });
     }
 
     /**

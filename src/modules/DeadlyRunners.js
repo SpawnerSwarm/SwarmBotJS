@@ -67,12 +67,14 @@ class DeadlyRunners extends Module {
                                 });
                             });
                         });
-                    }).catch(e => this.bot.logger.error(e));
+                    }).catch(e => this.logger.error(e));
                 }
                 else if (messageReaction.emoji.name == 'file_cabinet') {
-                    messageReaction.message.clearReactions().then((message) => {
-                        message.react('🗄️');
-                    })
+                    this.bot.settings.setArchived(messageReaction.message.id, 0).then(() => {
+                        messageReaction.message.clearReactions().then((message) => {
+                            message.react('🗄️');
+                        });
+                    }).catch(e => this.logger.error(e));
                 }
             }
             if (messageReaction.emoji.name == 'id') {
@@ -143,12 +145,12 @@ class DeadlyRunners extends Module {
                                 this.send(data.toString());
                             }.bind(channel));
                         } catch (err) {
-                            this.bot.logger.error(err);
+                            this.logger.error(err);
                         }
                     }
                 }
             })
-            .catch((error) => this.bot.logger.error(error));
+            .catch((error) => this.logger.error(error));
         this.client.user.setStatus('invisible');
     }
 }
