@@ -393,7 +393,26 @@ ORDER BY -Rank`,
         this.db.execute(SQL`INSERT INTO DRUNNERS (\`MessageID\`, \`Title\`, \`Item\`, \`UserID\`, \`ImageURL\`, \`Date\`) VALUES (${MessageID}, ${Title}, ${Item}, ${UserID}, ${ImageURL}, ${dateStr})`, function (err) {
             if (err) this.bot.logger.eror(err);
         }.bind(this));
+    }
 
+    designateBest(MessageID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item} AND Best=1`, function (err, results) {
+                        if (err) reject(err);
+                        if (results.length != 0) {
+                            this.db.execute(SQL`UPDATE DRUNNERS SET Best=1 WHERE MessageID=${MessageID}`, function (err) {
+                                if (err) reject(err);
+                            });
+                            resolve(results);
+                        }
+                    });
+
+                }
+            }.bind(this));
+        }).catch(e => this.bot.logger.error(e));
     }
 
     /**

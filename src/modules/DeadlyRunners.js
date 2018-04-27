@@ -15,7 +15,7 @@ class DeadlyRunners extends Module {
 
         this.shortName = 'drunners';
 
-        this.regex = /^ ?([^,]+), ?([^,]+), <@(.+)>/
+        this.regex = /^ ?([^,]+), ?([^,]+), <@(.+)>/;
 
         this.bot.settings.getModule(this.shortName).then((settings) => {
             this.settings = settings;
@@ -28,15 +28,19 @@ class DeadlyRunners extends Module {
                 let match = message.content.match(this.regex);
                 if(match) {
                     if(message.attachments.size != 1) {
+                        message.author.send(`Message was deleted due to too few or too many attachments (found ${message.attachments.size})`);
                         message.delete();
                     }
                     else {
                         let imageURL = message.attachments.first().url;
-                        this.bot.settings.createBuild(message.id, match[1], match[2], match[3], imageURL, new Date())
+                        this.bot.settings.createBuild(message.id, match[1], match[2], match[3], imageURL, new Date());
                         message.react('👑').then(() =>
                             message.react('🗄️').then(() =>
                                 message.react('🆔')));                     
                     }
+                }
+                else {
+                    message.delete();
                 }
             }
         }
@@ -46,7 +50,16 @@ class DeadlyRunners extends Module {
         if(!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
             if(user.id == '156962731084349442') {
                 if(messageReaction.emoji.name == 'crown') {
-                    
+                    this.bot.settings.designateBest(messageReaction.message.id).then((results) => {
+                        results.map((currentValue) => {
+                            messageReaction.message.channel.fetchMessage(currentValue.MessageID).then((message) => {
+                                let reaction = message.reactions.find(val => val.emoji.name == 'crown');
+                                reaction.users.map((user) => {
+                                    if(!user.bot) reaction.remove(user);
+                                });
+                            });
+                        });
+                    }).catch(e => this.bot.logger.error(e));
                 }
                 else if(messageReaction.emoji.name == 'file_cabinet') {
 
