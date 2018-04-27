@@ -23,20 +23,18 @@ class DeadlyRunners extends Module {
     }
 
     onMessage(message) {
-        if(!message.author.bot) {
-            if(message.channel.id == this.settings.Channel) {
+        if (!message.author.bot) {
+            if (message.channel.id == this.settings.Channel) {
                 let match = message.content.match(this.regex);
-                if(match) {
-                    if(message.attachments.size != 1) {
+                if (match) {
+                    if (message.attachments.size != 1) {
                         message.author.send(`Message was deleted due to too few or too many attachments (found ${message.attachments.size})`);
                         message.delete();
                     }
                     else {
                         let imageURL = message.attachments.first().url;
                         this.bot.settings.createBuild(message.id, match[1], match[2], match[3], imageURL, new Date());
-                        message.react('👑').then(() =>
-                            message.react('🗄️').then(() =>
-                                message.react('🆔')));                     
+                        this.addReactionSuite(message);
                     }
                 }
                 else {
@@ -46,72 +44,84 @@ class DeadlyRunners extends Module {
         }
     }
 
+    addReactionSuite(message) {
+        return new Promise((resolve) => {
+            resolve(message.react('👑').then((r, resolve) =>
+                resolve(message.react('🗄️').then((r, resolve) =>
+                    resolve(message.react('🆔'))
+                ))
+            ));
+        });
+    }
+
     onMessageReactionAdd(messageReaction, user) {
-        if(!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
-            if(user.id == '156962731084349442') {
-                if(messageReaction.emoji.name == 'crown') {
-                    this.bot.settings.designateBest(messageReaction.message.id).then((results) => {
+        if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
+            if (user.id == '156962731084349442') {
+                if (messageReaction.emoji.name == 'crown') {
+                    this.bot.settings.designateBestBuild(messageReaction.message.id).then((results) => {
                         results.map((currentValue) => {
                             messageReaction.message.channel.fetchMessage(currentValue.MessageID).then((message) => {
                                 let reaction = message.reactions.find(val => val.emoji.name == 'crown');
                                 reaction.users.map((user) => {
-                                    if(!user.bot) reaction.remove(user);
+                                    if (!user.bot) reaction.remove(user);
                                 });
                             });
                         });
                     }).catch(e => this.bot.logger.error(e));
                 }
-                else if(messageReaction.emoji.name == 'file_cabinet') {
-
+                else if (messageReaction.emoji.name == 'file_cabinet') {
+                    messageReaction.message.clearReactions().then((message) => {
+                        message.react('🗄️');
+                    })
                 }
             }
-            if(messageReaction.emoji.name == 'id') {
+            if (messageReaction.emoji.name == 'id') {
 
             }
-            else if(messageReaction.emoji.name == 'riven') {
-                
+            else if (messageReaction.emoji.name == 'riven') {
+
             }
         }
     }
 
     onMessageReactionRemove(messageReaction, user) {
-        if(!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
-            if(messageReaction.emoji.name == 'crown') {
+        if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
+            if (messageReaction.emoji.name == 'crown') {
 
             }
-            if(messageReaction.emoji.name == 'file_cabinet') {
+            if (messageReaction.emoji.name == 'file_cabinet') {
 
             }
         }
     }
 
     onMessageReactionRemoveAll(message) {
-        if(message.channel.id == this.settings.Channel) {
+        if (message.channel.id == this.settings.Channel) {
             message.delete();
-            
+
         }
     }
 
     onMessageDelete(message) {
-        if(!message.author.bot && message.channel.id == this.settings.Channel) {
-            
+        if (!message.author.bot && message.channel.id == this.settings.Channel) {
+
         }
     }
 
     onMessageDeleteBulk(messages) {
         messages.map(currentValue => {
-            
+
         });
     }
 
     onMessageUpdate(oldMessage, newMessage) {
         if (oldMessage.channel.id == this.settings.Channel && !oldMessage.author.bot) {
             let match = newMessage.content.match(this.regex);
-            if(!match) {
+            if (!match) {
 
             }
             else {
-                
+
             }
         }
     }

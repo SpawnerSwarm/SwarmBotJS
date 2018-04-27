@@ -395,11 +395,12 @@ ORDER BY -Rank`,
         }.bind(this));
     }
 
-    designateBest(MessageID) {
+    designateBestBuild(MessageID) {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`SELECT ID, Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
                 if (err) reject(err);
                 if (results.length != 0) {
+                    if(results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
                     this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item} AND Best=1`, function (err, results) {
                         if (err) reject(err);
                         if (results.length != 0) {
@@ -413,6 +414,14 @@ ORDER BY -Rank`,
                 }
             }.bind(this));
         }).catch(e => this.bot.logger.error(e));
+    }
+
+    setArchived(MessageID, Archived) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived} WHERE MessageID=${MessageID}`, function(err) {
+                if(err) reject(err);
+            }).catch(e => this.bot.logger.error(e));
+        })
     }
 
     /**
