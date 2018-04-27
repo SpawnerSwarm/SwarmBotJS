@@ -78,10 +78,21 @@ class DeadlyRunners extends Module {
                 }
             }
             if (messageReaction.emoji.name == 'id') {
-
+                this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build) => {
+                    user.send(`Build "${build.Title}" submitted by <@${build.UserID}> has ID ${build.ID}`);
+                }).catch(e => this.bot.logger.error(e));
             }
             else if (messageReaction.emoji.name == 'riven') {
-
+                this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build, resolve, reject) => {
+                    if (build.Riven == null) reject('noriven');
+                    user.send(build.Riven);
+                }).catch((e) => {
+                    if (e === 'noriven') {
+                        user.send('No Riven found for build');
+                        messageReaction.remove();
+                    }
+                    else this.logger.error(e);
+                })
             }
         }
     }

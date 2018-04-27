@@ -400,7 +400,7 @@ ORDER BY -Rank`,
             this.db.execute(SQL`SELECT ID, Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
                 if (err) reject(err);
                 if (results.length != 0) {
-                    if(results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
+                    if (results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
                     this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item} AND Best=1`, function (err, results) {
                         if (err) reject(err);
                         if (results.length != 0) {
@@ -418,10 +418,21 @@ ORDER BY -Rank`,
 
     setArchived(MessageID, Archived) {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived} WHERE MessageID=${MessageID}`, function(err) {
-                if(err) reject(err);
-            }).catch(e => this.bot.logger.error(e));
-        });
+            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived} WHERE MessageID=${MessageID}`, function (err) {
+                if (err) reject(err);
+            });
+        }).catch(e => this.bot.logger.error(e));
+    }
+
+    fetchBuildByMessageID(MessageID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    resolve(results[0]);
+                }
+            });
+        }).catch(e => this.bot.logger.error(e));
     }
 
     /**
