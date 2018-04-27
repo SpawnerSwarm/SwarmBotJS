@@ -444,15 +444,15 @@ ORDER BY -Rank`,
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err, results) {
                 if (err) reject(err);
-                resolve(results[0]);
             });
         }).catch(e => this.bot.logger.error(e));
     }
-
+    
     updateBuild(MessageID, Title, Item, UserID) {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Title=${Title}, Item=${Item}, UserID=${UserID} WHERE MessageID=${MessageID}`, function (err, results) {
                 if (err) reject(err);
+                resolve(results[0]);
             });
         });
     }
