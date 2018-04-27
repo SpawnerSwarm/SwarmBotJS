@@ -9,6 +9,8 @@ class Riven extends Command {
      */
     constructor(bot) {
         super(bot, 'warframe.riven', 'riven');
+
+        this.regex = /^(?:riven|<:riven:439450118870269954>)/i;
     }
 
     run(message) {
