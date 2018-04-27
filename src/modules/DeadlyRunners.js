@@ -70,7 +70,7 @@ class DeadlyRunners extends Module {
                     }).catch(e => this.logger.error(e));
                 }
                 else if (messageReaction.emoji.name == 'file_cabinet') {
-                    this.bot.settings.setArchived(messageReaction.message.id, 0).then(() => {
+                    this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
                         messageReaction.message.clearReactions().then((message) => {
                             message.react('🗄️');
                         });
