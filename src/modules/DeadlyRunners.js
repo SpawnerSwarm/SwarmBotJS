@@ -17,6 +17,8 @@ class DeadlyRunners extends Module {
 
         this.regex = /^ ?([^,]+), ?([^,]+), <@(.+)>/;
 
+        this.userid == '156962731084349442';
+
         this.bot.settings.getModule(this.shortName).then((settings) => {
             this.settings = settings;
         });
@@ -56,7 +58,7 @@ class DeadlyRunners extends Module {
 
     onMessageReactionAdd(messageReaction, user) {
         if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
-            if (user.id == '156962731084349442') {
+            if (user.id == this.userid) {
                 if (messageReaction.emoji.name == 'crown') {
                     this.bot.settings.designateBestBuild(messageReaction.message.id).then((results) => {
                         results.map((currentValue) => {
@@ -80,50 +82,56 @@ class DeadlyRunners extends Module {
             if (messageReaction.emoji.name == 'id') {
                 this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build) => {
                     user.send(`Build "${build.Title}" submitted by <@${build.UserID}> has ID ${build.ID}`);
+                    messageReaction.remove(user);
                 }).catch(e => this.bot.logger.error(e));
             }
             else if (messageReaction.emoji.name == 'riven') {
                 this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build, resolve, reject) => {
                     if (build.Riven == null) reject('noriven');
                     user.send(build.Riven);
+                    messageReaction.remove(user);
                 }).catch((e) => {
                     if (e === 'noriven') {
                         user.send('No Riven found for build');
                         messageReaction.remove();
                     }
                     else this.logger.error(e);
-                })
+                });
             }
         }
     }
 
     onMessageReactionRemove(messageReaction, user) {
-        if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
+        if (!user.bot && messageReaction.message.channel.id == this.settings.Channel && user.id == this.userid) {
             if (messageReaction.emoji.name == 'crown') {
-
+                this.bot.settings.setNotBestByMessageID(messageReaction.message.id)
+                    .catch(e => this.bot.logger.error(e));
             }
             if (messageReaction.emoji.name == 'file_cabinet') {
-
+                this.bot.settings.setArchived(messageReaction.message.id, 0).then((resolve) => {
+                    resolve(messageReaction.message.clearReactions().then((message) => {
+                        this.addReactionSuite(message);
+                    }));
+                }).catch(e => this.bot.logger.error(e));
             }
-        }
-    }
-
-    onMessageReactionRemoveAll(message) {
-        if (message.channel.id == this.settings.Channel) {
-            message.delete();
-
         }
     }
 
     onMessageDelete(message) {
         if (!message.author.bot && message.channel.id == this.settings.Channel) {
-
+            this.bot.settings.fetchBuildByMessageID(message.id).then((build, resolve) => {
+                resolve(this.bot.settings.setArchived(message.id, 1).then(() => {
+                    message.author.send(`Build ${build.ID} was archived because the message was deleted. If this is in error, contact Mardan`);
+                    this.logger.info(`Build ${build.ID} was archived due to deletion of message.`);
+                }));
+            }).catch(e => this.bot.logger.error(e));
         }
     }
 
     onMessageDeleteBulk(messages) {
+        this.logger.info(`Cataclysmic bulk deletion of messages in #deadlyrunners, ${messages.size} builds archived`);
         messages.map(currentValue => {
-
+            this.onMessageDelete(currentValue);
         });
     }
 
@@ -131,10 +139,20 @@ class DeadlyRunners extends Module {
         if (oldMessage.channel.id == this.settings.Channel && !oldMessage.author.bot) {
             let match = newMessage.content.match(this.regex);
             if (!match) {
-
+                this.bot.settings.fetchBuildByMessageID(oldMessage.id).then((build, resolve) => {
+                    resolve(this.bot.settings.setArchived(oldMessage.id, 1).then(() => {
+                        oldMessage.author.send(`Updated message for ${build.ID} does not fit pattern. Archiving build until message is amended.`);
+                        this.logger.info(`Build ${build.ID} was archived due to lack of pattern matching.`);
+                        newMessage.clearReactions().then((message) => {
+                            message.react('🗄️');
+                        });
+                    }));
+                }).catch(e => this.bot.logger.error(e));
             }
             else {
-
+                this.bot.settings.updateBuild(newMessage.id, match[1], match[2], match[3]).then((build) => {
+                    newMessage.author.send(`Updated build ${build.ID} for updated message successfully!`);
+                }).catch(e => this.bot.logger.error(e));
             }
         }
     }
