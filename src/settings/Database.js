@@ -365,6 +365,37 @@ ORDER BY -Rank`,
         }.bind(this));
     }
 
+    //End Bazaar
+
+    //DR
+    /**
+     * @param {number} MessageID
+     * @param {string} Title
+     * @param {string} Item
+     * @param {number} UserID
+     * @param {string} ImageURL
+     * @param {Date} date
+     */
+    createBuild(MessageID, Title, Item, UserID, ImageURL, date) {
+        var dd = date.getDate();
+        var mm = date.getMonth() + 1;
+        var yyyy = date.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        let dateStr = mm + '/' + dd + '/' + yyyy;
+        this.db.execute(SQL`INSERT INTO DRUNNERS (\`MessageID\`, \`Title\`, \`Item\`, \`UserID\`, \`ImageURL\`, \`Date\`) VALUES (${MessageID}, ${Title}, ${Item}, ${UserID}, ${ImageURL}, ${dateStr})`, function (err) {
+            if (err) this.bot.logger.eror(err);
+        }.bind(this));
+
+    }
+
     /**
      * @param {string} Name
      */
