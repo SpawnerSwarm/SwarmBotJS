@@ -17,7 +17,7 @@ class DeadlyRunners extends Module {
 
         this.regex = /^ ?([^,]+), ?([^,]+), <@!(\d+)>/;
 
-        this.userid == '156962731084349442';
+        this.userid = '156962731084349442';
 
         this.bot.settings.getModule(this.shortName).then((settings) => {
             this.settings = settings;

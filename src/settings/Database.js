@@ -403,12 +403,10 @@ ORDER BY -Rank`,
                     if (results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
                     this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item} AND Best=1`, function (err, results) {
                         if (err) reject(err);
-                        if (results.length != 0) {
-                            this.db.execute(SQL`UPDATE DRUNNERS SET Best=1 WHERE MessageID=${MessageID}`, function (err) {
-                                if (err) reject(err);
-                            });
-                            resolve(results);
-                        }
+                        this.db.execute(SQL`UPDATE DRUNNERS SET Best=1 WHERE MessageID=${MessageID}`, function (err) {
+                            if (err) reject(err);
+                        });
+                        resolve(results);
                     });
 
                 }
@@ -451,7 +449,7 @@ ORDER BY -Rank`,
             });
         }).catch(e => this.bot.logger.error(e));
     }
-    
+
     updateBuild(MessageID, Title, Item, UserID) {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Title=${Title}, Item=${Item}, UserID=${UserID} WHERE MessageID=${MessageID}`, function (err, results) {
