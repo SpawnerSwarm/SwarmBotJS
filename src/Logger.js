@@ -46,7 +46,7 @@ levels.forEach((level) => {
         if (level === 'error') {
             console.log(`${message}`);
         }
-        if(this.requestDisabled == 'false') {this.socket.emit('console log', {message: message, level: level});}
+        if(this.requestDisabled == 'false') {this.socket.emit('console log', {message: JSON.stringify(message).slice(1, -1), level: level});}
     };
 });
 
