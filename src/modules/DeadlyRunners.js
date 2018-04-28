@@ -26,7 +26,15 @@ class DeadlyRunners extends Module {
 
     onMessage(message) {
         if (!message.author.bot) {
-            if (message.channel.id == this.settings.Channel) {
+            if ((message.channel.id == this.settings.Channel || message.channel.type == 'dm') && (message.content.startsWith(this.prefix) && message.author.id == this.userid)) {
+                let messageWStrippedContent = message;
+                messageWStrippedContent.strippedContent = message.content.replace(this.prefix, '');
+                if (/^ ?(?:set)?riven \d+/i.test(messageWStrippedContent.strippedContent)) {
+                    this.setRiven(messageWStrippedContent);
+                }
+                if(message.chnanel.id == this.settings.Channel) message.delete();
+            }
+            else if (message.channel.id == this.settings.Channel) {
                 let match = message.content.match(this.regex);
                 if (match) {
                     if (message.attachments.size != 1) {
@@ -41,13 +49,6 @@ class DeadlyRunners extends Module {
                 }
                 else {
                     message.delete();
-                }
-            }
-            if (message.channel.id == this.settings.channel || message.channel.type == 'dm' && (message.startsWith(this.prefix) && message.author.id == this.userid)) {
-                let messageWStrippedContent = message;
-                messageWStrippedContent.strippedContent = message.content.replace(this.prefix, '');
-                if (/^ ?(?:set)?riven/i.test(messageWStrippedContent)) {
-                    this.setRiven(messageWStrippedContent);
                 }
             }
         }
@@ -110,8 +111,8 @@ class DeadlyRunners extends Module {
             }
             else if (messageReaction.emoji.name == 'riven') {
                 this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build) => {
-                    if (build.Riven == null) throw 'noriven';
-                    user.send(build.Riven);
+                    if (build.RivenURL == null) throw 'noriven';
+                    user.send(build.RivenURL);
                     messageReaction.remove(user);
                 }).catch((e) => {
                     if (e == 'noriven') {
@@ -218,7 +219,7 @@ class DeadlyRunners extends Module {
 
     setRiven(message) {
         let regex = /^ ?(?:set)?riven (\d+)/i;
-        let match = regex.match(message);
+        let match = message.strippedContent.match(regex);
         if (message.attachments.size == 1) {
             this.bot.settings.fetchBuildByID(match[1]).then((build) => {
                 this.bot.settings.setRiven(build.ID, message.attachments.first().url).then(() => {
