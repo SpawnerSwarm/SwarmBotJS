@@ -58,20 +58,27 @@ class DeadlyRunners extends Module {
 
     onMessageReactionAdd(messageReaction, user) {
         if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
-            if (user.id == this.userid) {
-                if (messageReaction.emoji.name == '👑') {
+            if (messageReaction.emoji.name == '👑') {
+                if (user.id == this.userid) {
                     this.bot.settings.designateBestBuild(messageReaction.message.id).then((results) => {
                         results.map((currentValue) => {
-                            messageReaction.message.channel.fetchMessage(currentValue.MessageID).then((message) => {
-                                let reaction = message.reactions.find(val => val.emoji.name == 'crown');
-                                reaction.users.map((x) => {
-                                    if (!x.bot) reaction.remove(x);
+                            if (currentValue.MessageID != messageReaction.message.id) {
+                                messageReaction.message.channel.fetchMessage(currentValue.MessageID).then((message) => {
+                                    let reaction = message.reactions.find(val => val.emoji.name == 'crown');
+                                    reaction.users.map((x) => {
+                                        if (!x.bot) reaction.remove(x);
+                                    });
                                 });
-                            });
+                            }
                         });
                     }).catch(e => this.logger.error(e));
                 }
-                else if (messageReaction.emoji.name == '📁') {
+                else {
+                    messageReaction.remove(user);
+                }
+            }
+            else if (messageReaction.emoji.name == '📁') {
+                if (user.id == this.userid) {
                     this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
                         messageReaction.message.reactions.map((reaction) => {
                             if (messageReaction.emoji.name != '📁') {
@@ -82,8 +89,11 @@ class DeadlyRunners extends Module {
                         });
                     }).catch(e => this.logger.error(e));
                 }
+                else {
+                    messageReaction.remove(user);
+                }
             }
-            if (messageReaction.emoji.name == '🆔') {
+            else if (messageReaction.emoji.name == '🆔') {
                 this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build) => {
                     user.send(`Build "${build.Title}" submitted by <@${build.UserID}> has ID ${build.ID}`);
                     messageReaction.remove(user);

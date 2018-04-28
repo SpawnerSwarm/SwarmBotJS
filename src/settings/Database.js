@@ -401,7 +401,7 @@ ORDER BY -Rank`,
                 if (err) reject(err);
                 if (results.length != 0) {
                     if (results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
-                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item} AND Best=1`, function (err, results) {
+                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item}`, function (err, results) {
                         if (err) reject(err);
                         this.db.execute(SQL`UPDATE DRUNNERS SET Best=1 WHERE MessageID=${MessageID}`, function (err) {
                             if (err) reject(err);
