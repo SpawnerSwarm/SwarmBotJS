@@ -59,7 +59,7 @@ class DeadlyRunners extends Module {
     onMessageReactionAdd(messageReaction, user) {
         if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
             if (user.id == this.userid) {
-                if (messageReaction.emoji.name == 'crown') {
+                if (messageReaction.emoji.name == '👑') {
                     this.bot.settings.designateBestBuild(messageReaction.message.id).then((results) => {
                         results.map((currentValue) => {
                             messageReaction.message.channel.fetchMessage(currentValue.MessageID).then((message) => {
@@ -71,7 +71,7 @@ class DeadlyRunners extends Module {
                         });
                     }).catch(e => this.logger.error(e));
                 }
-                else if (messageReaction.emoji.name == 'file_folder') {
+                else if (messageReaction.emoji.name == '📁') {
                     this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
                         messageReaction.message.clearReactions().then((message) => {
                             message.react('📁');
@@ -79,7 +79,7 @@ class DeadlyRunners extends Module {
                     }).catch(e => this.logger.error(e));
                 }
             }
-            if (messageReaction.emoji.name == 'id') {
+            if (messageReaction.emoji.name == '🆔') {
                 this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build) => {
                     user.send(`Build "${build.Title}" submitted by <@${build.UserID}> has ID ${build.ID}`);
                     messageReaction.remove(user);
@@ -103,11 +103,11 @@ class DeadlyRunners extends Module {
 
     onMessageReactionRemove(messageReaction, user) {
         if (!user.bot && messageReaction.message.channel.id == this.settings.Channel && user.id == this.userid) {
-            if (messageReaction.emoji.name == 'crown') {
+            if (messageReaction.emoji.name == '👑') {
                 this.bot.settings.setNotBestByMessageID(messageReaction.message.id)
                     .catch(e => this.bot.logger.error(e));
             }
-            if (messageReaction.emoji.name == 'file_folder') {
+            if (messageReaction.emoji.name == '📁') {
                 this.bot.settings.setArchived(messageReaction.message.id, 0).then(() => {
                     messageReaction.message.clearReactions().then((message) => {
                         this.addReactionSuite(message);
