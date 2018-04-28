@@ -49,8 +49,8 @@ class DeadlyRunners extends Module {
     addReactionSuite(message) {
         return new Promise((resolve) => {
             message.react('👑').then(() =>
-                message.react('🗄️').then(() =>
-                    resolve(message.react('🆔'))
+                message.react('🆔').then(() =>
+                    resolve(message.react('📁'))
                 )
             );
         });
@@ -71,10 +71,10 @@ class DeadlyRunners extends Module {
                         });
                     }).catch(e => this.logger.error(e));
                 }
-                else if (messageReaction.emoji.name == 'file_cabinet') {
+                else if (messageReaction.emoji.name == 'file_folder') {
                     this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
                         messageReaction.message.clearReactions().then((message) => {
-                            message.react('🗄️');
+                            message.react('📁');
                         });
                     }).catch(e => this.logger.error(e));
                 }
@@ -107,7 +107,7 @@ class DeadlyRunners extends Module {
                 this.bot.settings.setNotBestByMessageID(messageReaction.message.id)
                     .catch(e => this.bot.logger.error(e));
             }
-            if (messageReaction.emoji.name == 'file_cabinet') {
+            if (messageReaction.emoji.name == 'file_folder') {
                 this.bot.settings.setArchived(messageReaction.message.id, 0).then(() => {
                     messageReaction.message.clearReactions().then((message) => {
                         this.addReactionSuite(message);
@@ -144,7 +144,7 @@ class DeadlyRunners extends Module {
                         oldMessage.author.send(`Updated message for ${build.ID} does not fit pattern. Archiving build until message is amended.`);
                         this.logger.info(`Build ${build.ID} was archived due to lack of pattern matching.`);
                         newMessage.clearReactions().then((message) => {
-                            message.react('🗄️');
+                            message.react('📁');
                         });
                     });
                 }).catch(e => this.bot.logger.error(e));
