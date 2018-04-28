@@ -106,6 +106,7 @@ class DeadlyRunners extends Module {
             else if (messageReaction.emoji.name == '🆔') {
                 this.bot.settings.fetchBuildByMessageID(messageReaction.message.id).then((build) => {
                     user.send(`Build "${build.Title}" submitted by <@${build.UserID}> has ID ${build.ID}`);
+                    if(user.id == this.userid) user.send(`Command to set its riven is \`&dr riven ${build.ID}\``);
                     messageReaction.remove(user);
                 }).catch(e => this.bot.logger.error(e));
             }
