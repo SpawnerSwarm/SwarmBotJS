@@ -423,7 +423,11 @@ ORDER BY -Rank`,
                 if (results.length == 1 && results[0].Best == 1 && Archived == 1) {
                     this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
                         if (err) reject(err);
+                        resolve();
                     });
+                }
+                else {
+                    resolve();
                 }
             });
         }).catch(e => this.bot.logger.error(e));
@@ -442,7 +446,7 @@ ORDER BY -Rank`,
 
     setNotBestByMessageID(MessageID) {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
                 if (err) reject(err);
             });
         }).catch(e => this.bot.logger.error(e));

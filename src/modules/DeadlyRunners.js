@@ -15,7 +15,7 @@ class DeadlyRunners extends Module {
 
         this.shortName = 'drunners';
 
-        this.regex = /^ ?([^,]+), ?([^,]+), <@(.+)>/;
+        this.regex = /^ ?([^,]+), ?([^,]+), <@!(\d+)>/;
 
         this.userid == '156962731084349442';
 
