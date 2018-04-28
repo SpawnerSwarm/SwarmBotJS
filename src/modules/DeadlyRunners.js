@@ -73,8 +73,8 @@ class DeadlyRunners extends Module {
                 }
                 else if (messageReaction.emoji.name == '📁') {
                     this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
-                        messageReaction.message.clearReactions().then((message) => {
-                            message.react('📁');
+                        messageReaction.message.reactions.map((reaction) => {
+                            if(messageReaction.name != '📁') reaction.remove();
                         });
                     }).catch(e => this.logger.error(e));
                 }

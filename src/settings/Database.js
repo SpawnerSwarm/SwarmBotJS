@@ -407,7 +407,7 @@ ORDER BY -Rank`,
                             if (err) reject(err);
                         });
                         resolve(results);
-                    });
+                    }.bind(this));
 
                 }
             }.bind(this));
@@ -427,7 +427,7 @@ ORDER BY -Rank`,
                 else {
                     resolve();
                 }
-            });
+            }.bind(this));
         }).catch(e => this.bot.logger.error(e));
     }
 
