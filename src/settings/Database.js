@@ -416,17 +416,9 @@ ORDER BY -Rank`,
 
     setArchived(MessageID, Archived) {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived} WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived}, Best=0 WHERE MessageID=${MessageID}`, function (err, results) {
                 if (err) reject(err);
-                if (results.length == 1 && results[0].Best == 1 && results[0].Archived == 1) {
-                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
-                        if (err) reject(err);
-                        resolve();
-                    });
-                }
-                else {
-                    resolve();
-                }
+                resolve(results[0]);
             }.bind(this));
         }).catch(e => this.bot.logger.error(e));
     }

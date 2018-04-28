@@ -81,7 +81,7 @@ class DeadlyRunners extends Module {
                 if (user.id == this.userid) {
                     this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
                         messageReaction.message.reactions.map((reaction) => {
-                            if (messageReaction.emoji.name != '📁') {
+                            if (reaction.emoji.name != '📁') {
                                 reaction.fetchUsers().then((users) => {
                                     users.map((x) => {
                                         reaction.remove(x);
@@ -128,7 +128,9 @@ class DeadlyRunners extends Module {
             }
             if (messageReaction.emoji.name == '📁') {
                 this.bot.settings.setArchived(messageReaction.message.id, 0).then(() => {
-                    this.addReactionSuite(messageReaction.message);
+                    messageReaction.message.clearReactions().then((message) => {
+                        this.addReactionSuite(message);
+                    });
                 }).catch(e => this.bot.logger.error(e));
             }
         }
@@ -194,6 +196,11 @@ class DeadlyRunners extends Module {
                             this.logger.error(err);
                         }
                     }
+                }
+                else {
+                    messages.map((message) => {
+                        message.createReactionCollector(() => true, {time: 15000});
+                    });
                 }
             })
             .catch((error) => this.logger.error(error));
