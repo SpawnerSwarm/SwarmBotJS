@@ -64,8 +64,8 @@ class DeadlyRunners extends Module {
                         results.map((currentValue) => {
                             messageReaction.message.channel.fetchMessage(currentValue.MessageID).then((message) => {
                                 let reaction = message.reactions.find(val => val.emoji.name == 'crown');
-                                reaction.users.map((user) => {
-                                    if (!user.bot) reaction.remove(user);
+                                reaction.users.map((x) => {
+                                    if (!x.bot) reaction.remove(x);
                                 });
                             });
                         });
@@ -74,7 +74,11 @@ class DeadlyRunners extends Module {
                 else if (messageReaction.emoji.name == '📁') {
                     this.bot.settings.setArchived(messageReaction.message.id, 1).then(() => {
                         messageReaction.message.reactions.map((reaction) => {
-                            if(messageReaction.name != '📁') reaction.remove();
+                            if (messageReaction.emoji.name != '📁') {
+                                reaction.users.map((x) => {
+                                    reaction.remove(x);
+                                });
+                            }
                         });
                     }).catch(e => this.logger.error(e));
                 }
@@ -93,10 +97,13 @@ class DeadlyRunners extends Module {
                 }).catch((e) => {
                     if (e == 'noriven') {
                         user.send('No Riven found for build');
-                        messageReaction.remove();
+                        messageReaction.remove(user);
                     }
                     else this.logger.error(e);
                 });
+            }
+            else {
+                messageReaction.remove(user);
             }
         }
     }
@@ -109,9 +116,7 @@ class DeadlyRunners extends Module {
             }
             if (messageReaction.emoji.name == '📁') {
                 this.bot.settings.setArchived(messageReaction.message.id, 0).then(() => {
-                    messageReaction.message.clearReactions().then((message) => {
-                        this.addReactionSuite(message);
-                    });
+                    this.addReactionSuite(messageReaction.message);
                 }).catch(e => this.bot.logger.error(e));
             }
         }
