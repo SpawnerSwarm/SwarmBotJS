@@ -418,7 +418,7 @@ ORDER BY -Rank`,
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived} WHERE MessageID=${MessageID}`, function (err, results) {
                 if (err) reject(err);
-                if (results.length == 1 && results[0].Best == 1 && Archived == 1) {
+                if (results.length == 1 && results[0].Best == 1 && results[0].Archived == 1) {
                     this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
                         if (err) reject(err);
                         resolve();
