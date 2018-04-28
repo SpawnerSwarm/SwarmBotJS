@@ -43,6 +43,13 @@ class DeadlyRunners extends Module {
                     message.delete();
                 }
             }
+            if (message.channel.id == this.settings.channel || message.channel.type == 'dm' && message.startsWith(this.prefix)) {
+                let messageWStrippedContent = message;
+                messageWStrippedContent.strippedContent = message.content.replace(this.prefix, '');
+                if (/^ ?(?:set)?riven/i.test(messageWStrippedContent)) {
+                    this.setRiven(messageWStrippedContent);
+                }
+            }
         }
     }
 
@@ -199,12 +206,34 @@ class DeadlyRunners extends Module {
                 }
                 else {
                     messages.map((message) => {
-                        message.createReactionCollector(() => true, {time: 15000});
+                        message.createReactionCollector(() => true, { time: 15000 });
                     });
                 }
             })
             .catch((error) => this.logger.error(error));
         this.client.user.setStatus('invisible');
+    }
+
+    //Commands
+
+    setRiven(message) {
+        let regex = /^ ?(?:set)?riven (\d+)/i;
+        let match = regex.match(message);
+        if (message.attachments.size == 1) {
+            this.bot.settings.fetchBuildByID(match[1]).then((build) => {
+                this.bot.settings.setRiven(build.ID, message.attachments.first().url).then(() => {
+                    message.author.send('Riven set!');
+                    let guild = this.client.guilds.get(this.settings.Guild);
+                    let channel = guild.channels.get(this.settings.Channel);
+                    channel.fetchMessage(build.MessageID).then((x) => {
+                        x.react(message.guild.emojis.find('name', 'riven'));
+                    });
+                });
+            });
+        }
+        else {
+            message.channel.send(`Too many or too few attachments, found ${message.attachments.size}`);
+        }
     }
 }
 

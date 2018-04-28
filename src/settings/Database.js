@@ -434,6 +434,17 @@ ORDER BY -Rank`,
         }).catch(e => this.bot.logger.error(e));
     }
 
+    fetchBuildByID(ID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE ID=${ID}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    resolve(results[0]);
+                }
+            });
+        }).catch(e => this.bot.logger.error(e));
+    }
+
     setNotBestByMessageID(MessageID) {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
@@ -445,6 +456,15 @@ ORDER BY -Rank`,
     updateBuild(MessageID, Title, Item, UserID) {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Title=${Title}, Item=${Item}, UserID=${UserID} WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                resolve(results[0]);
+            });
+        });
+    }
+
+    setRiven(ID, RivenURL) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE DRUNNERS SET RivenURL=${RivenURL} WHERE ID=${ID}`, function (err, results) {
                 if (err) reject(err);
                 resolve(results[0]);
             });
