@@ -43,7 +43,7 @@ class DeadlyRunners extends Module {
                     message.delete();
                 }
             }
-            if (message.channel.id == this.settings.channel || message.channel.type == 'dm' && message.startsWith(this.prefix)) {
+            if (message.channel.id == this.settings.channel || message.channel.type == 'dm' && (message.startsWith(this.prefix) && message.author.id == this.userid)) {
                 let messageWStrippedContent = message;
                 messageWStrippedContent.strippedContent = message.content.replace(this.prefix, '');
                 if (/^ ?(?:set)?riven/i.test(messageWStrippedContent)) {
