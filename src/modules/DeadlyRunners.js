@@ -194,7 +194,7 @@ class DeadlyRunners extends Module {
                 if (messages.size < 2) {
                     this.logger.debug(`Under 2 messages found in ${this.name}. Deleting and re-sending info text.`);
                     messages.deleteAll();
-                    const path = './docs/drunners_channel.md';
+                    const path = './docs/deadlywelcome.md';
                     if (fs.existsSync(path)) {
                         try {
                             fs.readFile(path, function (err, data) {
