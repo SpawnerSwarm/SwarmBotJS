@@ -365,6 +365,112 @@ ORDER BY -Rank`,
         }.bind(this));
     }
 
+    //End Bazaar
+
+    //DR
+    /**
+     * @param {number} MessageID
+     * @param {string} Title
+     * @param {string} Item
+     * @param {number} UserID
+     * @param {string} ImageURL
+     * @param {Date} date
+     */
+    createBuild(MessageID, Title, Item, UserID, ImageURL, date) {
+        var dd = date.getDate();
+        var mm = date.getMonth() + 1;
+        var yyyy = date.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+
+        let dateStr = mm + '/' + dd + '/' + yyyy;
+        this.db.execute(SQL`INSERT INTO DRUNNERS (\`MessageID\`, \`Title\`, \`Item\`, \`UserID\`, \`ImageURL\`, \`Date\`) VALUES (${MessageID}, ${Title}, ${Item}, ${UserID}, ${ImageURL}, ${dateStr})`, function (err) {
+            if (err) this.bot.logger.eror(err);
+        }.bind(this));
+    }
+
+    designateBestBuild(MessageID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT ID, Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    if (results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
+                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item}`, function (err, results) {
+                        if (err) reject(err);
+                        this.db.execute(SQL`UPDATE DRUNNERS SET Best=1 WHERE MessageID=${MessageID}`, function (err) {
+                            if (err) reject(err);
+                        });
+                        resolve(results);
+                    }.bind(this));
+
+                }
+            }.bind(this));
+        }).catch(e => this.bot.logger.error(e));
+    }
+
+    setArchived(MessageID, Archived) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived}, Best=0 WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                resolve(results[0]);
+            }.bind(this));
+        }).catch(e => this.bot.logger.error(e));
+    }
+
+    fetchBuildByMessageID(MessageID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    resolve(results[0]);
+                }
+            });
+        }).catch(e => this.bot.logger.error(e));
+    }
+
+    fetchBuildByID(ID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE ID=${ID}`, function (err, results) {
+                if (err) reject(err);
+                if (results.length != 0) {
+                    resolve(results[0]);
+                }
+            });
+        }).catch(e => this.bot.logger.error(e));
+    }
+
+    setNotBestByMessageID(MessageID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
+                if (err) reject(err);
+            });
+        }).catch(e => this.bot.logger.error(e));
+    }
+
+    updateBuild(MessageID, Title, Item, UserID) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Title=${Title}, Item=${Item}, UserID=${UserID} WHERE MessageID=${MessageID}`, function (err, results) {
+                if (err) reject(err);
+                resolve(results[0]);
+            });
+        });
+    }
+
+    setRiven(ID, RivenURL) {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE DRUNNERS SET RivenURL=${RivenURL} WHERE ID=${ID}`, function (err, results) {
+                if (err) reject(err);
+                resolve(results[0]);
+            });
+        });
+    }
+
     /**
      * @param {string} Name
      */
