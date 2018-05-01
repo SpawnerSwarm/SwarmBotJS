@@ -17,6 +17,7 @@
           "TOKEN": "!_DISCORD API TOKEN_!", //Get a discord API token from https://discordapp.com
             "HAVEN_BAZAAR": "!_DISCORD API TOKEN_!", //Unnecessary if Haven Bazaar was disabled or removed
             "MAROO_BAZAAR": "!_DISCORD API TOKEN_!", //Unnecessary if Maroo's Bazaar was disabled or removed
+            "DEADLY_RUNNERS": "!_DISCORD API TOKEN_!", //Unnecessary if Deadly Runners was disabled or removed
           "PREFIX": "!", //The prefix used to recognize commands. Ensure this does not conflict with other bots on your server.
           "MD_LINE_END": "\n",
           "MD_BLOCK_END": "\n```",
@@ -46,7 +47,12 @@
           "LEGACY_LOGGER": false, //If set to true, Magnify will be disabled.
           "MAGNIFY_URL": "!_URL FOR MAGNIFY, LEAVE BLANK IF NO REMOTE SETUP_!", //Leave this blank if Magnify is not in use.
           "OCR_KEY": "!_OCR.SPACE API KEY FOR RIVEN_!", //Unnecessary if the !riven command was removed or disabled. Get an api key from https://ocr.space to use.
-          "SHOULD_PESTER": false //Disables sending periodic rankup notifications to users.
+          "SHOULD_PESTER": false, //Disables sending periodic rankup notifications to users.
+          //Below are unnecessary if you removed !viewdb
+          "GOOGLE_KEY": "!_KEY FOR GOOGLE SCRIPT !viewdb SERVICE",
+          "SQL_CSV_REQUESTS": "~/requests.sql", //The SQL requests to perform
+          "SQL_CSV_OUT": "~/out.csv", //Destination CSV (overwritten at next execution)
+          "GOOGLE_URL": "!_URL OF GOOGLE SCRIPT_!"
         }
       }
     ]
