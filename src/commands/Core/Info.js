@@ -3,7 +3,6 @@
 const Command = require('../../Command.js');
 const os = require('os');
 const exec = require('child_process').exec;
-const request = require('request');
 const Discord = require('discord.js');
 
 class Info extends Command {

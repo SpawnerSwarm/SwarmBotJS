@@ -22,7 +22,7 @@
         ],
         "react/jsx-sort-prop-types": "off",
         "no-invalid-regexp": "error",
-        "no-extra-parens": "error",
+        "no-extra-parens": "warn",
         "no-extra-semi": "error",
         "no-regex-spaces": "warn",
         "no-unreachable": "error",

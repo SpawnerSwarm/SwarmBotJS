@@ -317,4 +317,4 @@ module.exports = [
         content: 'https://github.com/SpawnerSwarm/SwarmBotJS/blob/master/src/resources/SpiralKnightsEmotes.js',
         partner: '*%1 %2*'
     }
-]
+];
