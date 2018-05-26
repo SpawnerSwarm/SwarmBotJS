@@ -21,7 +21,7 @@ class Info extends Command {
     run(message) {
         this.bot.settings.getVersion().then((mySQLVersion) => {
             new Promise((resolve) => {
-                exec('git rev-parse --short=15 HEAD', (error, stdout) => {
+                exec('git rev-parse --short=7 HEAD', (error, stdout) => {
                     resolve(stdout);
                 });
             }).then((gitHash) => {
