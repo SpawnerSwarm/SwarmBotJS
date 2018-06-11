@@ -32,7 +32,7 @@ class DeadlyRunners extends Module {
                 if (/^ ?(?:set)?riven \d+/i.test(messageWStrippedContent.strippedContent)) {
                     this.setRiven(messageWStrippedContent);
                 }
-                if(message.chnanel.id == this.settings.Channel) message.delete();
+                if(message.channel.id == this.settings.Channel) message.delete();
             }
             else if (message.channel.id == this.settings.Channel) {
                 let match = message.content.match(this.regex);
