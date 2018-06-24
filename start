@@ -1,0 +1,9 @@
+#!/bin/bash
+###
+# Docker start script
+#
+# Change the --name to your liking, but this may kill future scripts
+###
+docker run -d \
+    --name swarmbot \
+    --restart on-failure:5
