@@ -1,6 +1,5 @@
 ﻿import { ColorResolvable } from "discord.js";
 
-/*eslint-disable quotes*/
 export type Rank = {
     name: string,
     id: number,
