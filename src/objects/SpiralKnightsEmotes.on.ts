@@ -5,7 +5,13 @@ All the emotes from spiral knights conveniently in one JSON file.
 Made by crunchyintheory, I don't care where you use this.
 They made me make this I'm sorry.
 */
-module.exports = [
+export type SKEmote = {
+    command: string,
+    content: string,
+    partner?: string
+}
+
+export default [
     {
         command: 'amazed?',
         content: '%1 is utterly amazed!',
@@ -317,4 +323,4 @@ module.exports = [
         content: 'https://github.com/SpawnerSwarm/SwarmBotJS/blob/master/src/resources/SpiralKnightsEmotes.js',
         partner: '*%1 %2*'
     }
-];
+] as SKEmote[];
