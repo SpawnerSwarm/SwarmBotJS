@@ -1,8 +1,0 @@
-{
-    "root": "./modules",
-    "modules": [
-        "/Bazaar/Haven.js",
-        "/Bazaar/Maroo.js",
-        "/DeadlyRunners.js"
-    ]
-}
