@@ -1,13 +1,19 @@
-﻿'use strict';
+﻿import * as cluster from 'cluster';
+import Logger from './Logger';
 
-class ClusterManager {
-    constructor(cluster, logger, localShards, shardOffset) {
-        this.workerIDToShardID = {};
+export default class ClusterManager {
+    public workerIDToShardID: {} = {};
+    public cluster: any;
+    public logger: Logger;
+    public localShards: number | undefined;
+    public shardOffset: number | undefined;
+    public exit: boolean = false;
+
+    constructor(cluster: any, logger: Logger, localShards: string | number | undefined, shardOffset: string | number | undefined) {
         this.cluster = cluster;
         this.logger = logger;
-        this.localShards = localShards;
-        this.shardOffset = shardOffset;
-        this.exit = false;
+        this.localShards = Number(localShards);
+        this.shardOffset = Number(shardOffset);
 
         cluster.on('online', (worker) => {
             this.onOnlineWorker(worker);
@@ -61,5 +67,3 @@ class ClusterManager {
         }
     }
 }
-
-module.exports = ClusterManager;
