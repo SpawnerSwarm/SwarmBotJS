@@ -25,6 +25,8 @@ export default class Command {
     public requiredRank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
     public allowDM: boolean = true;
 
+    public mandatoryWords: RegExp | undefined = undefined;
+
     constructor(bot: Cephalon, id: string, call: string, description: string) {
         this.id = id;
         this.call = call;
