@@ -1,0 +1,43 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "adjacent-overload-signatures": true,
+        "align": true,
+        "member-access": true,
+        "typedef": {
+            "options": [
+                "call-signature",
+                "parameter",
+                "property-declaration",
+                "variable-declaration",
+                "member-variable-declaration",
+            ],
+            "severity": "error"
+        },
+        "typedef-whitespace": {
+            "options": [
+                {
+                    "call-signature": "nospace",
+                    "index-signature": "nospace",
+                    "parameter": "nospace",
+                    "property-declaration": "nospace",
+                    "variable-declaration": "nospace"
+                },
+                {
+                    "call-signature": "onespace",
+                    "index-signature": "onespace",
+                    "parameter": "onespace",
+                    "property-declaration": "onespace",
+                    "variable-declaration": "onespace"
+                }
+            ],
+            "severity": "error"
+        },
+        "curly": [
+            true,
+            "ignore-same-line"
+        ],
+        "no-console": [true, "log", "error"]
+    },
+    "defaultSeverity": "warning"
+}
