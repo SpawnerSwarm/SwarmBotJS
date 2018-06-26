@@ -17,7 +17,7 @@ export default class Help extends Command {
     run(message: MessageWithStrippedContent) {
         let match = message.strippedContent.match(this.regex);
         if(!this._tsoverrideregex(match)) return;
-        this.bot.logger.debug(match[1]);
+        this.logger.debug(match[1]);
         let name: string;
         
         if(!match[1]) name = '_';
@@ -41,7 +41,7 @@ export default class Help extends Command {
                     }
                 }.bind(message));
             } catch (err) {
-                this.bot.logger.error(err);
+                this.logger.error(err);
             }
         }
     }
