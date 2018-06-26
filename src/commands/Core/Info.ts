@@ -9,7 +9,7 @@ class Info extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'core.debug.info', 'info', 'Returns info about the current instance.');
 
-        this.regex = new RegExp('^(?:info|debug|session|vars)$');
+        this.regex = /^(?:info|debug|session|vars)$'/i;
 
         this.requiredRank = 0;
     }

@@ -9,7 +9,7 @@ export default class Emotes extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'core.emotes', 'emotes');
 
-        this.regex = new RegExp('^(?:emote(?:s)?|e)(?: (list|create|new|search|find)? ?)?(.+)?$', 'i');
+        this.regex = /^(?:emote(?:s)?|e)(?: (list|create|new|search|find)? ?)?(.+)?$/i;
     }
 
     run(message: MessageWithStrippedContent) {
