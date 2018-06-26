@@ -1,7 +1,7 @@
 import gulp from "gulp";
 import tslint from "gulp-tslint";
 import ts from "gulp-typescript";
-import { fs } from "fs";
+import * as fs from "fs";
 
 export function lint() {
     return gulp.src('src/**/*.ts')
@@ -31,6 +31,7 @@ export function start() {
         //Start bot without Docker
         return require('./dist/main.js');
     }
+    return 1;
 };
 
 export const bs = gulp.series(tsc, start);
