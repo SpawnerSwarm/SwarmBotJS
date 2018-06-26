@@ -62,7 +62,7 @@ export default class Emotes extends Command {
                 }
             });
         }).catch((err) => {
-            this.bot.logger.error(err);
+            this.logger.error(err);
             message.channel.send('http://i.imgur.com/zdMAeE9.png');
         });
     }
@@ -86,7 +86,7 @@ export default class Emotes extends Command {
                         resolve(creators);
                     }
                 }).catch(() => {
-                    this.bot.logger.error('Error: Could not find creator');
+                    this.logger.error('Error: Could not find creator');
                     creators.push(this.bot.client.user);
                     if (creators.length == emotes.length) {
                         resolve(creators);
@@ -107,12 +107,12 @@ export default class Emotes extends Command {
                         }
                     })
                     .catch((err) => {
-                        this.bot.logger.error(err);
+                        this.logger.error(err);
                         message.channel.send(`\`Error: ${err}\``);
                     });
             })
             .catch((err) => {
-                this.bot.logger.error(err);
+                this.logger.error(err);
                 message.channel.send(`\`Error: ${err}\``);
             });
     }
@@ -183,7 +183,7 @@ export default class Emotes extends Command {
                     }
                 });
             }).catch((err) => {
-                this.bot.logger.error(err);
+                this.logger.error(err);
                 message.channel.send('http://i.imgur.com/zdMAeE9.png');
             });
         }
