@@ -7,6 +7,7 @@ import Cephalon from "../Cephalon";
 import { UrlResolvable, RankNum } from "../objects/Types";
 import Member from "../objects/Member";
 import { User, Snowflake } from "discord.js";
+import Emote from "../objects/Emote";
 
 export type DbConnectionOptions = {
     host: UrlResolvable | "localhost",
@@ -17,7 +18,7 @@ export type DbConnectionOptions = {
 };
 
 export type EmotePage = {
-    results: RowDataPacket[],
+    results: Emote[],
     count: number
 }
 
@@ -146,11 +147,11 @@ ORDER BY -Rank`,
         });
     }
 
-    getEmote(ref: string) {
+    getEmote(ref: string): Promise<Emote> {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`SELECT * FROM EMOTES WHERE Reference= ${ref}`, function (err, results: RowDataPacket[]) {
                 if (results.length !== 0) {
-                    resolve(results[0]);
+                    resolve(results[0] as Emote);
                 } else {
                     reject('Emote not found');
                 }
@@ -166,7 +167,7 @@ ORDER BY -Rank`,
             db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results: RowDataPacket[]) {
                 db.execute(SQL`SELECT COUNT(*) FROM EMOTES`, function (err2, count) {
                     if (results.length !== 0) {
-                        resolve({ results: results, count: count[0]['COUNT(*)'] });
+                        resolve({ results: results as Emote[], count: count[0]['COUNT(*)'] });
                     } else {
                         reject('Unable to get emotes at that page');
                     }
@@ -188,7 +189,7 @@ ORDER BY -Rank`,
             db.execute(SQL`SELECT * FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l} LIMIT ${page}, 4`, function (err, results: RowDataPacket[]) {
                 db.execute(SQL`SELECT COUNT(*) FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l}`, function (err2, count: RowDataPacket[]) {
                     if (results.length !== 0) {
-                        resolve({ results: results, count: count[0]['COUNT(*)'] });
+                        resolve({ results: results as Emote[], count: count[0]['COUNT(*)'] });
                     } else {
                         reject('Unable to get emotes at that page');
                     }

@@ -1,24 +1,20 @@
-'use strict';
+import Command from "../../objects/Command";
+import EmoteEmbed from "../../embeds/EmoteEmbed";
+import Cephalon from "../../Cephalon";
+import { MessageWithStrippedContent } from "../../objects/Types";
+import { Snowflake, User, Message } from "discord.js";
+import Emote from "../../objects/Emote";
 
-const Command = require('../../Command.js');
-
-const EmoteEmbed = require('../../embeds/EmoteEmbed.js');
-
-class Emotes extends Command {
-    /**
-     * @param {Cephalon} bot 
-     */
-    constructor(bot) {
+export default class Emotes extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'core.emotes', 'emotes');
 
         this.regex = new RegExp('^(?:emote(?:s)?|e)(?: (list|create|new|search|find)? ?)?(.+)?$', 'i');
     }
 
-    /**
-     * @param {Message} message 
-     */
-    run(message) {
+    run(message: MessageWithStrippedContent) {
         let match = message.strippedContent.match(this.regex);
+        if(!this._tsoverrideregex(match)) return;
         if (match[1] === 'list') {
             this.list(message, match);
         }
@@ -32,22 +28,21 @@ class Emotes extends Command {
             this.get(message, match);
         }
         else {
-            let initialCommandUsed = message.strippedContent.match('^(emotes?|e)')[1];
+            let initialCommandUsed = (message.strippedContent.match('^(emotes?|e)') as RegExpMatchArray)[1];
             message.channel.send(`-** !${initialCommandUsed}** -- Display this text.\n-** !${initialCommandUsed} (ref)** -- Return the emote matching the ref.\n-** !${initialCommandUsed} list (page)** -- List all emotes.\n-** !${initialCommandUsed} create*/new*  "(name)" (reference) (requiredRank) (content) [creator]** -- Create a new Emote.`);
         }
     }
 
-    list(message, match) {
+    list(message: Message, match: RegExpMatchArray) {
         let page = parseInt(match[2]);
         if (isNaN(page)) {
             page = 1;
         }
-        this.bot.settings.getEmoteList(page).then((emotes) => {
+        this.bot.db.getEmoteList(page).then((emotes) => {
             let count = emotes.count;
-            emotes = emotes.results;
             let pageCount = page > 0 ? page - 1 : page,
                 min = pageCount * 5 - pageCount,
-                max = (pageCount + 1) * 5 - (5 - emotes.length) - pageCount;
+                max = (pageCount + 1) * 5 - (5 - emotes.results.length) - pageCount;
             min = min === 0 ? min + 1 : min;
             let text = `Page ${page}. Showing ${min}-${max} emotes out of ${count} emotes.`;
             if (max != count) {
@@ -58,23 +53,22 @@ class Emotes extends Command {
                 overrideAuthor = true;
             }
             message.channel.send(text);
-            this.fetchEmoteCreators(emotes).then((creators) => {
-                for (var i = 0; i < emotes.length; i++) {
+            this.fetchEmoteCreators(emotes.results).then((creators) => {
+                for (var i = 0; i < emotes.results.length; i++) {
                     if (overrideAuthor) {
                         creators[i] = this.bot.client.user;
                     }
-                    message.channel.send('', {embed: new EmoteEmbed(this.bot, emotes[i], creators[i])});
+                    message.channel.send('', {embed: new EmoteEmbed(this.bot, emotes.results[i], creators[i])});
                 }
             });
-        })
-            .catch((err) => {
-                this.bot.logger.error(err);
-                message.channel.send('http://i.imgur.com/zdMAeE9.png');
-            });
+        }).catch((err) => {
+            this.bot.logger.error(err);
+            message.channel.send('http://i.imgur.com/zdMAeE9.png');
+        });
     }
 
-    fetchEmoteCreators(emotes) {
-        function fetchUser(bot, id, i) {
+    fetchEmoteCreators(emotes: Emote[]): Promise<User[]> {
+        function fetchUser(bot: Cephalon, id: Snowflake, i: number): Promise<{ user: User, i: number }> {
             return new Promise((resolve) => {
                 bot.client.fetchUser(id).then((user) => {
                     resolve({ user: user, i: i });
@@ -82,13 +76,12 @@ class Emotes extends Command {
             });
         }
         return new Promise((resolve) => {
-            let creators = [];
+            let creators: User[] = [];
             for (var i = 0; i < emotes.length; i++) {
                 fetchUser(this.bot, emotes[i].Creator, i).then((user) => {
                     let i = user.i;
-                    user = user.user;
                     //creators.push(user);
-                    creators[i] = user;
+                    creators[i] = user.user;
                     if (creators.length == emotes.length) {
                         resolve(creators);
                     }
@@ -103,11 +96,11 @@ class Emotes extends Command {
         });
     }
 
-    get(message, match) {
+    get(message: Message, match: RegExpMatchArray): void {
         let ref = match[2].replace(' ', '');
-        this.bot.settings.getEmote(ref)
+        this.bot.db.getEmote(ref)
             .then((emote) => {
-                this.bot.settings.getMember(message.author.id)
+                this.bot.db.getMember(message.author.id)
                     .then((member) => {
                         if (emote.Rank <= member.Rank) {
                             message.channel.send(emote.Content);
@@ -124,8 +117,8 @@ class Emotes extends Command {
             });
     }
 
-    create(message, match) {
-        this.bot.settings.getMember(message.author.id).then((member) => {
+    create(message, match): void {
+        this.bot.db.getMember(message.author.id).then((member) => {
             if (member.Rank != 7) {
                 message.channel.send('Sorry, you don\'t have permission to create emotes');
                 return;
@@ -152,27 +145,28 @@ class Emotes extends Command {
             } else {
                 creator = '137976237292388353';
             }
-            this.bot.settings.createEmote(name, reference, rank, content, creator);
+            this.bot.db.createEmote(name, reference, rank, content, creator);
             message.channel.send(`Created emote ${name}!`);
         });
     }
 
-    search(message, match) {
+    search(message: Message, match: RegExpMatchArray) {
         let rematch = match[2].match(/(".+"|[^ ]+)(?: (\d+))?/i);
+        if(!this._tsoverrideregex(rematch)) return;
         if (rematch[1] != undefined) {
             let page = parseInt(rematch[2]);
             if (isNaN(page)) {
                 page = 1;
             }
-            this.bot.settings.findEmotes(rematch[1].replace(' ', ''), page).then((results) => {
+            this.bot.db.findEmotes(rematch[1].replace(' ', ''), page).then((results) => {
                 let count = results.count;
-                results = results.results;
                 let pageCount = page > 0 ? page - 1 : page,
                     min = pageCount * 5 - pageCount,
-                    max = (pageCount + 1) * 5 - (5 - results.length) - pageCount;
+                    max = (pageCount + 1) * 5 - (5 - results.results.length) - pageCount;
                 min = min === 0 ? min + 1 : min;
                 let text = `Page ${page}. Showing ${min}-${max} emotes out of ${count} emotes.`;
                 if (max != count) {
+                    if(!this._tsoverrideregex(rematch)) return;
                     text = `${text} To move to the next page, use **!e find ${rematch[1]} ${page + 1}**`;
                 }
                 let overrideAuthor = false;
@@ -180,12 +174,12 @@ class Emotes extends Command {
                     overrideAuthor = true;
                 }
                 message.channel.send(text);
-                this.fetchEmoteCreators(results).then((creators) => {
-                    for (var i = 0; i < results.length; i++) {
+                this.fetchEmoteCreators(results.results).then((creators) => {
+                    for (var i = 0; i < results.results.length; i++) {
                         if (overrideAuthor) {
                             creators[i] = this.bot.client.user;
                         }
-                        message.channel.send('', {embed: new EmoteEmbed(this.bot, results[i], creators[i])});
+                        message.channel.send('', {embed: new EmoteEmbed(this.bot, results.results[i], creators[i])});
                     }
                 });
             }).catch((err) => {
@@ -195,5 +189,3 @@ class Emotes extends Command {
         }
     }
 }
-
-module.exports = Emotes;

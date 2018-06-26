@@ -6,7 +6,7 @@ import Database from "../helpers/Database";
 export default class Member {
     public readonly ID: Snowflake;
     public readonly Name: string;
-    public readonly Rank: Rank;
+    public readonly Rank: number;
     private bot: Cephalon;
 
     private _wfname: string;

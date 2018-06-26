@@ -1,15 +1,14 @@
 ﻿import Cephalon from "../Cephalon";
-import Logger from "./Logger";
-import CommandHandler from "./CommandHandler";
-import { Message } from "discord.js";
-import { MessageWithStrippedContent } from "../objects/Types";
+import Logger from "../helpers/Logger";
+import CommandHandler from "../helpers/CommandHandler";
+import { MessageWithStrippedContent, RankNum } from "../objects/Types.d";
 
 export default class Command {
-    private bot: Cephalon;
-    private get logger():Logger {
+    protected bot: Cephalon;
+    protected get logger(): Logger {
         return this.bot.logger;
     }
-    private get ch():CommandHandler {
+    protected get ch(): CommandHandler {
         return this.bot.ch;
     }
 
@@ -18,16 +17,16 @@ export default class Command {
     public description: string;
     public regex: RegExp;
     public usages: {
-        description: string,
+        description?: string,
         parameters: string[]
     }[];
     public ownerOnly: boolean = false;
-    public requiredRank: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+    public requiredRank: RankNum;
     public allowDM: boolean = true;
 
     public mandatoryWords: RegExp | undefined = undefined;
 
-    constructor(bot: Cephalon, id: string, call: string, description: string) {
+    constructor(bot: Cephalon, id: string, call: string, description?: string) {
         this.id = id;
         this.call = call;
 
@@ -42,11 +41,15 @@ export default class Command {
         this.requiredRank = 1;
     }
 
-    run(message: MessageWithStrippedContent) {
+    public run(message: MessageWithStrippedContent): void {
         message.reply('This is a basic Command')
             .then((msg) => {
                 this.logger.debug(`Sent ${msg}`);
             })
             .catch((error) => this.logger.error(`Error: ${error}`));
+    }
+
+    protected _tsoverrideregex(match: RegExpMatchArray | null): match is RegExpMatchArray {
+        return true;
     }
 }
