@@ -1,22 +1,21 @@
-﻿'use strict';
+﻿import * as fs from "fs";
+import * as path from "path";
+import decache from "decache";
+import Cephalon from "../Cephalon";
+import Logger from "./Logger";
+import Command from "./Command";
+import { Message } from "discord.js";
+import { MessageWithStrippedContent } from "../objects/Types";
 
-const fs = require('fs');
-const path = require('path');
-const decache = require('decache');
+export default class CommandHandler {
+    private bot: Cephalon;
+    private get logger():Logger {
+        return this.bot.logger;
+    }
+    public commands: Command[] = [];
 
-class CommandHandler {
-    /**
-     * @param {Cephalon} bot
-    */
-    constructor(bot) {
+    constructor(bot: Cephalon) {
         this.bot = bot;
-        this.logger = bot.logger;
-
-        /**
-         * @type {Array<Command>}
-         * @private
-        */
-        this.commands = [];
     }
 
     loadCommands() {
@@ -58,54 +57,42 @@ class CommandHandler {
             .filter(c => c !== null);
     }
 
-    /**
-     * @param {Message} message
-    */
-    handleCommand(message) {
+    handleCommand(message: Message) {
         let content = message.content;
         const botping = `@${this.bot.client.user.username}`;
-        this.bot.settings.getPrefix()
-            .then((prefix) => {
-                if (!content.startsWith(prefix) && !content.startsWith(botping)) {
-                    return;
+        if (!content.startsWith(this.bot.prefix) && !content.startsWith(botping)) {
+            return;
+        }
+        if (content.startsWith(this.bot.prefix)) {
+            content = content.replace(this.bot.prefix, '');
+        }
+        if (content.startsWith(botping)) {
+            content = content.replace(new RegExp(`${botping}\\s+`, 'i'), '');
+        }
+        const messageWithStrippedContent = message as MessageWithStrippedContent;
+        messageWithStrippedContent.strippedContent = content;
+        this.logger.debug(`Handling \`${content}\``);
+        this.commands.forEach((command) => {
+            if (command.regex.test(content)) {
+                if (command.mandatoryWords === undefined || command.mandatoryWords.test(content)) {
+                    this.checkCanAct(command, messageWithStrippedContent)
+                        .then((canAct) => {
+                            if (canAct) {
+                                this.logger.debug(`Matched ${command.id}`);
+                                command.run(messageWithStrippedContent);
+                            }
+                        });
                 }
-                if (content.startsWith(prefix)) {
-                    content = content.replace(prefix, '');
-                }
-                if (content.startsWith(botping)) {
-                    content = content.replace(new RegExp(`${botping}\\s+`, 'i'), '');
-                }
-                const messageWithStrippedContent = message;
-                messageWithStrippedContent.strippedContent = content;
-                this.logger.debug(`Handling \`${content}\``);
-                this.commands.forEach((command) => {
-                    if (command.regex.test(content)) {
-                        if (command.mandatoryWords == undefined || command.mandatoryWords.test(content)) {
-                            this.checkCanAct(command, messageWithStrippedContent)
-                                .then((canAct) => {
-                                    if (canAct) {
-                                        this.logger.debug(`Matched ${command.id}`);
-                                        command.run(messageWithStrippedContent);
-                                    }
-                                });
-                        }
-                    }
-                });
-            })
-        .catch(this.logger.error);
+            }
+        });
     }
 
-    /**
-     * @param {Command} command
-     * @param {Message} message
-     * @returns {boolean}
-    */
     checkCanAct(command, message) {
         return new Promise((resolve) => {
             if (message.channel.type === 'text' || (message.channel.type === 'dm' && command.allowDM)) {
-                this.bot.settings.getMember(message.author.id).then((member) => {
+                this.bot.db.getMember(message.author.id).then((member) => {
                     if (!command.ownerOnly || message.author.id === this.bot.owner) {
-                        if (member.Banned === 1) {
+                        if (member.Banned === true) {
                             message.channel.send('You are currently banned from using commands. Please contact Mardan to rectify this.');
                             this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
                         }
@@ -137,5 +124,3 @@ class CommandHandler {
         });
     }
 }
-
-module.exports = CommandHandler;
