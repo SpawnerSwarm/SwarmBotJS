@@ -1,70 +1,52 @@
-﻿'use strict';
+﻿import { createConnection, Connection, RowDataPacket, Query } from "mysql2";
+import { exec } from "child_process";
+import SQL from "sql-template-strings";
 
-const mysql = require('mysql2');
-const SQL = require('sql-template-strings');
-const Promise = require('bluebird');
+import Ranks, { Rank } from "../objects/Ranks.on";
+import Cephalon from "../Cephalon";
+import { UrlResolvable, RankNum } from "../objects/Types";
+import Member from "../objects/Member";
+import { User, Snowflake } from "discord.js";
 
-const Ranks = require('../resources/Ranks.js');
+export type DbConnectionOptions = {
+    host: UrlResolvable | "localhost",
+    port: number,
+    user: string,
+    pass: string,
+    database: string
+};
 
-const exec = require('child_process').exec;
+export type EmotePage = {
+    results: RowDataPacket[],
+    count: number
+}
 
-/**
- * @typedef {Object} DbConnectionOptions
- * @property {string} [host=localhost]
- * @property {number} [port=3306]
- * @property {string} user
- * @property {string} password
- * @property {string} database
-*/
+export default class Database {
+    private db: Connection;
+    private bot: Cephalon;
 
-/**
- * @typedef {Object} Member
- * @property {number} ID
- * @property {string} Name
- * @property {number} Rank
- * @property {string} WarframeName
- * @property {string} SpiralKnightsName
- * @property {string} SteamName
- * @property {number} FormaDonated
-*/
-
-class Database {
-    /**
-     * @param {DbConnectionOptions} dbOptions
-     * @param {Cephalon} bot
-    */
-    constructor(dbOptions, bot) {
+    constructor(dbOptions: DbConnectionOptions, bot: Cephalon) {
         const opts = {
             supportBigNumbers: true,
             bigNumberStrings: true,
             Promise,
         };
         Object.assign(opts, dbOptions);
-        this.db = mysql.createConnection(opts);
+        this.db = createConnection(opts);
         this.bot = bot;
-
-        this.defaults = {
-            prefix: '!',
-            respond_to_settings: true,
-            delete_after_respond: true,
-        };
     }
 
-    getVersion() {
+    getVersion(): Promise<string> {
         return new Promise((resolve) => {
-            this.db.query(SQL`SELECT @@version`, function (err, results) {
+            this.db.query(SQL`SELECT @@version`, function (err, results: RowDataPacket[]) {
                 resolve(results[0]['@@version']);
             });
         });
     }
 
-    /**
-     * @param {User} user
-     * @param {Date} date
-    */
-    addMember(user, date) {
+    addMember(user: User, date: Date): Query {
         const query = SQL`INSERT INTO MEMBERS (ID, Name, Rank) VALUES (${user.id}, ${user.username}, 'Recruit');`;
-        if (date != null) {
+        if (date !== null) {
             query.append(SQL`INSERT IGNORE INTO RANKS (ID, Recruit) VALUES (${user.id}, ${date});`);
         } else {
             query.append(SQL`INSERT IGNORE INTO RANKS (ID, Recruit) VALUES (${user.id}, ${Date.now()});`);
@@ -73,15 +55,7 @@ class Database {
         return this.db.query(query);
     }
 
-    getPrefix() {
-        return new Promise((resolve) => { resolve(this.bot.prefix); });
-    }
-
-    /**
-     * @param {string} id
-     * @returns {Member}
-     */
-    getMember(id) {
+    getMember(id: Snowflake): Promise<Member> {
         return new Promise((resolve, reject) => {
             this.db.query(SQL`SELECT MEMBERS.*, RANKS.*
 FROM MEMBERS
@@ -89,9 +63,10 @@ INNER JOIN RANKS
 ON MEMBERS.ID=RANKS.ID
 WHERE MEMBERS.ID=${id}
 ORDER BY -Rank`,
-                function (err, results) {
+                function (err, results: RowDataPacket[]) {
                     if (results.length !== 0) {
-                        resolve(results[0]);
+                        results[0].bot = this.bot;
+                        resolve(results[0] as Member);
                     } else {
                         reject('Member not found');
                     }
@@ -99,66 +74,58 @@ ORDER BY -Rank`,
         });
     }
 
-    /**
-     * @param {string} id
-     */
-    createMember(id, name) {
+    createMember(id: Snowflake, name: string): void {
         var today = new Date();
         var dd = today.getDate();
         var mm = today.getMonth() + 1;
         var yyyy = today.getFullYear();
 
         if (dd < 10) {
-            dd = '0' + dd;
+            dd = Number('0' + dd);
         }
 
         if (mm < 10) {
-            mm = '0' + mm;
+            mm = Number('0' + mm);
         }
 
-        today = mm + '/' + dd + '/' + yyyy;
+        let day = mm + '/' + dd + '/' + yyyy;
         this.db.execute(SQL`INSERT INTO MEMBERS (\`ID\`, \`Name\`, \`Rank\`) VALUES (${id}, ${name}, '1');`);
-        this.db.execute(SQL`INSERT INTO RANKS (\`ID\`, \`Recruit\`) VALUES (${id}, ${today});`);
+        this.db.execute(SQL`INSERT INTO RANKS (\`ID\`, \`Recruit\`) VALUES (${id}, ${day});`);
     }
 
-    /**
-     * @param {Member} member
-     * @param {number} rank
-     * @param {Date} date
-     */
-    promote(member, rank, date) {
+    promote(member: Member, rank: RankNum, date: Date): void {
         var dd = date.getDate();
         var mm = date.getMonth() + 1;
         var yyyy = date.getFullYear();
 
         if (dd < 10) {
-            dd = '0' + dd;
+            dd = Number('0' + dd);
         }
 
         if (mm < 10) {
-            mm = '0' + mm;
+            mm = Number('0' + mm);
         }
 
         let dateStr = mm + '/' + dd + '/' + yyyy;
 
-        let rankStr = Ranks.find(x => x.id == rank).name;
+        let rankStr = (Ranks.find(x => x.id == rank) as Rank).name;
 
         this.db.execute(`UPDATE RANKS SET \`${rankStr}\`='${dateStr}' WHERE \`ID\`='${member.ID}';`);
         this.db.execute(SQL`UPDATE MEMBERS SET \`Rank\`=${rank}, \`LastPesteredIndex\`=0 WHERE \`ID\`=${member.ID};`);
     }
 
-    setLastPestered(id) {
+    setLastPestered(id: Snowflake): void {
         let date = new Date();
         var dd = date.getDate();
         var mm = date.getMonth() + 1;
         var yyyy = date.getFullYear();
 
         if (dd < 10) {
-            dd = '0' + dd;
+            dd = Number('0' + dd);
         }
 
         if (mm < 10) {
-            mm = '0' + mm;
+            mm = Number('0' + mm);
         }
 
         let dateStr = mm + '/' + dd + '/' + yyyy;
@@ -166,12 +133,12 @@ ORDER BY -Rank`,
         this.db.execute(SQL`UPDATE MEMBERS SET \`LastPestered\`=${dateStr}, \`LastPesteredIndex\`=\`LastPesteredIndex\`+1 WHERE \`ID\`=${id};`);
     }
 
-    getRankPopulation() {
+    getRankPopulation(): Promise<number[]> {
         return new Promise((resolve) => {
             let res = [0];
             for (let i = 1; i <= 7; i++) {
-                this.db.execute(SQL`SELECT * FROM MEMBERS WHERE \`Rank\`=${i} AND \`Banned\`=0;`, function (err, results) {
-                    if (res.push(results.length) == 8) {
+                this.db.execute(SQL`SELECT * FROM MEMBERS WHERE \`Rank\`=${i} AND \`Banned\`=0;`, function (err, results: RowDataPacket[]) {
+                    if (res.push(results.length) === 8) {
                         resolve(res);
                     }
                 });
@@ -179,12 +146,9 @@ ORDER BY -Rank`,
         });
     }
 
-    /**
-     * @param {string} ref
-     */
-    getEmote(ref) {
+    getEmote(ref: string) {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM EMOTES WHERE Reference= ${ref}`, function (err, results) {
+            this.db.execute(SQL`SELECT * FROM EMOTES WHERE Reference= ${ref}`, function (err, results: RowDataPacket[]) {
                 if (results.length !== 0) {
                     resolve(results[0]);
                 } else {
@@ -194,15 +158,12 @@ ORDER BY -Rank`,
         });
     }
 
-    /**
-     * @param {number} page
-     */
-    getEmoteList(page) {
+    getEmoteList(page: number): Promise<EmotePage> {
         return new Promise((resolve, reject) => {
             let db = this.db;
             page = page > 0 ? page - 1 : page;
             page = page * 5 == 0 ? page * 5 : page * 5 - page;
-            db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results) {
+            db.execute(SQL`SELECT * FROM EMOTES LIMIT ${page}, 4`, function (err, results: RowDataPacket[]) {
                 db.execute(SQL`SELECT COUNT(*) FROM EMOTES`, function (err2, count) {
                     if (results.length !== 0) {
                         resolve({ results: results, count: count[0]['COUNT(*)'] });
@@ -214,18 +175,18 @@ ORDER BY -Rank`,
         });
     }
 
-    createEmote(name, reference, rank, content, creator) {
+    createEmote(name: string, reference: string, rank: 0 | RankNum, content: string, creator: Snowflake): void {
         this.db.execute(SQL`INSERT INTO EMOTES (\`Name\`, \`Content\`, \`Reference\`, \`Rank\`, \`Creator\`) VALUES (${name}, ${content}, ${reference}, ${rank}, ${creator});`);
     }
 
-    findEmotes(like, page) {
+    findEmotes(like: string, page: number): Promise<EmotePage> {
         return new Promise((resolve, reject) => {
             let db = this.db;
             let l = `%${like}%`;
             page = page > 0 ? page - 1 : page;
             page = page * 5 == 0 ? page * 5 : page * 5 - page;
-            db.execute(SQL`SELECT * FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l} LIMIT ${page}, 4`, function (err, results) {
-                db.execute(SQL`SELECT COUNT(*) FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l}`, function (err2, count) {
+            db.execute(SQL`SELECT * FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l} LIMIT ${page}, 4`, function (err, results: RowDataPacket[]) {
+                db.execute(SQL`SELECT COUNT(*) FROM EMOTES WHERE Reference LIKE ${l} OR Name LIKE ${l}`, function (err2, count: RowDataPacket[]) {
                     if (results.length !== 0) {
                         resolve({ results: results, count: count[0]['COUNT(*)'] });
                     } else {
@@ -236,22 +197,22 @@ ORDER BY -Rank`,
         });
     }
 
-    setBanned(id, banned) {
+    setBanned(id: Snowflake, banned: 1 | 0): void {
         if (banned !== 1 && banned !== 0) {
             throw 'Invalid Banned State';
         }
         this.db.execute(SQL`UPDATE MEMBERS SET Banned=${banned} WHERE ID=${id}`);
     }
 
-    updateWF(id, WarframeName) {
+    updateWF(id: Snowflake, WarframeName: string): void {
         this.db.execute(SQL`UPDATE MEMBERS SET WarframeName=${WarframeName} WHERE ID=${id}`);
     }
 
-    updateSK(id, SpiralKnightsName) {
+    updateSK(id: Snowflake, SpiralKnightsName: string): void {
         this.db.execute(SQL`UPDATE MEMBERS SET SpiralKnightsName=${SpiralKnightsName} WHERE ID=${id}`);
     }
 
-    saveCSVData() {
+    saveCSVData(): Promise<void> {
         return new Promise((resolve, reject) => {
             exec(`mysql ${process.env.MYSQL_DB} --password=${process.env.MYSQL_PASSWORD} --user=${process.env.MYSQL_USER} < ${process.env.SQL_CSV_REQUESTS} | sed 's/\t/,/g' > ${process.env.SQL_CSV_OUT}`,
                 (error) => {
@@ -268,28 +229,22 @@ ORDER BY -Rank`,
 
     //Bazaar
 
-    /**
-     * @param {number} ListingID 
-     */
-    getOffers(ListingID) {
+    getOffers(ListingID: number): Promise<RowDataPacket[]> {
         return new Promise((resolve) => {
-            this.db.execute(SQL`SELECT * FROM BZ_OFFERS WHERE ListingID=${ListingID}`, function (err, results) {
+            this.db.execute(SQL`SELECT * FROM BZ_OFFERS WHERE ListingID=${ListingID}`, function (err, results: RowDataPacket[]) {
                 resolve(results);
             });
         });
     }
 
-    /**
-     * @param {number} ListingID 
-     */
-    getListing(ListingID) {
+    getListing(ListingID: number): Promise<RowDataPacket> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM BAZAAR WHERE ID=${ListingID}`, function (err, results) {
+            this.db.execute(SQL`SELECT * FROM BAZAAR WHERE ID=${ListingID}`, function (err, results: RowDataPacket[]) {
                 if (results.length !== 0) {
                     this.getOffers(ListingID).then((offers) => {
-                        results = results[0];
-                        results.offers = offers;
-                        resolve(results);
+                        let result = results[0];
+                        result.offers = offers;
+                        resolve(result);
                     });
                 } else {
                     reject('Unable to retrieve Listing');
@@ -298,35 +253,19 @@ ORDER BY -Rank`,
         });
     }
 
-    /**
-     * @param {number} ListingID
-     * @param {string} Type
-     * @param {number} NonNegotiable
-     * @param {number} Price 
-     * @param {string} Currency 
-     * @param {string} Item 
-     * @param {string} Bazaar 
-     */
-    createListing(ListingID, Type, NonNegotiable, Price, Currency, Item, Bazaar) {
+    createListing(ListingID: number, Type: 'WTB' | 'WTS', NonNegotiable: 0 | 1, Price: number, Currency: string, Item: string, Bazaar: string): void {
         this.db.execute(SQL`INSERT INTO BAZAAR VALUES(${ListingID}, ${Type}, ${NonNegotiable}, ${Price}, ${Currency}, ${Item}, ${Bazaar}, 0)`, function (err) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
     }
 
-    /**
-     * @param {number} ListingID 
-     * @param {number} ID 
-     */
-    createOffer(ListingID, ID) {
+    createOffer(ListingID: number, ID: number): void {
         this.db.execute(SQL`INSERT INTO BZ_OFFERS VALUES(${ListingID}, ${ID})`, function (err) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
     }
 
-    /**
-     * @param {number} ListingID
-     */
-    closeListing(ListingID) {
+    closeListing(ListingID: number): Promise<void> {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`DELETE FROM BAZAAR WHERE ID=${ListingID};`, function (err) {
                 if (err) reject(err);
@@ -338,10 +277,7 @@ ORDER BY -Rank`,
         });
     }
 
-    /**
-     * @param {number} UserID
-     */
-    closeOffer(ListingID, UserID) {
+    closeOffer(ListingID: number, UserID: number): void {
         this.db.execute(SQL`DELETE FROM BZ_OFFERS WHERE ID=${UserID} AND ListingID=${ListingID};`, function (err) {
             if (err) this.bot.logger.error(err);
             this.db.execute(SQL`UPDATE BAZAAR SET OfferCount = OfferCount - 1 WHERE ID=${ListingID};`, function (err) {
@@ -350,16 +286,7 @@ ORDER BY -Rank`,
         }.bind(this));
     }
 
-    /**
-     * @param {number} ListingID
-     * @param {string} Type
-     * @param {number} NonNegotiable
-     * @param {number} Price 
-     * @param {string} Currency 
-     * @param {string} Item 
-     * @param {string} Bazaar 
-     */
-    updateListing(ListingID, Type, NonNegotiable, Price, Currency, Item, Bazaar) {
+    updateListing(ListingID: number, Type: 'WTB' | 'WTS', NonNegotiable: 0 | 1, Price: number, Currency: string, Item: string, Bazaar: string): void {
         this.db.execute(SQL`UPDATE BAZAAR SET Type=${Type}, NonNegotiable=${NonNegotiable}, Price=${Price}, Currency=${Currency}, Item=${Item}, Bazaar=${Bazaar} WHERE ID=${ListingID};`, function (err) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
@@ -368,25 +295,17 @@ ORDER BY -Rank`,
     //End Bazaar
 
     //DR
-    /**
-     * @param {number} MessageID
-     * @param {string} Title
-     * @param {string} Item
-     * @param {number} UserID
-     * @param {string} ImageURL
-     * @param {Date} date
-     */
-    createBuild(MessageID, Title, Item, UserID, ImageURL, date) {
+    createBuild(MessageID: Snowflake, Title: string, Item: string, UserID: Snowflake, ImageURL: UrlResolvable, date: Date): void {
         var dd = date.getDate();
         var mm = date.getMonth() + 1;
         var yyyy = date.getFullYear();
 
         if (dd < 10) {
-            dd = '0' + dd;
+            dd = Number('0' + dd);
         }
 
         if (mm < 10) {
-            mm = '0' + mm;
+            mm = Number('0' + mm);
         }
 
         let dateStr = mm + '/' + dd + '/' + yyyy;
@@ -395,13 +314,13 @@ ORDER BY -Rank`,
         }.bind(this));
     }
 
-    designateBestBuild(MessageID) {
+    designateBestBuild(MessageID: Snowflake): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT ID, Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`SELECT ID, Item, Best FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);
-                if (results.length != 0) {
+                if (results.length !== 0) {
                     if (results[0].Best != 0) reject(`Build ${results[0].ID} already designated as best.`);
-                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item}`, function (err, results) {
+                    this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE Item=${results[0].Item}`, function (err, results: RowDataPacket[]) {
                         if (err) reject(err);
                         this.db.execute(SQL`UPDATE DRUNNERS SET Best=1 WHERE MessageID=${MessageID}`, function (err) {
                             if (err) reject(err);
@@ -414,76 +333,82 @@ ORDER BY -Rank`,
         }).catch(e => this.bot.logger.error(e));
     }
 
-    setArchived(MessageID, Archived) {
+    setArchived(MessageID: Snowflake, Archived: 0 | 1): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived}, Best=0 WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Archived=${Archived}, Best=0 WHERE MessageID=${MessageID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);
                 resolve(results[0]);
             }.bind(this));
         }).catch(e => this.bot.logger.error(e));
     }
 
-    fetchBuildByMessageID(MessageID) {
+    fetchBuildByMessageID(MessageID: Snowflake): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE MessageID=${MessageID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);
-                if (results.length != 0) {
+                if (results.length !== 0) {
                     resolve(results[0]);
                 }
             });
         }).catch(e => this.bot.logger.error(e));
     }
 
-    fetchBuildByID(ID) {
+    fetchBuildByID(ID: number): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE ID=${ID}`, function (err, results) {
+            this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE ID=${ID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);
-                if (results.length != 0) {
+                if (results.length !== 0) {
                     resolve(results[0]);
                 }
             });
         }).catch(e => this.bot.logger.error(e));
     }
 
-    setNotBestByMessageID(MessageID) {
+    setNotBestByMessageID(MessageID: Snowflake): Promise<void | {}> {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`UPDATE DRUNNERS SET Best=0 WHERE MessageID=${MessageID}`, function (err) {
                 if (err) reject(err);
+                resolve();
             });
         }).catch(e => this.bot.logger.error(e));
     }
 
-    updateBuild(MessageID, Title, Item, UserID) {
+    updateBuild(MessageID: Snowflake, Title: string, Item: string, UserID: Snowflake): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`UPDATE DRUNNERS SET Title=${Title}, Item=${Item}, UserID=${UserID} WHERE MessageID=${MessageID}`, function (err, results) {
+            this.db.execute(SQL`UPDATE DRUNNERS SET Title=${Title}, Item=${Item}, UserID=${UserID} WHERE MessageID=${MessageID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);
                 resolve(results[0]);
             });
         });
     }
 
-    setRiven(ID, RivenURL) {
+    setRiven(ID: number, RivenURL: UrlResolvable): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`UPDATE DRUNNERS SET RivenURL=${RivenURL} WHERE ID=${ID}`, function (err, results) {
+            this.db.execute(SQL`UPDATE DRUNNERS SET RivenURL=${RivenURL} WHERE ID=${ID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);
                 resolve(results[0]);
             });
         });
     }
 
-    /**
-     * @param {string} Name
-     */
-    getModule(Name) {
+    getModule(Name: string): Promise<any> { //Won't allow DBModule assignment
         return new Promise((resolve, reject) => {
-            this.db.execute(SQL`SELECT * FROM MODULES WHERE Name=${Name}`, function (err, results) {
-                if (err) reject(err);
-                if (results.length != 0) {
-                    resolve(results[0]);
+            this.db.query(SQL`SELECT * FROM MODULES WHERE Name=${Name}`, function (err, results: RowDataPacket[]) {
+                //if (err) reject(err);
+                if (results.length !== 0) {
+                    resolve(results);
+                } else {
+                    reject();
                 }
             }.bind(this));
         }).catch(e => this.bot.logger.error(e));
     }
 }
 
-module.exports = Database;
+export type DBModule = {
+    Name: string,
+    ID: Snowflake,
+    Guild: Snowflake,
+    Channel: Snowflake,
+    Rank: 0 | RankNum
+}

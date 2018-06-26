@@ -3,7 +3,7 @@ import * as path from "path";
 import decache from "decache";
 import Cephalon from "../Cephalon";
 import Logger from "./Logger";
-import Command from "./Command";
+import Command from "../objects/Command";
 import { Message } from "discord.js";
 import { MessageWithStrippedContent } from "../objects/Types";
 
