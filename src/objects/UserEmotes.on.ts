@@ -18,7 +18,7 @@ export interface ComplexUserEmote extends UserEmote {
     function(id: Snowflake): Promise<string>;
 }
 
-export default [
+export const UserEmotes = [
     {
         isSimple: true,
         user: "139109512744402944",
@@ -60,3 +60,4 @@ export default [
         call: "lenny"
     } as ComplexUserEmote
 ] as UserEmote[];
+export default UserEmotes;
