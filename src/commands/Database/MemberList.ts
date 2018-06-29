@@ -1,14 +1,9 @@
-'use strict';
+import Command from "../../objects/Command";
+import Ranks from "../../objects/Ranks.on";
+import Cephalon from "../../Cephalon";
 
-const Command = require('../../Command.js');
-
-const Ranks = require('../../resources/Ranks.js');
-
-class MemberList extends Command {
-    /**
-     * @param {Cephalon} bot
-     */
-    constructor(bot) {
+export default class MemberList extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'database.memberList', 'memberList');
 
         this.bot = bot;
@@ -18,7 +13,7 @@ class MemberList extends Command {
 
     run(message) {
         let str = '```xl\n';
-        this.bot.settings.getRankPopulation().then((res) => {
+        this.bot.db.getRankPopulation().then((res: number[]) => {
             for (let i = 1; i <= 7; i++) {
                 str += `${Ranks[i].name}: ${res[i]} out of ${Ranks[i].max}\n`;
             }
@@ -27,5 +22,3 @@ class MemberList extends Command {
         });
     }
 }
-
-module.exports = MemberList;
