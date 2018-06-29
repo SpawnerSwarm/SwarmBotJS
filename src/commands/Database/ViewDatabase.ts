@@ -1,15 +1,11 @@
-'use strict';
+import Command from "../../objects/Command";
+import * as fs from "fs";
+import * as request from "request";
+import { MessageWithStrippedContent } from "../../objects/Types";
+import Cephalon from "../../Cephalon";
 
-const Command = require('../../Command.js');
-
-const fs = require('fs');
-const request = require('request');
-
-class ViewDatabase extends Command {
-    /**
-     * @param {Cephalon} bot
-    */
-    constructor(bot) {
+export default class ViewDatabase extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'database.viewDatabase', 'viewDatabase', 'View entire member database as a CSV on Google Sheets.');
 
         this.regex = new RegExp('^(?:view)?(?:db|database)$', 'i');
@@ -19,13 +15,17 @@ class ViewDatabase extends Command {
         this.requiredRank = 5;
     }
 
-    run(message) {
+    run(message: MessageWithStrippedContent) {
+        const csv = process.env.SQL_CSV_OUT;
+        const g_url = process.env.GOOGLE_URL;
+        const g_key = process.env.GOOGLE_KEY;
+        if(csv === undefined || g_url === undefined) return;
         message.react('🔄').then((reaction) => {
-            this.bot.settings.saveCSVData().then(() => {
-                fs.readFile(process.env.SQL_CSV_OUT, function (err, data) {
+            this.bot.db.saveCSVData().then(() => {
+                fs.readFile(csv, function (err, data) {
                     let str = data.toString();
                     str = encodeURI(str);
-                    let url = `${process.env.GOOGLE_URL}?key=${process.env.GOOGLE_KEY}&csv=${str}`;
+                    let url = `${process.env.GOOGLE_URL}${g_key === undefined ? '?' : `?key=${g_key}&`}csv=${str}`;
 
                     request.get(url, function (err, httpResponse, body) {
                         this.message.channel.send(body);
@@ -36,7 +36,7 @@ class ViewDatabase extends Command {
                 }.bind({message: message, reaction: reaction}));
             })
             .catch((err) => {
-                this.bot.logger.error(err);
+                this.logger.error(err);
                 message.channel.send(`\`Error: ${err}\``);
                 reaction.remove().then(() => {
                     message.react('🆘');
@@ -45,5 +45,3 @@ class ViewDatabase extends Command {
         });
     }
 }
-
-module.exports = ViewDatabase;
