@@ -1,9 +1,9 @@
-'use strict';
+import Command from "../../objects/Command";
+import Cephalon from "../../Cephalon";
+import { MessageWithStrippedContent, GuildTextChannel } from "../../objects/Types";
 
-const Command = require('../../Command.js');
-
-class Kick extends Command {
-    constructor(bot) {
+export default class Kick extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'moderation.kick', 'kick');
 
         this.bot = bot;
@@ -12,16 +12,19 @@ class Kick extends Command {
         this.allowDM = false;
     }
 
-    run(message) {
+    run(message: MessageWithStrippedContent) {
         let match = message.strippedContent.match(this.regex);
+        if(!this._tsoverrideregex(match)) return;
         message.guild.fetchMember(match[1]).then((user) => {
-            this.bot.settings.getMember(message.author.id).then((author) => {
-                this.bot.settings.getMember(match[1]).then((member) => {
+            this.bot.db.getMember(message.author.id).then((author) => {
+                if(!this._tsoverrideregex(match)) return;
+                this.bot.db.getMember(match[1]).then((member) => {
+                    if(!this._tsoverrideregex(match)) return;
                     if (member.Rank >= author.Rank) {
                         message.channel.send('You cannot kick a member of higher or equal rank!');
-                        this.bot.logger.warning(`${author.Name} tried to kick ${member.Name} but was too low of rank`);
+                        this.logger.warning(`${author.Name} tried to kick ${member.Name} but was too low of rank`);
                     } else {
-                        this.bot.settings.setBanned(member.ID, 1);
+                        this.bot.db.setBanned(member.ID, 1);
                         if (user.guild.id == '137991656547811328') {
                             let content = 'Kick 👢';
                             content += `\n**User:** ${user.user.username}#${user.user.discriminator} (${user.id})`;
@@ -31,23 +34,21 @@ class Kick extends Command {
                                 reason = match[2];
                             }
                             content += `\n**Reason:** ${reason}`;
-                            user.guild.channels.get('274687008406765568').send(content);
+                            (user.guild.channels.get('274687008406765568') as GuildTextChannel).send(content);
                             user.send(`Hello ${member.Name}, this is an automated message from the Spawner Swarm to inform you that you have been kicked for '${reason}'.  If you want to re-enter the Swarm, please contact an Officer for a re-invite. You will still be subject to the same rules, however.`);
                         }
                         user.kick();
-                        this.bot.logger.info(`${author.Name} kicked ${member.Name} from the server`);
+                        this.logger.info(`${author.Name} kicked ${member.Name} from the server`);
                     }
                 })
                     .catch((err) => {
                         message.channel.send('Unable to find user. They may not be present in the database or a database connection failed. Please contact Mardan.');
-                        this.bot.logger.error(`Error in !kick: ${err}`);
+                        this.logger.error(`Error in !kick: ${err}`);
                     });
             });
         }).catch((err) => {
             message.channel.send('Could not find user or was unable to kick them.');
-            this.bot.logger.error(`Error in !kick: ${err}`);
+            this.logger.error(`Error in !kick: ${err}`);
         });
     }
 }
-
-module.exports = Kick;
