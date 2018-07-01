@@ -1,19 +1,16 @@
-'use strict';
+import Command from "../../objects/Command";
+import * as request from "request";
+import Cephalon from "../../Cephalon";
+import { MessageWithStrippedContent } from "../../objects/Types";
 
-const Command = require('../../Command.js');
-const request = require('request');
-
-class Riven extends Command {
-    /**
-     * @param {Cephalon} bot
-     */
-    constructor(bot) {
+export default class Riven extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'warframe.riven', 'riven');
 
         this.regex = /^(?:riven|<:riven:439450118870269954>)/i;
     }
 
-    run(message) {
+    run(message: MessageWithStrippedContent) {
         if (message.attachments.array().length > 0) {
             message.react('🔄').then((reaction) => {
                 request.post(
@@ -28,27 +25,27 @@ class Riven extends Command {
                     },
                     (error, response, body) => {
                         if (error) {
-                            this.bot.logger.error('Unable to connect to OCR server:');
+                            this.logger.error('Unable to connect to OCR server:');
                             message.channel.send('Unable to connect to OCR server. Please try again later.');
-                            this.bot.logger.error(error.toString());
+                            this.logger.error(error.toString());
                             reaction.remove().then(() => {
                                 message.react('🆘');
                             });
                         }
                         else {
                             let text = this.filterText(JSON.parse(body).ParsedResults[0].ParsedText);
-                            this.bot.logger.debug(text);
+                            this.logger.debug(text);
                             let hasWarned = false;
                             message.channel.send(
                                 '**Rank 8**'.concat(
                                     '\n\n',
-                                    text.replace(/[-]?(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?:[eE][-+]?[0-9]+)?/g, (n) => {
+                                    text.replace(/[-]?(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?:[eE][-+]?[0-9]+)?/g, (n): string => {
                                         let m = +n * 9;
                                         if (m >= 500 && !hasWarned) {
                                             hasWarned = true;
                                             message.channel.send('These stats look a bit too high, make sure your screenshot is of a **Rank 0** mod and has no interference');
                                         }
-                                        return Math.floor(m);
+                                        return String(Math.floor(m));
                                     })                            
                                 )
                             );
@@ -65,7 +62,7 @@ class Riven extends Command {
         }
     }
 
-    filterText(text) {
+    filterText(text: string): string {
         let split = text.split('\n');
         let filteredText = '';
         for (var i = 0; i < split.length; i++) {
@@ -73,12 +70,14 @@ class Riven extends Command {
 
             //add additional filters here
             let m = item.match(/[\d ]+/g);
-            if (m != null && m[0] == item.match(/.+/g)) {
+            let n = item.match(/.+/g);
+            if(!this._tsoverrideregex(m) || !this._tsoverrideregex(n)) return '';
+            if (m != null && m[0] == n[0]) {
                 //remove lines with only a number in them, usually the mastery rank requirement of the mod
                 continue;
             }
             m = item.match(/MR[\d ]+/g);
-            if (m != null && m[0] == item.match(/.+/g)) {
+            if (m != null && m[0] == n[0]) {
                 continue;
             }
             filteredText = filteredText.concat(item, '\n');
@@ -86,5 +85,3 @@ class Riven extends Command {
         return filteredText;
     }
 }
-
-module.exports = Riven;
