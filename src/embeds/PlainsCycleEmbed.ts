@@ -1,8 +1,11 @@
-'use strict';
+import { RichEmbed } from "discord.js";
+import Cephalon from "../Cephalon";
+import { CetusCycle } from "../objects/Types";
 
-class PlainsCycleEmbed {
+export default class PlainsCycleEmbed extends RichEmbed {
     //Genesis: https://github.com/WFCD/genesis/blob/master/src/embeds/EarthCycleEmbed.js
-    constructor(bot, cycle) {
+    constructor(bot: Cephalon, cycle: CetusCycle) {
+        super();
         this.title = `PoE Cycle - ${cycle.isDay ? 'Day' : 'Night'}`;
         this.color = cycle.isDay ? 0xB64624 : 0x000066;
         this.thumbnail = {
@@ -20,5 +23,3 @@ class PlainsCycleEmbed {
         };
     }
 }
-
-module.exports = PlainsCycleEmbed;

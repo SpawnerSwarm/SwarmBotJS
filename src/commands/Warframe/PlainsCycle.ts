@@ -1,29 +1,26 @@
-'use strict';
+import Command from "../../objects/Command";
+import PlainsCycleEmbed from "../../embeds/PlainsCycleEmbed";
+import Cephalon from "../../Cephalon";
+import { MessageWithStrippedContent } from "../../objects/Types";
 
-const Command = require('../../Command.js');
-const PlainsCycleEmbed = require('../../embeds/PlainsCycleEmbed.js');
-
-class PlainsCycle extends Command {
-    constructor(bot) {
+export default class PlainsCycle extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'warframe.cycle', 'cycle');
         this.regex = /^(?:cycle|plains)$/i;
     }
 
-    run(message) {
+    run(message: MessageWithStrippedContent) {
         message.react('✅');
         //From Genesis: https://github.com/wfcd/genesis/blob/master/src/commands/Worldstate/EarthCycle.js
-        this.bot.worldState.getData()
+        this.bot.wfws.getData()
         .then((ws) => {
             const cycle = ws.cetusCycle;
-            this.bot.logger.debug(cycle);
             const ostrons = ws.syndicateMissions.filter(mission => mission.syndicate === 'Ostrons')[0];
             if(ostrons) {
-                cycle.bountyExpiry = ostrons.expiry;
+                cycle.expiry = ostrons.expiry;
             }
             message.channel.send('', {embed: new PlainsCycleEmbed(this.bot, cycle)});
         })
-        .catch((err) => this.bot.logger.error(err));
+        .catch((err) => this.logger.error(err));
     }
 }
-
-module.exports = PlainsCycle;
