@@ -1,8 +1,6 @@
-'use strict';
-
-const Command = require('../../Command.js');
-const NexusEmbed = require('../../embeds/NexusEmbed.js');
-const request = require('request-promise');
+import Command from "../../objects/Command";
+import NexusEmbed from "../../embeds/NexusEmbed";
+import * as request from "request";
 
 class PriceCheck extends Command {
     /**
@@ -33,7 +31,7 @@ class PriceCheck extends Command {
                         message.react('✅');
                     });
                 }).catch((e) => {
-                    this.bot.logger.error(e);
+                    this.logger.error(e);
                     message.channel.send('An Error occured. Please try again later.');
                     reaction.remove().then(() => {
                         message.react('🆘');

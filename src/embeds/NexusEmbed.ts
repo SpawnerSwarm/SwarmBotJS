@@ -1,17 +1,13 @@
-'use strict';
+import { RichEmbed } from "discord.js";
+import Cephalon from "../Cephalon";
 
-class NexusEmbed {
-    /**
-     * @param {Cephalon} bot
-     * @param {Array.<Attachment>} result
-     * @param {string} query
-     */
-    constructor(bot, result, query) {
+export default class NexusEmbed extends RichEmbed {
+    constructor(bot: Cephalon, result: any, query: string) {
+        super();
         const attachment = result[0];
         
         this.description = `Price Check for search term ${query}`;
         this.color = parseInt(attachment.color, 16);
-        this.type = attachment.type;
         this.title = attachment.title;
         this.url = attachment.url;
         this.fields = attachment.fields;
@@ -19,5 +15,3 @@ class NexusEmbed {
         this.footer = attachment.footer;
     }
 }
-
-module.exports = NexusEmbed;
