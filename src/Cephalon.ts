@@ -137,7 +137,7 @@ export default class Cephalon {
         });
         this.ready = true;
         for (let i = 0; i < this.modulePaths.length; i++) {
-            const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`);
+            const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`).default;
             let Module = new ModuleClass(this);
             Module.start();
             this.modules.push(Module);

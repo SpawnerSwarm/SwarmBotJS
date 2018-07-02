@@ -230,7 +230,7 @@ ORDER BY -Rank`,
 
     //Bazaar
 
-    getOffers(ListingID: number): Promise<RowDataPacket[]> {
+    getOffers(ListingID: Snowflake): Promise<RowDataPacket[]> {
         return new Promise((resolve) => {
             this.db.execute(SQL`SELECT * FROM BZ_OFFERS WHERE ListingID=${ListingID}`, function (err, results: RowDataPacket[]) {
                 resolve(results);
@@ -238,7 +238,7 @@ ORDER BY -Rank`,
         });
     }
 
-    getListing(ListingID: number): Promise<RowDataPacket> {
+    getListing(ListingID: Snowflake): Promise<RowDataPacket> {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`SELECT * FROM BAZAAR WHERE ID=${ListingID}`, function (err, results: RowDataPacket[]) {
                 if (results.length !== 0) {
@@ -254,19 +254,19 @@ ORDER BY -Rank`,
         });
     }
 
-    createListing(ListingID: number, Type: 'WTB' | 'WTS', NonNegotiable: 0 | 1, Price: number, Currency: string, Item: string, Bazaar: string): void {
+    createListing(ListingID: Snowflake, Type: 'WTB' | 'WTS', NonNegotiable: 0 | 1, Price: number, Currency: string, Item: string, Bazaar: string): void {
         this.db.execute(SQL`INSERT INTO BAZAAR VALUES(${ListingID}, ${Type}, ${NonNegotiable}, ${Price}, ${Currency}, ${Item}, ${Bazaar}, 0)`, function (err) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
     }
 
-    createOffer(ListingID: number, ID: number): void {
+    createOffer(ListingID: Snowflake, ID: Snowflake): void {
         this.db.execute(SQL`INSERT INTO BZ_OFFERS VALUES(${ListingID}, ${ID})`, function (err) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
     }
 
-    closeListing(ListingID: number): Promise<void> {
+    closeListing(ListingID: Snowflake): Promise<void> {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`DELETE FROM BAZAAR WHERE ID=${ListingID};`, function (err) {
                 if (err) reject(err);
@@ -278,7 +278,7 @@ ORDER BY -Rank`,
         });
     }
 
-    closeOffer(ListingID: number, UserID: number): void {
+    closeOffer(ListingID: Snowflake, UserID: Snowflake): void {
         this.db.execute(SQL`DELETE FROM BZ_OFFERS WHERE ID=${UserID} AND ListingID=${ListingID};`, function (err) {
             if (err) this.bot.logger.error(err);
             this.db.execute(SQL`UPDATE BAZAAR SET OfferCount = OfferCount - 1 WHERE ID=${ListingID};`, function (err) {
@@ -287,7 +287,7 @@ ORDER BY -Rank`,
         }.bind(this));
     }
 
-    updateListing(ListingID: number, Type: 'WTB' | 'WTS', NonNegotiable: 0 | 1, Price: number, Currency: string, Item: string, Bazaar: string): void {
+    updateListing(ListingID: Snowflake, Type: 'WTB' | 'WTS', NonNegotiable: 0 | 1, Price: number, Currency: string, Item: string, Bazaar: string): void {
         this.db.execute(SQL`UPDATE BAZAAR SET Type=${Type}, NonNegotiable=${NonNegotiable}, Price=${Price}, Currency=${Currency}, Item=${Item}, Bazaar=${Bazaar} WHERE ID=${ListingID};`, function (err) {
             if (err) this.bot.logger.error(err);
         }.bind(this));
@@ -354,7 +354,7 @@ ORDER BY -Rank`,
         }).catch(e => this.bot.logger.error(e));
     }
 
-    fetchBuildByID(ID: number): Promise<any> {
+    fetchBuildByID(ID: Snowflake): Promise<any> {
         return new Promise((resolve, reject) => {
             this.db.execute(SQL`SELECT * FROM DRUNNERS WHERE ID=${ID}`, function (err, results: RowDataPacket[]) {
                 if (err) reject(err);

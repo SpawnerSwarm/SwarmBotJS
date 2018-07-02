@@ -1,25 +1,23 @@
-'use strict';
+import Module from "../Module";
+import * as fs from "fs";
+import Cephalon from "../../Cephalon";
+import { DBModule } from "../../helpers/Database";
+import { MessageReaction, User, Message, Guild, TextChannel, Collection } from "discord.js";
 
-const Module = require('../Module.js');
-const fs = require('fs');
-
-class Bazaar extends Module {
-    /**
-     * @param {Cephalon} bot 
-     */
-    constructor(bot, token, name, shortName, args) {
+export default class Bazaar extends Module {
+    constructor(bot: Cephalon, token: string, name: string, shortName: string, args: {}) {
         super(bot, token, name, args);
 
         this.shortName = shortName;
 
         this.regex = /[[(](WTS|WTB)[\])] ?([[(]NN[\])] ?)?[[(]([$0-9]+)((?: ?[kmbtq])?(?: ?(?:CR|CE|Plat|Platinum|p|<:Crown:318234064941350912>|<:Platinum:230528518147145731>|<:Energy:318527974557089792>|<:CrownFlat:318536338934857728>) ?)?)[\])]([^[(\])]+)/i;
         
-        this.bot.settings.getModule(this.shortName).then((settings) => {
+        this.bot.db.getModule(this.shortName).then((settings: DBModule) => {
             this.settings = settings;
         });
     }
 
-    onMessage(message) {
+    public onMessage(message: Message): void {
         if (!message.author.bot) {
             if (message.channel.id == this.settings.Channel) {
                 if (message.content.startsWith(this.prefix) || message.content.startsWith(this.bot.prefix)) {
@@ -28,9 +26,9 @@ class Bazaar extends Module {
                 }
                 let match = message.content.match(this.regex);
                 if (match) {
-                    let nn = null;
+                    let nn = 0;
                     if (match[2] == '[NN] ') nn = 1;
-                    this.bot.settings.createListing(message.id, match[1], nn, match[3], match[4], match[5].substring(1), this.shortName);
+                    this.bot.db.createListing(message.id, match[1] as "WTB" | "WTS", nn as 0 | 1, Number(match[3]), match[4], match[5].substring(1), this.shortName);
                     message.react(message.guild.emojis.find('name', 'Shop')).then(() =>
                         message.react(message.guild.emojis.find('name', 'Disconnect')));
                 } else {
@@ -41,19 +39,19 @@ class Bazaar extends Module {
         }
     }
 
-    onMessageReactionAdd(messageReaction, user) {
+    public onMessageReactionAdd(messageReaction: MessageReaction, user: User): void {
         if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
             if (messageReaction.message.author.id == user.id) {
                 if (messageReaction.emoji.name == 'Disconnect') {
-                    this.bot.settings.closeListing(messageReaction.message.id);
+                    this.bot.db.closeListing(messageReaction.message.id);
                     messageReaction.message.delete();
                 } else {
                     messageReaction.remove(user.id);
                 }
             } else {
                 if (messageReaction.emoji.name == 'Shop') {
-                    this.bot.settings.createOffer(messageReaction.message.id, user.id);
-                    this.bot.settings.getListing(messageReaction.message.id).then((listing) => {
+                    this.bot.db.createOffer(messageReaction.message.id, user.id);
+                    this.bot.db.getListing(messageReaction.message.id).then((listing) => {
                         let type;
                         /*eslint-disable indent*/
                         switch (listing.Type) {
@@ -75,13 +73,13 @@ This message is being sent to inform you that the listing price has been marked 
         }
     }
 
-    onMessageReactionRemove(messageReaction, user) {
+    public onMessageReactionRemove(messageReaction: MessageReaction, user: User): void {
         if (!user.bot && messageReaction.message.channel.id == this.settings.Channel) {
             if (messageReaction.emoji.name == 'Shop') {
-                this.bot.settings.getOffers(messageReaction.message.id).then((offers) => {
+                this.bot.db.getOffers(messageReaction.message.id).then((offers) => {
                     if (offers.find(x => x.ID == user.id)) {
-                        this.bot.settings.closeOffer(messageReaction.message.id, user.id);
-                        this.bot.settings.getListing(messageReaction.message.id).then((listing) => {
+                        this.bot.db.closeOffer(messageReaction.message.id, user.id);
+                        this.bot.db.getListing(messageReaction.message.id).then((listing) => {
                             user.send(`Your offer on [${listing.Type}] ${listing.Item} for ${listing.Price}${listing.Currency} was canceled because you removed your reaction`);
                         });
                     }
@@ -90,50 +88,50 @@ This message is being sent to inform you that the listing price has been marked 
         }
     }
 
-    onMessageReactionRemoveAll(message) {
+    public onMessageReactionRemoveAll(message: Message): void {
         if (message.channel.id == this.settings.Channel) {
             message.delete();
-            this.bot.settings.getListing(message.id).then((listing) => {
+            this.bot.db.getListing(message.id).then((listing) => {
                 message.author.send(`Your listing of [${listing.Type}] ${listing.Item} for ${listing.Price}${listing.Currency} was terminated because offers were removed`);
             });
-            this.bot.settings.closeListing(message.id);
+            this.bot.db.closeListing(message.id);
         }
     }
 
-    onMessageDelete(message) {
+    public onMessageDelete(message: Message): void {
         if (!message.author.bot && message.channel.id == this.settings.Channel) {
-            this.bot.settings.getListing(message.id).then((listing) => {
+            this.bot.db.getListing(message.id).then((listing) => {
                 message.author.send(`Your listing of [${listing.Type}] ${listing.Item} for ${listing.Price}${listing.Currency} was terminated either by yourself or a moderator.`);
             }).catch(() => { });
-            this.bot.settings.closeListing(message.id);
+            this.bot.db.closeListing(message.id);
         }
     }
 
-    onMessageDeleteBulk(messages) {
+    public onMessageDeleteBulk(messages: Collection<string, Message>): void {
         messages.forEach((message) => {
             if (message.channel.id == this.settings.Channel && !message.author.bot) {
-                this.bot.settings.getListing(message.id).then((listing) => {
+                this.bot.db.getListing(message.id).then((listing) => {
                     message.author.send(`Your listing of [${listing.Type}] ${listing.Item} for ${listing.Price}${listing.Currency} was terminated by a bulk message removal.`);
                 });
             }
         }, this);
     }
 
-    onMessageUpdate(oldMessage, newMessage) {
+    public onMessageUpdate(oldMessage: Message, newMessage: Message): void {
         if (oldMessage.channel.id == this.settings.Channel && !oldMessage.author.bot) {
             let match = newMessage.content.match(this.regex);
             if (!match) {
-                this.bot.settings.getListing(newMessage.id).then((listing) => {
+                this.bot.db.getListing(newMessage.id).then((listing) => {
                     newMessage.author.send(`Your listing of [${listing.Type}] ${listing.Item} for ${listing.Price}${listing.Currency} was terminated by an invalid listing update.`);
                 });
-                this.bot.settings.closeListing(newMessage.id);
+                this.bot.db.closeListing(newMessage.id);
                 newMessage.delete();
             }
             else {
-                let nn = null;
+                let nn = 0;
                 if (match[2] == '[NN] ') nn = 1;
-                this.bot.settings.updateListing(newMessage.id, match[1], nn, match[3], match[4], match[5].substring(1), this.shortName);
-                this.bot.settings.getOffers(newMessage.id).then((offers) => {
+                this.bot.db.updateListing(newMessage.id, match[1] as "WTB" | "WTS", nn as 0 | 1, Number(match[3]), match[4], match[5].substring(1), this.shortName);
+                this.bot.db.getOffers(newMessage.id).then((offers) => {
                     offers.forEach((offer) => {
                         newMessage.guild.fetchMember(offer.ID).then((member) => {
                             member.send(`${newMessage.author.username} has updated one of their listings you previously made an offer on. Please take a moment and review your offers`);
@@ -144,9 +142,9 @@ This message is being sent to inform you that the listing price has been marked 
         }
     }
 
-    onReadyExtra() {
-        let guild = this.client.guilds.get(this.settings.Guild);
-        let channel = guild.channels.get(this.settings.Channel);
+    public onReadyExtra(): void {
+        let guild = this.client.guilds.get(this.settings.Guild) as Guild;
+        let channel = guild.channels.get(this.settings.Channel) as TextChannel;
         channel.fetchMessages({ limit: 100 })
             .then((messages) => {
                 this.logger.debug(`Received ${messages.size} messages from ${this.name}`);
@@ -161,14 +159,12 @@ This message is being sent to inform you that the listing price has been marked 
                                 this.send(data.toString());
                             }.bind(channel));
                         } catch (err) {
-                            this.bot.logger.error(err);
+                            this.logger.error(err);
                         }
                     }
                 }
             })
-            .catch((error) => this.bot.logger.error(error));
+            .catch((error) => this.logger.error(error));
         this.client.user.setStatus('invisible');
     }
 }
-
-module.exports = Bazaar;

@@ -1,34 +1,45 @@
-'use strict';
+import Cephalon from "../Cephalon";
+import { Client, Snowflake, Message, GuildMember, MessageReaction, User, Collection } from "discord.js";
+import Logger from "../helpers/Logger";
+import Database, { DBModule } from "../helpers/Database";
 
-const Discord = require('discord.js');
+export default class Module {
+    private token: string;
+    public client: Client;
+    public bot: Cephalon;
+    public get logger(): Logger {
+        return this.bot.logger;
+    }
+    public get owner(): Snowflake {
+        return this.bot.owner;
+    }
+    public get db(): Database {
+        return this.bot.db;
+    }
 
-class Module {
-    /**
-     * 
-     * @param {string} discordToken 
-     * @param {Cephalon} bot 
-     * @param {string} name 
-     * @param {Object} [options]
-     * @param {number} [options.shardId]
-     * @param {number} [options.shardCount]
-     * @param {string} [options.prefix]
-     */
-    constructor(bot, discordToken, name, { shardId = 0, shardCount = 1, prefix = process.env.PREFIX, statusMessage = null } = {}) {
-        /**
-         * @type {Cephalon}
-         */
+    public name: string;
+    public shardId: number;
+    public shardCount: number;
+    public prefix: string;
+    public statusMessage: string;
+
+    public escapedPrefix: string;
+    public ready: boolean;
+
+    public shortName: string;
+    public regex: RegExp;
+    public settings: DBModule;
+
+    protected _tsoverrideregex(match: RegExpMatchArray | null): match is RegExpMatchArray {
+        return true;
+    }
+
+    constructor(bot: Cephalon, discordToken: string, name: string, { shardId = 0, shardCount = 1, prefix = process.env.PREFIX as string, statusMessage = '' } = {}) {
         this.bot = bot;
 
-        /**
-         * @type {string}
-         */
         this.name = name;
 
-        /**
-         * @type {Discord.Client}
-         * @private
-         */
-        this.client = new Discord.Client({
+        this.client = new Client({
             fetchAllMembers: true,
             ws: {
                 compress: true,
@@ -41,54 +52,20 @@ class Module {
         this.shardId = shardId;
         this.shardCount = shardCount;
 
-        /**
-         * @type {string}
-         * @private
-         */
         this.token = discordToken;
 
-        /**
-         * @type {Logger}
-         * @private
-         */
-        this.logger = this.bot.logger;
-
-        /**
-         * @type {string}
-         * @private
-         */
+        this.prefix = prefix;
+        
         this.escapedPrefix = prefix.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
-        /**
-         * @type {string}
-         * @private
-         */
-        this.prefix = prefix;
+        this.ready = false;
 
-        /**
-         * @type {boolean}
-         */
-        this.readyToExecute = false;
-
-        /**
-         * @type {string}
-         */
-        this.owner = this.bot.owner;
-
-        /**
-         * @type {string}
-         */
         this.statusMessage = statusMessage;
-
-        /**
-         * @type {Database}
-         */
-        this.settings = this.bot.settings;
 
         this.setupHandlers();
     }
 
-    setupHandlers() {
+    private setupHandlers(): void {
         this.client.on('ready', () => this.onReady());
         this.client.on('message', message => this.onMessage(message));
 
@@ -100,7 +77,7 @@ class Module {
 
         this.client.on('presenceUpdate', (oldMember, newMember) => this.onPresenceUpdate(oldMember, newMember));
 
-        this.client.on('error', error => this.logger.error(error));
+        this.client.on('error', error => this.logger.error(error.message));
         this.client.on('warn', warning => this.logger.warning(warning));
 
         this.client.on('messageReactionAdd', (messageReaction, user) => this.onMessageReactionAdd(messageReaction, user));
@@ -112,7 +89,7 @@ class Module {
         this.client.on('messageUpdate', (oldMessage, newMessage) => this.onMessageUpdate(oldMessage, newMessage));
     }
 
-    start() {
+    private start(): void {
         this.client.login(this.token)
             .then(() => {
                 this.logger.info(`${this.name} Logged in!`);
@@ -122,7 +99,7 @@ class Module {
             });
     }
 
-    onReady() {
+    private onReady(): void {
         this.logger.info(`${this.client.user.username} ready!`);
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
         if (this.statusMessage) {
@@ -134,43 +111,43 @@ class Module {
                 }
             });
         }
-        this.readyToExecute = true;
+        this.ready = true;
         this.onReadyExtra();
     }
 
-    onMessage() {
+    onMessage(message: Message) {
 
     }
 
-    onGuildMemberAdd() {
+    onGuildMemberAdd(member: GuildMember) {
 
     }
 
-    onPresenceUpdate() {
+    onPresenceUpdate(oldMember: GuildMember, newMember: GuildMember) {
 
     }
 
-    onMessageReactionAdd() {
+    onMessageReactionAdd(messageReaction: MessageReaction, user: User) {
 
     }
 
-    onMessageReactionRemove() {
+    onMessageReactionRemove(messageReaction: MessageReaction, user: User) {
 
     }
 
-    onMessageReactionRemoveAll() {
+    onMessageReactionRemoveAll(message: Message) {
         
     }
 
-    onMessageDelete() {
+    onMessageDelete(message: Message) {
 
     }
 
-    onMessageDeleteBulk() {
+    onMessageDeleteBulk(messages: Collection<string, Message>) {
 
     }
 
-    onMessageUpdate() {
+    onMessageUpdate(oldMessage: Message, newMessage: Message) {
         
     }
 
@@ -178,5 +155,3 @@ class Module {
         
     }
 }
-
-module.exports = Module;
