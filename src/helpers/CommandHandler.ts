@@ -9,7 +9,7 @@ import { MessageWithStrippedContent } from "../objects/Types";
 
 export default class CommandHandler {
     private bot: Cephalon;
-    private get logger():Logger {
+    private get logger(): Logger {
         return this.bot.logger;
     }
     public commands: Command[] = [];
@@ -18,7 +18,7 @@ export default class CommandHandler {
         this.bot = bot;
     }
 
-    loadCommands() {
+    loadCommands(): void {
         const commandDir = path.join(__dirname, 'commands');
         let files = fs.readdirSync(commandDir);
 
@@ -43,7 +43,7 @@ export default class CommandHandler {
             try {
                 const Cmd = require(path.join(commandDir, f));
                 if (Object.prototype.toString.call(Cmd) === '[object Function]') {
-                    const command = new Cmd(this.bot);
+                    const command = new Cmd.default(this.bot);
 
                     this.logger.debug(`Adding ${command.id}`);
                     return command;
@@ -57,7 +57,7 @@ export default class CommandHandler {
             .filter(c => c !== null);
     }
 
-    handleCommand(message: Message) {
+    handleCommand(message: Message): void {
         let content = message.content;
         const botping = `@${this.bot.client.user.username}`;
         if (!content.startsWith(this.bot.prefix) && !content.startsWith(botping)) {
@@ -87,14 +87,14 @@ export default class CommandHandler {
         });
     }
 
-    checkCanAct(command, message) {
+    checkCanAct(command: Command, message: Message): Promise<boolean> {
         return new Promise((resolve) => {
             if (message.channel.type === 'text' || (message.channel.type === 'dm' && command.allowDM)) {
                 this.bot.db.getMember(message.author.id).then((member) => {
                     if (!command.ownerOnly || message.author.id === this.bot.owner) {
                         if (member.Banned === true) {
                             message.channel.send('You are currently banned from using commands. Please contact Mardan to rectify this.');
-                            this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
+                            this.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
                         }
                         else {
                             if (command.requiredRank === 0) {
@@ -104,7 +104,7 @@ export default class CommandHandler {
                                     resolve(true);
                                 } else {
                                     message.channel.send('You lack the privileges to perform that action');
-                                    this.bot.logger.warning(`User ${member.Name} tried to use command ${command.id} but is too low of rank.`);
+                                    this.logger.warning(`User ${member.Name} tried to use command ${command.id} but is too low of rank.`);
                                 }
 
                             }
@@ -119,7 +119,7 @@ export default class CommandHandler {
             }
             else {
                 message.channel.send('This command cannot be perofrmed in DMs');
-                this.bot.logger.warning(`User ${message.author.username} tried to use command ${command.id} but it is disallowed in DMs`);
+                this.logger.warning(`User ${message.author.username} tried to use command ${command.id} but it is disallowed in DMs`);
             }
         });
     }
