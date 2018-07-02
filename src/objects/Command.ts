@@ -21,7 +21,7 @@ export default class Command {
         parameters: string[]
     }[];
     public ownerOnly: boolean = false;
-    public requiredRank: RankNum;
+    public requiredRank: 0 | RankNum;
     public allowDM: boolean = true;
 
     public mandatoryWords: RegExp | undefined = undefined;
