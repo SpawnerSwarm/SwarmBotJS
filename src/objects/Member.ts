@@ -1,7 +1,6 @@
-import { Rank } from "./Ranks.on";
 import { Snowflake } from "discord.js";
 import Cephalon from "../Cephalon";
-import Database from "../helpers/Database";
+import { RankNum } from "./Types";
 
 export default class Member {
     public readonly ID: Snowflake;
@@ -46,7 +45,7 @@ export default class Member {
         bot: Cephalon,
         id: Snowflake,
         name: string,
-        rank: Rank,
+        rank: RankNum,
         wfname: string,
         skname: string,
         lastPestered: Date,
