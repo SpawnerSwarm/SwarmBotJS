@@ -1,12 +1,11 @@
 import Command from "../../objects/Command";
 import NexusEmbed from "../../embeds/NexusEmbed";
-import * as request from "request";
+import * as request from "request-promise";
+import Cephalon from "../../Cephalon";
+import { MessageWithStrippedContent } from "../../objects/Types";
 
-class PriceCheck extends Command {
-    /**
-     * @param {Cephalon} bot
-     */
-    constructor(bot) {
+export default class PriceCheck extends Command {
+    constructor(bot: Cephalon) {
         super(bot, 'warframe.priceCheck', 'priceCheck');
 
         this.regex = new RegExp('^(?:priceCheck|pc) ?(.+)?$');
@@ -14,8 +13,9 @@ class PriceCheck extends Command {
         this.requiredRank = 0;
     }
 
-    run(message) {
+    run(message: MessageWithStrippedContent) {
         const match = message.strippedContent.match(this.regex);
+        if(!this._tsoverrideregex(match)) return;
         if (!match[1]) {
             message.channel.send('Syntax incorrect. Please provide an item to price check.');
         } else {
@@ -41,5 +41,3 @@ class PriceCheck extends Command {
         }
     }
 }
-
-module.exports = PriceCheck;
