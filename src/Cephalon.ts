@@ -1,164 +1,119 @@
-﻿'use strict';
+import * as request from "request";
 
-const CommandHandler = require('./CommandHandler.js');
-const Discord = require('discord.js');
-const md = require('node-md-config');
-const WorldStateCache = require('./WorldStateCache.js');
-const Database = require('./settings/Database.js');
-const request = require('request');
-const Ranks = require('./resources/Ranks.js');
-const SKEmotes = require('./resources/SpiralKnightsEmotes.js');
-const Modules = require('./modules/modules.json');
-const pkg = require('../package.json');
+import Logger from "./helpers/Logger";
+import { Snowflake, Client, Message, Role, TextChannel, GroupDMChannel, DMChannel, GuildMember, Channel } from "discord.js";
+import Database from "./helpers/Database";
+import CommandHandler from "./helpers/CommandHandler";
+import WorldStateCache from "./helpers/WorldStateCache";
+import Module from "./modules/Module";
 
-/**
- * @typedef {Object.<string>} MarkdownSettings
- * @property {string} lineEnd      - Line return character
- * @property {string} blockEnd     - Block end string
- * @property {string} doubleReturn - Double line return string
- * @property {string} linkBegin    - Link begin string
- * @property {string} linkMid      - Link middle string
- * @property {string} linkEnd      - Link end string
- * @property {string} bold         - String for denoting bold text
- * @property {string} italic       - String for denoting italicized text
- * @property {string} underline    - String for denoting underlined text
- * @property {string} strike       - String for denoting striked-through text
- * @property {string} codeLine     - String for denoting in-line code
- * @property {string} codeBlock    - String for denoting multi-line code blocks
- */
+import { UrlResolvable, GuildTextChannel } from "./objects/Types.d";
+import Ranks from "./objects/Ranks.on";
+import Modules from "/etc/swarmbot/modules.on";
+import { SKEmote, default as SKEmotes } from "./objects/SpiralKnightsEmotes.on"
+import { PathLike } from "fs";
 
-class Cephalon {
-    /**
-     * @param  {string}           discordToken         The token used to authenticate with Discord
-     * @param  {Logger}           logger               The logger object
-     * @param  {Object}           [options]            Bot options
-     * @param  {number}           [options.shardId]    The shard ID of this instance
-     * @param  {number}           [options.shardCount] The total number of shards
-     * @param  {string}           [options.prefix]     Prefix for calling the bot
-     * @param  {MarkdownSettings} [options.mdConfig]   The markdown settings
-     */
-    constructor(discordToken, logger, { shardId = 0, shardCount = 1, prefix = process.env.PREFIX,
-        mdConfig = md, owner = null } = {}) {
+export default class Cephalon {
+    private token: string;
+    public prefix: string;
+    public owner: Snowflake;
+    public shardId: number;
+    public shardCount: number;
+    public guildMailUrl: UrlResolvable;
+    
+    public logger: Logger;
+    public client: Client;
+    public ch: CommandHandler;
+    public db: Database;
+    public wfws: WorldStateCache;
 
-        /**
-         * @type {Discord.Client}
-         * @private
-        */
-        this.client = new Discord.Client({
+    public escapedPrefix: string;
+    public ready: boolean;
+    public statusMessage: string;
+
+    public modulePaths: PathLike[];
+    public modules: Module[];
+
+    constructor(
+        token: string,
+        logger: Logger,
+        options: {
+            shardId: number | string,
+            shardCount: number | string,
+            prefix: string,
+            owner: Snowflake
+        }
+    ) {
+        this.token = token;
+        this.logger = logger;
+        this.prefix = options.prefix;
+        this.owner = options.owner as Snowflake;
+        
+        this.shardId = options.shardId as number;
+        this.shardCount = options.shardCount as number;
+        
+        this.client = new Client({
             fetchAllMembers: true,
             ws: {
                 compress: true,
-                large_threshold: 1000,
+                large_threshold: 1000
             },
-            shardId,
-            shardCount,
+            shardId: this.shardId,
+            shardCount: this.shardCount
         });
 
-        this.shardId = shardId;
-        this.shardCount = shardCount;
+        this.escapedPrefix = options.prefix.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        this.statusMessage = `Type ${options.prefix} for help.`;
 
-        /**
-         * @type {string}
-         * @private
-        */
-        this.token = discordToken;
-
-        /**
-         * @type {Logger}
-         * @private
-        */
-        this.logger = logger;
-
-        /**
-         * @type {string}
-         * @private
-        */
-        this.escapedPrefix = prefix.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-
-        /**
-         * @type {string}
-         * @private
-        */
-        this.prefix = prefix;
-
-        /**
-         * @type {MarkdownSettings}
-         * @private
-        */
-        this.md = mdConfig;
-
-        /**
-         * @type {boolean}
-        */
-        this.readyToExecute = false;
-
-        /**
-         * @type {CommandHandler}
-         * @private
-        */
-        this.commandHandler = new CommandHandler(this);
-
-        /**
-         * @type {string}
-        */
-        this.owner = owner;
-
-        /**
-         * @type {string}
-        */
-        this.statusMessage = `Type ${prefix}help for help`;
-
-        /**
-         * @type {Database}
-        */
-        this.settings = new Database({
-            host: process.env.MYSQL_HOST,
-            port: process.env.MYSQL_PORT,
-            user: process.env.MYSQL_USER,
-            password: process.env.MYSQL_PASSWORD,
-            database: process.env.MYSQL_DB,
+        this.db = new Database({
+            host: process.env.MYSQL_HOST as UrlResolvable,
+            port: Number(process.env.MYSQL_PORT),
+            user: process.env.MYSQL_USER as string,
+            pass: process.env.MYSQL_PASS as string,
+            database: process.env.MYSQL_DB as string
         }, this);
 
         const worldStateTimeout = process.env.WORLDSTATE_TIMEOUT;
 
-        /**
-         * @type {Object.<WorldStateCache>}
-        */
-        this.worldState = new WorldStateCache(worldStateTimeout, logger);
-
-        this.commandHandler.loadCommands();
+        this.wfws = new WorldStateCache(Number(worldStateTimeout as string), logger);
+        
+        this.ch = new CommandHandler(this);
+        this.ch.loadCommands();
 
         this.setupHandlers();
 
-        this.guildMailURL = process.env.GM_URL;
+        this.guildMailUrl = process.env.GM_URL as UrlResolvable;
 
         this.modulePaths = Modules.modules;
-
         this.modules = [];
     }
 
-    setupHandlers() {
-        this.client.on('ready', () => this.onReady());
-        this.client.on('message', message => this.onMessage(message));
-
-        this.client.on('disconnect', (event) => {
-            this.logger.fatal(`Disconnected with close event: ${event.code}`);
-            process.exit(4);
-        });
-
-        this.client.on('guildMemberAdd', (member) => {
-            if (member.guild.id == 137991656547811328 || member.guild.id == 157978818466807808) {
-                member.guild.channels.get(`${member.guild.id}`).send(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailURL} and ask a Veteran or above if you have any questions!`);
-            }
-        });
-
-        this.client.on('presenceUpdate', (oldMember, newMember) => this.onPresenceUpdate(oldMember, newMember));
-
-        this.client.on('error', error => this.logger.error(error));
-        this.client.on('warn', warning => this.logger.warning(warning));
+    public static _checkChannelIsText(channel: DMChannel | GroupDMChannel | TextChannel, id: Snowflake): channel is TextChannel {
+        return channel.id === id;
     }
 
-    start() {
+    private setupHandlers(): void {
+        this.client.on('ready', this.onReady);
+        this.client.on('message', this.onMessage);
+        
+        this.client.on('disconnect', (e) => {
+            this.logger.fatal(`Disconnected with close event: ${e.code}`);
+            process.exit(4);
+        });
+        
+        this.client.on('guildMemberAdd', (member) => {
+            if(member.guild.id as Snowflake === String(137991656547811328) || member.guild.id as Snowflake === String(157978818466807808)) {
+                (member.guild.channels.get(`${member.guild.id}`) as GuildTextChannel).send(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailUrl} and ask a Veteran or above if you have any questions!`);
+            }
+        });
+        
+        this.client.on('presenceUpdate', this.onPresenceUpdate);
+        
+        this.client.on('error', this.logger.error);
+        this.client.on('warning', this.logger.warning);
+    }
+    
+    public start(): void {
         this.client.login(this.token)
             .then(() => {
                 this.logger.info('Logged in!');
@@ -166,10 +121,10 @@ class Cephalon {
                 this.logger.error(e.message);
                 this.logger.fatal(e);
                 process.exit(1);
-            });
+            })
     }
-
-    onReady() {
+    
+    private onReady(): void {
         this.logger.info(`${this.client.user.username} ready!`);
         this.logger.info(`Bot: ${this.client.user.username}#${this.client.user.discriminator}`);
         this.client.user.setPresence({
@@ -177,10 +132,10 @@ class Cephalon {
             afk: false,
             game: {
                 name: this.statusMessage,
-                url: pkg.repository
+                url: process.env.SOURCE
             }
         });
-        this.readyToExecute = true;
+        this.ready = true;
         for (let i = 0; i < this.modulePaths.length; i++) {
             const ModuleClass = require(`${Modules.root}${this.modulePaths[i]}`);
             let Module = new ModuleClass(this);
@@ -189,12 +144,9 @@ class Cephalon {
         }
     }
 
-    /**
-     * @param {Message} message
-    */
-    onMessage(message) {
-        if (this.readyToExecute && !message.author.bot) {
-            if (message.channel.id === '137991656547811328' || message.channel.id === '165649798551175169' || message.channel.id === '157978818466807808') {
+    private onMessage(message: Message): void {
+        if (this.ready && !message.author.bot) {
+            if (Cephalon._checkChannelIsText(message.channel, '137991656547811328') || Cephalon._checkChannelIsText(message.channel, '165649798551175169') || Cephalon._checkChannelIsText(message.channel, '157978818466807808')) {
                 if (message.attachments.array().length > 0 || message.embeds.length > 0) {
                     if (message.member.roles.find('name', 'Certified Weeb') != null) {
                         message.react(message.guild.emojis.find('name', 'Weeb'));
@@ -202,13 +154,16 @@ class Cephalon {
                 }
             }
             if (message.content.match(/\[\[.+\]\]/)) {
-                //let match = message.content.match(/([^ ]{1,3})?\[\[(.+)\]\]/i);
-                let match;
+                let match: RegExpExecArray;
                 let regex = /([^ ]{1,3})?\[\[([^\]]+)\]\]/g;
                 let i = 0;
-                while ((match = regex.exec(message.content)) !== null && i < 5) {
+                while ((match = regex.exec(message.content) as RegExpExecArray) !== null && i < 5) {
                     this.logger.debug(`Found wiki match in message, ${i}: ${match[2]}`);
-                    let wiki;
+                    let wiki: {
+                        url: UrlResolvable,
+                        name: string,
+                        char: string
+                    };
                     /*eslint-disable indent*/
                     switch (match[1]) {
                         case 'wf': wiki = { url: 'http://warframe.wikia.com/wiki/', name: 'Warframe', char: '_' }; break;
@@ -236,7 +191,7 @@ class Cephalon {
                 }
             }
             if (message.content.match(/@everyone/)) {
-                if (message.channel.id === '137996862211751936' || message.channel.id === '250077586695258122' || message.channel.id == '137996873913860097') {
+                if (Cephalon._checkChannelIsText(message.channel, '137996862211751936') || Cephalon._checkChannelIsText(message.channel, '250077586695258122') || Cephalon._checkChannelIsText(message.channel, '137996873913860097')) {
                     let title = message.channel.name.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 
                     message.channel.send(`You seem to be using an 'everyone' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
@@ -244,24 +199,24 @@ class Cephalon {
                 }
             }
             if (message.content.match(/@here/)) {
-                if(message.channel.id === '137996862211751936') {
-                    let title;
+                if(Cephalon._checkChannelIsText(message.channel, '137996862211751936')) {
+                    let title: string | undefined; //TODO: fix https://stackoverflow.com/questions/51007234/typescript-inline-static-type-guard
                     switch(message.channel.name) {
                         case 'warframe':
                             title = 'wfhere';
                     }
 
-                    message.channel.send(`You seem to be using a 'here' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
+                    message.channel.send(`You seem to be using a 'here' mention in a game-specific channel.\nIf your message was specifically related to this game, please use the '${title as string}' mention instead.\nIf your message was more general, please consider using the <#${message.guild.defaultChannel.id}> channel instead!`);
                     this.logger.info(`Warned ${message.author.username} against using the @here mention in #${message.channel.name}`);
                 }
             }
             if (message.content.match(/<@&438837282783363092>|@wfhere/i)) {
                 if (message.guild && message.guild.roles.has('138054399950848000')) {
                     message.guild.fetchMembers().then((guild) => {
-                        let members = guild.roles.get('138054399950848000').members
+                        let members = (guild.roles.get('138054399950848000') as Role).members
                             .filter(member => member.presence.status == 'online' || member.presence.status == 'idle');
                         let memberMap = members.map(member => ` <@${member.id}>`);
-                        let reducer = (accumulator, currentValue) => {
+                        let reducer = (accumulator: string, currentValue: string) => {
                             return accumulator.concat(currentValue);
                         };
                         let msg = `Mentioning currently-online Warframe members${memberMap.reduce(reducer, ':')}`;
@@ -270,9 +225,9 @@ class Cephalon {
                 }
             }
             else if (message.content.startsWith('/')) {
-                let msg = message.cleanContent.substring('1');
+                let msg = message.cleanContent.substring(1);
                 try {
-                    SKEmotes.forEach(function (x) {
+                    SKEmotes.forEach(function (x: SKEmote) {
                         let regex = new RegExp(`^(?:${x.command})(?: (.+)|$)`, 'i');
                         let match = msg.match(regex);
                         if (!match) {
@@ -291,39 +246,39 @@ class Cephalon {
                     this.logger.error(e);
                 }
             }
-            this.commandHandler.handleCommand(message);
+            this.ch.handleCommand(message);
         }
     }
 
-    onPresenceUpdate(oldMember, newMember) {
+    private onPresenceUpdate(oldMember: GuildMember, newMember: GuildMember): void {
         if (process.env.SHOULD_PESTER != 'false' && oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
-            let checkReadyForRankup = (date, compDate, breakOnNull, member) => {
-                if (date === null && breakOnNull) {
+            let checkReadyForRankup = (dateStr: string | Date, compDate: number | undefined, breakOnNull: boolean, member) => {
+                if (dateStr === null && breakOnNull) {
                     return false;
                 }
                 let one = 1000 * 60 * 60 * 24;
                 let today = new Date();
 
-                date = new Date(date);
+                const date = new Date(dateStr);
 
-                let dateDiff = Math.floor((today - date) / one);
+                let dateDiff = Math.floor((today.valueOf() - date.valueOf()) / one);
                 if (member.Rank === 7) {
                     return false;
                 }
-                else if (dateDiff >= compDate) {
+                else if (dateDiff >= (compDate as number)) {
                     return true;
                 } else {
                     return false;
                 }
             };
-            this.settings.getMember(newMember.id).then((member) => {
-                if (member.Rank > 3 || member.Ally === 1 || member.Banned === 1) { return; }
+            this.db.getMember(newMember.id).then((member) => {
+                if (member.Rank > 3 || member.Ally || member.Banned) { return; }
                 if (checkReadyForRankup(member[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
                     if (checkReadyForRankup(member.LastPestered, 7, false, member)) {
                         if (member.LastPesteredIndex < 3) {
-                            newMember.send(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailURL}) and ask an Officer+ to administer your test!\nThis message will only be sent 3 times for each pending rank.`);
-                            this.settings.setLastPestered(member.ID);
-                            this.client.channels.get('165649798551175169').send(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
+                            newMember.send(`Hello, ${member.Name}! This is an automated message from the Spawner Swarm to remind you that you're ready to take your rankup test!\nPlease be sure to review the rankup procedure in the guildmail (${this.guildMailUrl}) and ask an Officer+ to administer your test!\nThis message will only be sent 3 times for each pending rank.`);
+                            this.db.setLastPestered(member.ID);
+                            (this.client.channels.get('165649798551175169')as TextChannel).send(`<@&137992918957817856> Sent <@${member.ID}> a rankup notification.\n Last pestered on ${member.LastPestered}.`);
                             this.logger.info(`Sent ${member.Name} a rankup notification.`);
                         }
                     }
@@ -338,5 +293,3 @@ class Cephalon {
         }*/
     }
 }
-
-module.exports = Cephalon;
