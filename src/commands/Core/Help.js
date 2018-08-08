@@ -16,7 +16,6 @@ class Help extends Command {
 
     run(message) {
         let match = message.strippedContent.match(this.regex);
-        this.bot.logger.debug(match[1]);
         let name;
         
         if(!match[1]) name = '_';
