@@ -3,6 +3,7 @@ docs
 env.js
 env.list
 dist
+etc/*.js
 
 # Logs
 logs
