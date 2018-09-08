@@ -51,25 +51,24 @@ export default class Cephalon {
         
         this.shardId = options.shardId as number;
         this.shardCount = options.shardCount as number;
-        
+
         this.client = new Client({
-            fetchAllMembers: true,
             ws: {
                 compress: true,
                 large_threshold: 1000
             },
             shardId: this.shardId,
-            shardCount: this.shardCount
+            shardCount: this.shardId
         });
 
         this.escapedPrefix = options.prefix.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-        this.statusMessage = `Type ${options.prefix} for help.`;
+        this.statusMessage = `Type ${options.prefix}help for help.`;
 
         this.db = new Database({
             host: process.env.MYSQL_HOST as UrlResolvable,
             port: Number(process.env.MYSQL_PORT),
             user: process.env.MYSQL_USER as string,
-            pass: process.env.MYSQL_PASS as string,
+            password: process.env.MYSQL_PASSWORD as string,
             database: process.env.MYSQL_DB as string
         }, this);
 
@@ -93,8 +92,8 @@ export default class Cephalon {
     }
 
     private setupHandlers(): void {
-        this.client.on('ready', this.onReady);
-        this.client.on('message', this.onMessage);
+        this.client.on('ready', this.onReady.bind(this));
+        this.client.on('message', this.onMessage.bind(this));
         
         this.client.on('disconnect', (e) => {
             this.logger.fatal(`Disconnected with close event: ${e.code}`);
@@ -107,10 +106,10 @@ export default class Cephalon {
             }
         });
         
-        this.client.on('presenceUpdate', this.onPresenceUpdate);
+        this.client.on('presenceUpdate', this.onPresenceUpdate.bind(this));
         
-        this.client.on('error', this.logger.error);
-        this.client.on('warning', this.logger.warning);
+        this.client.on('error', this.logger.error.bind(this));
+        this.client.on('warning', this.logger.warning.bind(this));
     }
     
     public start(): void {
@@ -251,7 +250,7 @@ export default class Cephalon {
     }
 
     private onPresenceUpdate(oldMember: GuildMember, newMember: GuildMember): void {
-        if (process.env.SHOULD_PESTER != 'false' && oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
+        if (process.env.SHOULD_PESTER != '0' && oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
             let checkReadyForRankup = (dateStr: string | Date, compDate: number | undefined, breakOnNull: boolean, member) => {
                 if (dateStr === null && breakOnNull) {
                     return false;

@@ -5,11 +5,11 @@ import { version } from "discord.js";
 import Cephalon from "../../Cephalon";
 import { MessageWithStrippedContent } from "../../objects/Types";
 
-class Info extends Command {
+export default class Info extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'core.debug.info', 'info', 'Returns info about the current instance.');
 
-        this.regex = /^(?:info|debug|session|vars)$'/i;
+        this.regex = /^(?:info|debug|session|vars)$/i;
 
         this.requiredRank = 0;
     }
@@ -37,5 +37,3 @@ class Info extends Command {
         });
     }
 }
-
-module.exports = Info;

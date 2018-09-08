@@ -6,4 +6,7 @@
 ###
 docker run -d \
     --name swarmbot \
-    --restart on-failure:5
+    --restart on-failure:5 \
+    -v "/var/docker/swarmbot/docs:/var/docs" \
+    --env-file ./env.list \
+    swarmbot

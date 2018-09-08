@@ -1,6 +1,7 @@
 swarmbot.json
 docs
 env.js
+env.list
 dist
 
 # Logs

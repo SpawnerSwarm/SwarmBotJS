@@ -7,7 +7,7 @@ export default class Logger {
 
     constructor(magnify: string | boolean | Falsey | Truthy = false) {
         console.log(magnify);
-        this.useMagnify = magnify as boolean;
+        this.useMagnify = magnify === 1 ? true : false;
         if(this.useMagnify === true && process.env.MAGNIFY_URL !== undefined) {
             this.socket = io(process.env.MAGNIFY_URL as string);
             this.socket.on('connect', function() {

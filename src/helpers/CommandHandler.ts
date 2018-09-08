@@ -19,7 +19,7 @@ export default class CommandHandler {
     }
 
     loadCommands(): void {
-        const commandDir = path.join(__dirname, 'commands');
+        const commandDir = path.join(__dirname, '..', 'commands');
         let files = fs.readdirSync(commandDir);
 
         const categories = files.filter(f => f.indexOf('.js') === -1);
@@ -37,18 +37,15 @@ export default class CommandHandler {
             });
         }
 
-        this.logger.debug(`Loading commands: ${files}`);
+        this.logger.debug(`Loading commands: ${files.join(', ')}`);
 
         this.commands = files.map((f) => {
+            console.log(f);
             try {
-                const Cmd = require(path.join(commandDir, f));
-                if (Object.prototype.toString.call(Cmd) === '[object Function]') {
-                    const command = new Cmd.default(this.bot);
-
-                    this.logger.debug(`Adding ${command.id}`);
-                    return command;
-                }
-                return null;
+                const Cmd = require(path.join(commandDir, f)).default;
+                const command = new Cmd(this.bot);
+                this.logger.debug(`Adding ${command.id}`);
+                return command;
             } catch (err) {
                 this.logger.error(err);
                 return null;

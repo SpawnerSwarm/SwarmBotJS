@@ -11,9 +11,9 @@ LABEL source=${source}
 ENV VERIONS=${version}
 ENV SOURCE=${source}
 
-VOLUME /var/docs
-
-COPY bin /bin/swarmbot
+COPY dist /bin/swarmbot
+COPY package.json /bin/swarmbot
+COPY node_modules /bin/swarmbot/node_modules
 COPY etc /etc/swarmbot
 
 WORKDIR /bin/swarmbot
@@ -50,6 +50,7 @@ ENV SQL_CSV_REQUESTS "/etc/swarmbot/requests.sql"
 ENV SQL_CSV_OUT "/tmp/swarmbot.csv"
 #!ENV GOOGLE_URL
 
-RUN yarn install
+RUN apk update
+RUN apk add git python
 
-CMD [ "node /bin/swarmbot/main.js" ]
+ENTRYPOINT node main.js

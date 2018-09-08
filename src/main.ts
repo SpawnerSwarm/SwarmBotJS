@@ -6,9 +6,15 @@ import ClusterManger from './helpers/ClusterManager';
 
 const logger: Logger = new Logger(process.env.USE_MAGNIFY);
 
-if(!process.env.TOKEN) logger.fatal("Missing Discord token!"); process.exit(1);
-if(!process.env.PREFIX) logger.fatal("Missing prefix!"); process.exit(1);
-if(!process.env.OWNER) logger.fatal("Missing Discord owner!"); process.exit(1);
+if(!process.env.TOKEN) { 
+    logger.fatal("Missing Discord token!"); process.exit(1);
+}
+if(!process.env.PREFIX) {
+    logger.fatal("Missing prefix!"); process.exit(1);
+}
+if(!process.env.OWNER) {
+    logger.fatal("Missing Discord owner!"); process.exit(1);
+}
 
 if(cluster.isMaster) {
     const localShards = process.env.LOCAL_SHARDS;

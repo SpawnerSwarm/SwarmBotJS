@@ -3,7 +3,7 @@ import AlertsEmbed from "../../embeds/AlertsEmbed";
 import Cephalon from "../../Cephalon";
 import { MessageWithStrippedContent } from "../../objects/Types";
 
-class Alerts extends Command {
+export default class Alerts extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'warframe.alerts', 'wfalerts');
 
@@ -20,5 +20,3 @@ class Alerts extends Command {
         .catch((err) => this.logger.error(err));
     }
 }
-
-module.exports = Alerts;

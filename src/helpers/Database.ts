@@ -13,7 +13,7 @@ export type DbConnectionOptions = {
     host: UrlResolvable | "localhost",
     port: number,
     user: string,
-    pass: string,
+    password: string,
     database: string
 };
 

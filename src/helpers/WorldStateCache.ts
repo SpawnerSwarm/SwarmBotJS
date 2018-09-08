@@ -68,7 +68,7 @@ export default class WorldStateCache {
                 if (!response.statusCode || response.statusCode < 200 || response.statusCode > 299) {
                     reject(new Error(`Failed to load page, status code: ${response.statusCode}`));
                 }
-                let body: (string | Buffer)[]
+                const body: (string | Buffer)[] = [];
                 response.on('data', chunk => body.push(chunk));
                 response.on('end', () => resolve(body.join('')));
             });
