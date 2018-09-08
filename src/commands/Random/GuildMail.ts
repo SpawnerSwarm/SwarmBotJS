@@ -6,7 +6,7 @@ export default class GuildMail extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'random.debug.guildmail', 'guildmail', 'Returns guildmail.');
 
-        this.regex = new RegExp('^(?:guildmail|mail|gm)$');
+        this.regex = /^(?:guildmail|mail|gm)$/i;
 
         this.requiredRank = 0;
     }

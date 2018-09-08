@@ -7,7 +7,7 @@ export default class Alerts extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'warframe.alerts', 'wfalerts');
 
-        this.regex = new RegExp('^(?:warframe ?|wf ?)?alerts ?(?:list)?$');
+        this.regex = /^(?:warframe ?|wf ?)?alerts ?(?:list)?$/i;
 
         this.requiredRank = 0;
     }

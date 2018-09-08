@@ -8,7 +8,7 @@ export default class ViewDatabase extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'database.viewDatabase', 'viewDatabase', 'View entire member database as a CSV on Google Sheets.');
 
-        this.regex = new RegExp('^(?:view)?(?:db|database)$', 'i');
+        this.regex = /^(?:view)?(?:db|database)$/i;
 
         this.allowDM = true;
 

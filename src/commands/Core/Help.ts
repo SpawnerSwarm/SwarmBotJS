@@ -24,9 +24,9 @@ export default class Help extends Command {
         else name = match[1].toLowerCase();
         
         if (name == 'about-this-server') return;
-        if (fs.existsSync(`./docs/${name}.md`)) {
+        if (fs.existsSync(`/var/docs/${name}.md`)) {
             try {
-                fs.readFile(`./docs/${name}.md`, function (err: NodeJS.ErrnoException, data: Buffer) {
+                fs.readFile(`/var/docs/${name}.md`, function (err: NodeJS.ErrnoException, data: Buffer) {
                     if (err) throw err;
                     this.react('✅');
                     let str = data.toString();

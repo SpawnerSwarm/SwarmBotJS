@@ -8,7 +8,7 @@ export default class PriceCheck extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'warframe.priceCheck', 'priceCheck');
 
-        this.regex = new RegExp('^(?:priceCheck|pc) ?(.+)?$');
+        this.regex = /^(?:priceCheck|pc) ?(.+)?$/i;
 
         this.requiredRank = 0;
     }

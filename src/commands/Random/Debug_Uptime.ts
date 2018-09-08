@@ -6,7 +6,7 @@ export default class Uptime extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'random.debug.uptime', 'uptime', 'Returns uptime.');
 
-        this.regex = new RegExp('^(?:uptime|time)$');
+        this.regex = /^(?:uptime|time)$/i;
 
         this.requiredRank = 0;
     }

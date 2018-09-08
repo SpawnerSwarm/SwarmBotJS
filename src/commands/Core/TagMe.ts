@@ -11,7 +11,7 @@ export default class TagMe extends Command {
 
         this.allowDM = false;
 
-        this.regex = /'^(?:tagme|tag) ?(.*?)?(?: <@!?(\d+)>)?$'/i;
+        this.regex = /'^(?:tagme|tag) ?(.*?)?(?: <@!?(\d+)>)?$/i;
     }
 
     run(message: MessageWithStrippedContent) {

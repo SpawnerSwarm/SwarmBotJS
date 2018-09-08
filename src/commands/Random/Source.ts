@@ -6,7 +6,7 @@ export default class Source extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'random.source', 'source', 'Post a link to the bot\'s source');
 
-        this.regex = new RegExp('^(?:source|code|sourcecode|github)$');
+        this.regex = /^(?:source|code|sourcecode|github)$/i;
 
         this.requiredRank = 0;
     }

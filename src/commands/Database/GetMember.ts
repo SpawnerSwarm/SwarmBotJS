@@ -14,7 +14,7 @@ export default class GetMember extends Command {
         ];
 
         //this.regex = new RegExp('^(?:getMember|member(?: get)?)? <@!?(\d+)> ?(.+)?$', 'i');
-        this.regex = /^(?:getMember|member(?: get)?) <@!?(\\d+)> ?(.+)?$/i;
+        this.regex = /^(?:getMember|member(?: get)?) <@!?(\d+)> ?(.+)?$/i;
 
         this.allowDM = false;
 

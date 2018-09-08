@@ -21,13 +21,13 @@ export default class DiscordTags {
     }
 
     static addRoleToMember(member: GuildMember, roleName: string): void {
-        let role = member.guild.roles.find('name', roleName);
+        let role = member.guild.roles.find(x => x.name === roleName);
 
         member.addRole(role);
     }
 
     static removeRoleFromMember(member: GuildMember, roleName: string): void {
-        let role = member.guild.roles.find('name', roleName);
+        let role = member.guild.roles.find(x => x.name === roleName);
 
         member.removeRole(role);
     }

@@ -230,7 +230,7 @@ export default class DeadlyRunners extends Module {
                     let guild = this.client.guilds.get(this.settings.Guild) as Guild;
                     let channel = guild.channels.get(this.settings.Channel) as TextChannel;
                     channel.fetchMessage(build.MessageID).then((x) => {
-                        x.react(message.guild.emojis.find('name', 'riven'));
+                        x.react(message.guild.emojis.find(x => x.name === 'riven'));
                     });
                 });
             });

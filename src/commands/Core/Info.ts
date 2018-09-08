@@ -23,7 +23,7 @@ export default class Info extends Command {
             }).then((gitHash: string) => {
                 let str = `Platform: ${os.type()}${process.arch}`;
                 str += `\nCPUs: ${os.cpus().length}`;
-                str += `\nBot version: ${gitHash}`;
+                str += `\nBot version: ${process.env.VERSIONS}`;
                 str += `\nDiscord.js version: ${version}`;
                 str += `\n\nNode.js version: ${process.versions.node}`;
                 str += `\nV8 version: ${process.versions.v8}`;

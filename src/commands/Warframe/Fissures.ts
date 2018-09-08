@@ -7,7 +7,7 @@ export default class Fissures extends Command {
     constructor(bot: Cephalon) {
         super(bot, 'warframe.fissures', 'wffissures');
 
-        this.regex = /^(?:warframe ?|wf ?)?fissures ?(?:list)?$/;
+        this.regex = /^(?:warframe ?|wf ?)?fissures ?(?:list)?$/i;
 
         this.requiredRank = 0;
     }

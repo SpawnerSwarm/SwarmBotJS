@@ -3,6 +3,7 @@ import tslint from "gulp-tslint";
 import ts from "gulp-typescript";
 import * as fs from "fs";
 import del from "del";
+import { exec } from 'child_process';
 
 export function lint() {
     return gulp.src('src/**/*.ts')
@@ -29,6 +30,10 @@ export function tsc() {
 };
 export { tsc as build }
 
+export function docker() {
+    return exec('docker build -t swarmbot -f Dockerfile .');
+}
+
 export function start() {
     if(fs.existsSync('env.js')) {
         //Setup testing environment variables
@@ -41,6 +46,9 @@ export function start() {
 
 export const bs = gulp.series(tsc, clean, start);
 gulp.task('build-start', bs);
+
+export const bd = gulp.series(tsc, clean, docker);
+gulp.task('build-docker', bd);
 
 export const lbs = gulp.series(lint, bs);
 gulp.task('lint-build-start', lbs);

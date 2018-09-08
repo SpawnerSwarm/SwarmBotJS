@@ -29,8 +29,8 @@ export default class Bazaar extends Module {
                     let nn = 0;
                     if (match[2] == '[NN] ') nn = 1;
                     this.bot.db.createListing(message.id, match[1] as "WTB" | "WTS", nn as 0 | 1, Number(match[3]), match[4], match[5].substring(1), this.shortName);
-                    message.react(message.guild.emojis.find('name', 'Shop')).then(() =>
-                        message.react(message.guild.emojis.find('name', 'Disconnect')));
+                    message.react(message.guild.emojis.find(x => x.name === 'Shop')).then(() =>
+                        message.react(message.guild.emojis.find(x => x.name === 'Disconnect')));
                 } else {
                     message.author.send(`Thank you for your submission to the ${this.name}! Unfortunately, your submittion has been removed because it did not match the proper formatting. Please consult the channel information for proper formatting guides. If you beleive this was in error, please contact Mardan.`);
                     message.delete();

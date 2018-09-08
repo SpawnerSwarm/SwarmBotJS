@@ -147,8 +147,8 @@ export default class Cephalon {
         if (this.ready && !message.author.bot) {
             if (Cephalon._checkChannelIsText(message.channel, '137991656547811328') || Cephalon._checkChannelIsText(message.channel, '165649798551175169') || Cephalon._checkChannelIsText(message.channel, '157978818466807808')) {
                 if (message.attachments.array().length > 0 || message.embeds.length > 0) {
-                    if (message.member.roles.find('name', 'Certified Weeb') != null) {
-                        message.react(message.guild.emojis.find('name', 'Weeb'));
+                    if (message.member.roles.find(x => x.name === 'Certified Weeb') != null) {
+                        message.react(message.guild.emojis.find(x => x.name === 'Weeb'));
                     }
                 }
             }

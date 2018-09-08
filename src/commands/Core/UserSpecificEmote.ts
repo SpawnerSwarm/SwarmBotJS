@@ -22,7 +22,7 @@ export default class UserSpecificEmote extends Command {
     }
 
     run(message: MessageWithStrippedContent): void {
-        let emote = UserEmotes.find((x) => { return message.cleanContent.match(x.call) ? true : false; });
+        let emote = UserEmotes.find(x => message.cleanContent.match(x.call) ? true : false);
 
         if(emote) {
             if(simple(emote)) {
