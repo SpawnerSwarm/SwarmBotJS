@@ -9,4 +9,4 @@ docker run -d \
     --restart on-failure:5 \
     -v "/var/docker/swarmbot/docs:/var/docs" \
     --env-file ./env.list \
-    swarmbot
+    registry.gitlab.com/crunchyintheory/swarmbot

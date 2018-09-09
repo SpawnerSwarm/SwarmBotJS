@@ -31,7 +31,11 @@ export function tsc() {
 export { tsc as build }
 
 export function docker() {
-    return exec('docker build -t swarmbot -f Dockerfile .');
+    return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot -f Dockerfile .');
+}
+
+export function docker_arm32v7() {
+    return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot/arm32v7 -f Dockerfile.arm32v7 .');
 }
 
 export function start() {
@@ -44,10 +48,12 @@ export function start() {
     return 1;
 };
 
+export const docker_all = gulp.series(docker, docker_arm32v7);
+
 export const bs = gulp.series(tsc, clean, start);
 gulp.task('build-start', bs);
 
-export const bd = gulp.series(tsc, clean, docker);
+export const bd = gulp.series(tsc, clean, docker_all);
 gulp.task('build-docker', bd);
 
 export const lbs = gulp.series(lint, bs);
