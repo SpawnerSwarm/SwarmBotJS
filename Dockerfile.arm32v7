@@ -2,7 +2,7 @@ FROM arm32v7/node:carbon-slim
 RUN apt-get -y update
 RUN apt-get -y install git python make g++ linux-libc-dev mysql-client
 
-ARG version="2.5.0"
+ARG version="2.5.1"
 ARG source="https://github.com/spawnerswarm/swarmbotjs"
 
 LABEL version=${version}
