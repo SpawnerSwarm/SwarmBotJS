@@ -26,16 +26,16 @@ export function tsc() {
             module: "commonjs",
             target: "es2016",
         }))
-        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest('dist'));
 };
 export { tsc as build }
 
 export function docker() {
-    return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot -f Dockerfile .');
+    return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot -f Dockerfile .').stdout;
 }
 
 export function docker_arm32v7() {
-    return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot/arm32v7 -f Dockerfile.arm32v7 .');
+    return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot/arm32v7 -f Dockerfile.arm32v7 .').stdout;
 }
 
 export function start() {
