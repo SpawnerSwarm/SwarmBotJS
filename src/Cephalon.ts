@@ -5,6 +5,7 @@ import { Snowflake, Client, Message, Role, TextChannel, GroupDMChannel, DMChanne
 import Database from "./helpers/Database";
 import CommandHandler from "./helpers/CommandHandler";
 import WorldStateCache from "./helpers/WorldStateCache";
+import NeedsMoreJpeg from "./helpers/NeedsMoreJpeg";
 import Module from "./modules/Module";
 
 import { UrlResolvable, GuildTextChannel } from "./objects/Types.d";
@@ -222,6 +223,19 @@ export default class Cephalon {
                         message.channel.send(msg);
                     });
                 }
+            }
+            else if (message.content.toLowerCase() === 'needs more jpeg') {
+                message.react('🔄').then(reaction => {
+                    NeedsMoreJpeg.handleMessage(message, this.logger).then(x => {
+                        if(x) {
+                            reaction.remove();
+                            message.react('✅');
+                        } else {
+                            message.react('🆘');
+                        }
+                        this.logger.debug('===end jpeg===')
+                    });
+                });
             }
             else if (message.content.startsWith('/')) {
                 let msg = message.cleanContent.substring(1);
