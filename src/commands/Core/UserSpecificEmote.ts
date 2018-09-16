@@ -21,25 +21,27 @@ export default class UserSpecificEmote extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent): void {
-        let emote = UserEmotes.find(x => message.cleanContent.match(x.call) ? true : false);
+    async run(message: MessageWithStrippedContent) {
+        let emote = UserEmotes.find(x => message.cleanContent.match(x.call) ? true : false) as ComplexUserEmote | SimpleUserEmote | undefined;
 
         if(emote) {
             if(simple(emote)) {
                 this.executeSimpleEmote(emote, message);
+                return true;
             } else {
-                (emote as ComplexUserEmote).function(message.author.id).then((content) => {
-                    message.channel.send(content);
-                });
+                const content = await emote.function(message.author.id);
+                message.channel.send(content);
+                return true;
             }
         }
+        return false;
     }
 
-    executeSimpleEmote(emote: SimpleUserEmote, message: Message): void {
+    executeSimpleEmote(emote: SimpleUserEmote, message: Message): Promise<Message | Message[]> {
         if(message.author.id === emote.user) {
-            message.channel.send(emote.content);
+            return message.channel.send(emote.content);
         } else {
-            message.channel.send('This command is restricted to a specific user');
+            return message.channel.send('This command is restricted to a specific user');
         }
     }
 }
