@@ -24,7 +24,7 @@ export function tsc() {
         .pipe(ts({
             allowJs: true,
             module: "commonjs",
-            target: "es2016",
+            target: "es2017",
         }))
         .pipe(gulp.dest('dist'));
 };
