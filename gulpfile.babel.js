@@ -19,6 +19,10 @@ export function clean() {
     return del(['dist/**/*.js.map']);
 }
 
+export function preclean() {
+    return del(['dist/**']);
+}
+
 export function tsc() {
     return gulp.src('src/**/*.ts')
         .pipe(ts({
@@ -28,7 +32,7 @@ export function tsc() {
         }))
         .pipe(gulp.dest('dist'));
 };
-export { tsc as build }
+export const build = gulp.series(preclean, tsc, clean);
 
 export function docker() {
     return exec('docker build -t registry.gitlab.com/crunchyintheory/swarmbot -f Dockerfile .').stdout;
