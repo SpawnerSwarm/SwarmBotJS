@@ -14,35 +14,38 @@ export default class Help extends Command {
         this.regex = /(?:help|man(?:ual)?|docs?|what)(?: (.+))?/i;
     }
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent): Promise<boolean> {
         let match = message.strippedContent.match(this.regex);
-        if(!this._tsoverrideregex(match)) return;
+        if(!this._tsoverrideregex(match)) return false;
         this.logger.debug(match[1]);
         let name: string;
         
         if(!match[1]) name = '_';
         else name = match[1].toLowerCase();
         
-        if (name == 'about-this-server') return;
+        if (name == 'about-this-server') return false;
         if (fs.existsSync(`/var/docs/${name}.md`)) {
             try {
-                fs.readFile(`/var/docs/${name}.md`, function (err: NodeJS.ErrnoException, data: Buffer) {
+                fs.readFile(`/var/docs/${name}.md`, async (err: NodeJS.ErrnoException, data: Buffer) => {
                     if (err) throw err;
-                    this.react('✅');
                     let str = data.toString();
                     let formattedStr = str.split('\\split');
                     if(formattedStr.length > 0) {
                         for(let i = 0; i < formattedStr.length; i++) {
-                            this.author.send(formattedStr[i].replace('\\split', ''));
+                            await message.author.send(formattedStr[i].replace('\\split', ''));
+                            return true;
                         }
                     }
                     else {
-                        this.author.send(data.toString());
+                        await message.author.send(data.toString());
+                        return true;
                     }
-                }.bind(message));
+                });
             } catch (err) {
                 this.logger.error(err);
+                return false;
             }
         }
+        return false;
     }
 }
