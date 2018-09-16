@@ -54,7 +54,7 @@ export default class CommandHandler {
             .filter(c => c !== null);
     }
 
-    handleCommand(message: Message): void {
+    async handleCommand(message: Message) {
         let content = message.content;
         const botping = `@${this.bot.client.user.username}`;
         if (!content.startsWith(this.bot.prefix) && !content.startsWith(botping)) {
@@ -69,55 +69,63 @@ export default class CommandHandler {
         const messageWithStrippedContent = message as MessageWithStrippedContent;
         messageWithStrippedContent.strippedContent = content;
         this.logger.debug(`Handling \`${content}\``);
-        this.commands.forEach((command) => {
-            if (command.regex.test(content)) {
-                if (command.mandatoryWords === undefined || command.mandatoryWords.test(content)) {
-                    this.checkCanAct(command, messageWithStrippedContent)
-                        .then((canAct) => {
-                            if (canAct) {
-                                this.logger.debug(`Matched ${command.id}`);
-                                command.run(messageWithStrippedContent);
-                            }
-                        });
+        this.commands.forEach(async command => {
+            if (command.regex.test(content) && (command.mandatoryWords === undefined || command.mandatoryWords.test(content))) {
+                const canAct: boolean = await this.checkCanAct(command, messageWithStrippedContent);
+                if (canAct) {
+                    this.logger.debug(`Matched ${command.id}`);
+                    const reaction = await message.react('🔄');
+                    message.channel.startTyping();
+                    try {
+                        const result: boolean = await command.run(messageWithStrippedContent);
+                        message.channel.stopTyping();
+                        message.react(result ? '✅' : '🆘');
+                    } catch (e) {
+                        message.react('🆘');    
+                    }
+                    await reaction.remove();
                 }
             }
         });
     }
 
-    checkCanAct(command: Command, message: Message): Promise<boolean> {
-        return new Promise((resolve) => {
-            if (message.channel.type === 'text' || (message.channel.type === 'dm' && command.allowDM)) {
-                this.bot.db.getMember(message.author.id).then((member) => {
-                    if (!command.ownerOnly || message.author.id === this.bot.owner) {
-                        if (member.Banned === true) {
-                            message.channel.send('You are currently banned from using commands. Please contact Mardan to rectify this.');
-                            this.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
-                        }
-                        else {
-                            if (command.requiredRank === 0) {
-                                resolve(true);
+    async checkCanAct(command: Command, message: Message): Promise<boolean> {
+        if (message.channel.type === 'text' || (message.channel.type === 'dm' && command.allowDM)) {
+            try {
+                const member = await this.bot.db.getMember(message.author.id);
+                if (!command.ownerOnly || message.author.id === this.bot.owner) {
+                    if (member.Banned === true) {
+                        message.channel.send('You are currently banned from using commands. Please contact Mardan to rectify this.');
+                        this.logger.warning(`User ${member.Name} tried to use command ${command.id} but is banned`);
+                        return false;
+                    }
+                    else {
+                        if (command.requiredRank === 0) {
+                            return true;
+                        } else {
+                            if (command.requiredRank <= member.Rank) {
+                                return true;
                             } else {
-                                if (command.requiredRank <= member.Rank) {
-                                    resolve(true);
-                                } else {
-                                    message.channel.send('You lack the privileges to perform that action');
-                                    this.logger.warning(`User ${member.Name} tried to use command ${command.id} but is too low of rank.`);
-                                }
-
+                                message.channel.send('You lack the privileges to perform that action');
+                                this.logger.warning(`User ${member.Name} tried to use command ${command.id} but is too low of rank.`);
+                                return false;
                             }
                         }
-                    } else {
-                        message.channel.send('This command is restricted to the bot owner.');
                     }
-                }).catch((err) => {
-                    this.logger.error(err);
-                    message.channel.send(`\`Error: ${err}\``);
-                });
-            }
-            else {
-                message.channel.send('This command cannot be perofrmed in DMs');
-                this.logger.warning(`User ${message.author.username} tried to use command ${command.id} but it is disallowed in DMs`);
-            }
-        });
+                } else {
+                    message.channel.send('This command is restricted to the bot owner.');
+                    return false;
+                }
+            } catch(err) {
+                this.logger.error(err);
+                message.channel.send(`\`Error: ${err}\``);
+                return false;
+            };
+        }
+        else {
+            message.channel.send('This command cannot be perofrmed in DMs');
+            this.logger.warning(`User ${message.author.username} tried to use command ${command.id} but it is disallowed in DMs`);
+            return false;
+        }
     }
 }

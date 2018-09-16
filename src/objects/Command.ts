@@ -41,12 +41,16 @@ export default class Command {
         this.requiredRank = 1;
     }
 
-    public run(message: MessageWithStrippedContent): void {
-        message.reply('This is a basic Command')
+    public async run(message: MessageWithStrippedContent): Promise<boolean> {
+        return message.reply('This is a basic Command')
             .then((msg) => {
                 this.logger.debug(`Sent ${msg}`);
+                return true;
             })
-            .catch((error) => this.logger.error(`Error: ${error}`));
+            .catch(error => {
+                this.logger.error(`Error: ${error}`);
+                return false;
+            });
     }
 
     protected _tsoverrideregex(match: RegExpMatchArray | null): match is RegExpMatchArray {
