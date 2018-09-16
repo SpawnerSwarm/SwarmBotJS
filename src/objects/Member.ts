@@ -5,7 +5,7 @@ import { RankNum } from "./Types";
 export default class Member {
     public readonly ID: Snowflake;
     public readonly Name: string;
-    public readonly Rank: number;
+    public readonly Rank: RankNum;
     private bot: Cephalon;
 
     private _wfname: string;

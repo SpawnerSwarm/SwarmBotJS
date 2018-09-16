@@ -3,7 +3,6 @@ import DiscordTags from "../../helpers/DiscordTags";
 import Cephalon from "../../Cephalon";
 import { MessageWithStrippedContent } from "../../objects/Types";
 import { GuildMember } from "discord.js";
-import Member from "../../objects/Member";
 
 export default class TagMe extends Command {
     constructor(bot: Cephalon) {
@@ -11,62 +10,72 @@ export default class TagMe extends Command {
 
         this.allowDM = false;
 
-        this.regex = /'^(?:tagme|tag) ?(.*?)?(?: <@!?(\d+)>)?$/i;
+        this.regex = /^(un)?(?:tagme|tag) ?(.*?)?(?: <@!?(\d+)>)?$/i;
     }
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent) {
         let match = message.strippedContent.match(this.regex);
-        if(!this._tsoverrideregex(match)) return;
-        let tag = match[1];
-        let target = match[2];
+        if(!this._tsoverrideregex(match)) return false;
+        let untag = match[1] === 'un';
+        let tag = match[2];
+        let target = match[3];
 
-        let argstr = ' Correct format is \'!tagme (overwatch/warframe/sk/bot/rank/leave)\'';
+        let argstr = ` Correct format is '!tagme (overwatch/warframe/sk/bot/${!untag ? 'rank/' : ''}leave)'`;
         if (tag === undefined) {
-            message.channel.send(`Error: Argument blank.${argstr}`); return;
+            message.channel.send(`Error: Argument blank.${argstr}`);
+            return false;
         } else if (!tag.match(/^(?:overwatch|warframe|sk|bot|rank|(?:on)?leave)$/i)) {
-            message.channel.send(`Error: Argument invalid.${argstr}`); return;
+            message.channel.send(`Error: Argument invalid.${argstr}`);
+            return false;
         }
         tag = tag.toLowerCase();
 
-        function callback(member: GuildMember) {
-            if (tag === 'rank') {
-                this.bot.settings.getMember(member.id).then((member) => {
-                    DiscordTags.assignRankTagsToMember(message, member.Rank, member);
-                });
-            }
-            else {
-                switch (tag) {
-                    case 'overwatch': DiscordTags.addRoleToMember(member, 'Overwatch'); break;
-                    case 'warframe': DiscordTags.addRoleToMember(member, 'Warframe'); break;
-                    case 'sk': DiscordTags.addRoleToMember(member, 'Spiral Knights'); break;
-                    case 'bot': DiscordTags.addRoleToMember(member, 'Bot Notifications'); break;
-                    case 'leave': this.addOnLeaveTag(member); break;
-                    case 'onleave': this.addOnLeaveTag(member); break;
-                }
-            }
-            message.channel.send(`Successfully gave ${member.id == message.author.id ? 'you' : member.user.username} the ${tag} tag!`);
-            this.logger.info(`Added ${tag} tag to member ${member.user.username}`);
-        }
+        let member: GuildMember;
         if (target === undefined) {
-            callback.bind(this)(message.member);
+            member = message.member;
         } else {
-            message.guild.fetchMember(target).then((member: GuildMember) => {
-                callback.bind(this)(member);
-            });
+            member = await message.guild.fetchMember(target);
         }
+        if (tag === 'rank') {
+            if(untag) {
+                message.channel.send(`Error: Cannot remove rank tags.`);
+                return false;
+            }
+            const dbmember = await this.bot.db.getMember(member.id);
+            await DiscordTags.assignRankTagsToMember(message, dbmember.Rank, member);
+        }
+        else {
+            const fn = untag ? DiscordTags.removeRoleFromMember : DiscordTags.addRoleToMember;
+            switch (tag) {
+                case 'overwatch': await fn(member, 'Overwatch'); break;
+                case 'warframe': await fn(member, 'Warframe'); break;
+                case 'sk': await fn(member, 'Spiral Knights'); break;
+                case 'bot': await fn(member, 'Bot Notifications'); break;
+                case 'leave': await this.handleOnLeaveTag(member, fn); break;
+                case 'onleave': await this.handleOnLeaveTag(member, fn); break;
+            }
+        }
+        if(untag) {
+            this.logger.info(`Removed ${tag} tag from member ${member.user.username}`);
+            message.channel.send(`Successfully removed the ${tag} tag!`);
+        }
+        else {
+            this.logger.info(`Added ${tag} tag to member ${member.user.username}`);
+            message.channel.send(`Successfully gave ${member.id == message.author.id ? 'you' : member.user.username} the ${tag} tag!`);
+        }
+        return true;
     }
 
-    addOnLeaveTag(member: GuildMember): void {
-        this.bot.db.getMember(member.id).then((dbmember: Member) => {
-            if (dbmember.Rank == 7) {
-                return DiscordTags.addRoleToMember(member, 'On Leave (GM)');
-            }
-            else if (dbmember.Rank >= 5) {
-                return DiscordTags.addRoleToMember(member, 'On Leave (General)');
-            }
-            else {
-                return DiscordTags.addRoleToMember(member, 'On Leave (Member)');
-            }
-        });
+    async handleOnLeaveTag(member: GuildMember, fn: Function): Promise<GuildMember> {
+        const dbmember = await this.bot.db.getMember(member.id);
+        if (dbmember.Rank == 7) {
+            return fn(member, 'On Leave (GM)');
+        }
+        else if (dbmember.Rank >= 5) {
+            return fn(member, 'On Leave (General)');
+        }
+        else {
+            return fn(member, 'On Leave (Member)');
+        }
     }
 }

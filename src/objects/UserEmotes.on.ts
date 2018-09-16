@@ -45,17 +45,15 @@ export const UserEmotes = [
     } as SimpleUserEmote,
     {
         isSimple: false,
-        function: (id: Snowflake) => {
-            return new Promise<string>((resolve) => {
-                /*eslint-disable indent*/
-                switch(id) {
-                    case "138043934143152128": resolve("http://i.imgur.com/MXeL1Jh.gifv"); break; //Fox
-                    case "137976237292388353": resolve("http://i.imgur.com/6AMJZaD.gifv"); break; //Mardan
-                    case "139109512744402944": resolve("http://i.imgur.com/LUfk3HX.gifv"); break; //Quantum
-                    default: resolve("( ͡° ͜ʖ ͡°)"); break;
-                }
-                /*eslint-enable indent*/
-            });
+        function: async (id: Snowflake) => {
+            /*eslint-disable indent*/
+            switch(id) {
+                case "138043934143152128": return "http://i.imgur.com/MXeL1Jh.gifv"; //Fox
+                case "137976237292388353": return "http://i.imgur.com/6AMJZaD.gifv"; //Mardan
+                case "139109512744402944": return "http://i.imgur.com/LUfk3HX.gifv"; //Quantum
+                default: return "( ͡° ͜ʖ ͡°)";
+            }
+            /*eslint-enable indent*/
         },
         call: "lenny"
     } as ComplexUserEmote
