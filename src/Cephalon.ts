@@ -102,8 +102,12 @@ export default class Cephalon {
         });
         
         this.client.on('guildMemberAdd', (member) => {
-            if(member.guild.id as Snowflake === String(137991656547811328) || member.guild.id as Snowflake === String(157978818466807808)) {
-                (member.guild.channels.get(`${member.guild.id}`) as GuildTextChannel).send(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailUrl} and ask a Veteran or above if you have any questions!`);
+            // Currently, there's no good way to determine the default text channel for a guild. For now, I'm just assuming it's named #general.
+            if(member.guild.id as Snowflake === '137991656547811328' || member.guild.id as Snowflake === '157978818466807808') {
+                const channel = member.guild.channels.find(x => x.name === 'general') as GuildTextChannel;
+                if(channel && channel.send) { // Channel exists and is a text channel
+                    channel.send(`Greetings <@${member.id}>! Welcome to the Swarm!\nPlease read the guild mail at ${this.guildMailUrl} and ask a Veteran or above if you have any questions!`);
+                }
             }
         });
         
