@@ -76,14 +76,15 @@ export default class CommandHandler {
                     this.logger.debug(`Matched ${command.id}`);
                     const reaction = await message.react('🔄');
                     message.channel.startTyping();
+                    let result: boolean;
                     try {
-                        const result: boolean = await command.run(messageWithStrippedContent);
+                        result = await command.run(messageWithStrippedContent);
                         message.channel.stopTyping();
-                        message.react(result ? '✅' : '🆘');
                     } catch (e) {
-                        message.react('🆘');    
+                        result = false;
                     }
                     await reaction.remove();
+                    message.react(result ? '✅' : '🆘');
                 }
             }
         });
