@@ -11,7 +11,7 @@ export default class Help extends Command {
 
         this.requiredRank = 1;
 
-        this.regex = /(?:help|man(?:ual)?|docs?|what)(?: (.+))?/i;
+        this.regex = /^(?:help|man(?:ual)?|docs?|what)(?: (.+))?/i;
     }
 
     async run(message: MessageWithStrippedContent): Promise<boolean> {
