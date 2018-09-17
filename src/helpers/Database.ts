@@ -205,12 +205,20 @@ ORDER BY -Rank`,
         this.db.execute(SQL`UPDATE MEMBERS SET Banned=${banned} WHERE ID=${id}`);
     }
 
-    updateWF(id: Snowflake, WarframeName: string): void {
-        this.db.execute(SQL`UPDATE MEMBERS SET WarframeName=${WarframeName} WHERE ID=${id}`);
+    updateWF(id: Snowflake, WarframeName: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE MEMBERS SET WarframeName=${WarframeName} WHERE ID=${id}`, () => {
+                resolve();
+            });
+        })
     }
 
-    updateSK(id: Snowflake, SpiralKnightsName: string): void {
-        this.db.execute(SQL`UPDATE MEMBERS SET SpiralKnightsName=${SpiralKnightsName} WHERE ID=${id}`);
+    updateSK(id: Snowflake, SpiralKnightsName: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.db.execute(SQL`UPDATE MEMBERS SET SpiralKnightsName=${SpiralKnightsName} WHERE ID=${id}`, (err) => {
+                resolve();
+            });
+        })
     }
 
     saveCSVData(): Promise<void> {

@@ -6,28 +6,25 @@ import Logger from './Logger';
 export default class NeedsMoreJpeg {
 
     public static async getUrl(_messages: Collection<string, Message>, logger: Logger): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            let messages = _messages.array();
-            let i = 1;
-            for (let x of messages) {
-                logger.debug(`  ${i++}) Found ${x.embeds.length} embeds [${x.id}]`);
-                for (let y of x.embeds) {
-                    let j = 1;
-                    logger.debug(`    ${j++}) type: ${y.type}`);
-                    if(y.type === 'image') {
-                        resolve(y.thumbnail.url);
-                        return;
-                    }
-                }
-                logger.debug(`  ${i++}) Found ${x.attachments.array().length} attachments [${x.id}]`);
-                for (let y of x.attachments) {
-                    if (y[1].height) { //Test if image
-                        resolve(y[1].url);
-                        return;
-                    }
+        let messages = _messages.array();
+        let i = 1;
+        for (let x of messages) {
+            logger.debug(`  ${i++}) Found ${x.embeds.length} embeds [${x.id}]`);
+            for (let y of x.embeds) {
+                let j = 1;
+                logger.debug(`    ${j++}) type: ${y.type}`);
+                if(y.type === 'image') {
+                    return y.thumbnail.url;
                 }
             }
-        });
+            logger.debug(`  ${i++}) Found ${x.attachments.array().length} attachments [${x.id}]`);
+            for (let y of x.attachments) {
+                if (y[1].height) { //Test if image
+                    return y[1].url;
+                }
+            }
+        }
+        return '';
     }
     
     public static async handleMessage(message: Message, logger: Logger): Promise<Message | Message[] | void> {

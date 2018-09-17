@@ -1,6 +1,7 @@
 import Command from "../../objects/Command";
 import Ranks from "../../objects/Ranks.on";
 import Cephalon from "../../Cephalon";
+import { MessageWithStrippedContent } from "../../objects/Types";
 
 export default class MemberList extends Command {
     constructor(bot: Cephalon) {
@@ -11,14 +12,14 @@ export default class MemberList extends Command {
         this.requiredRank = 1;
     }
 
-    run(message) {
+    async run(message: MessageWithStrippedContent) {
         let str = '```xl\n';
-        this.bot.db.getRankPopulation().then((res: number[]) => {
-            for (let i = 1; i <= 7; i++) {
-                str += `${Ranks[i].name}: ${res[i]} out of ${Ranks[i].max}\n`;
-            }
-            str += '\n```';
-            message.channel.send(str);
-        });
+        const res: number[] = await this.bot.db.getRankPopulation();
+        for (let i = 1; i <= 7; i++) {
+            str += `${Ranks[i].name}: ${res[i]} out of ${Ranks[i].max}\n`;
+        }
+        str += '\n```';
+        message.channel.send(str);
+        return true;
     }
 }

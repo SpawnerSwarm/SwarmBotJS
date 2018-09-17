@@ -9,7 +9,6 @@ export default class SendAboutMessage extends Command {
         message: string,
         file: BufferResolvable | undefined
     }[];
-    private i: number;
 
     constructor(bot: Cephalon) {
         super(bot, 'moderation.aboutmessage', 'sendaboutmessage');
@@ -19,19 +18,20 @@ export default class SendAboutMessage extends Command {
     }
 
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent) {
         this.queue = [];
-        this.i = 0;
-        let channel = message.guild.channels.find(x => x.name == 'about-this-server') as GuildTextChannel;
-        channel.bulkDelete(20);
-        if (!channel.permissionsFor(this.bot.client.user).has(Permissions.FLAGS.SEND_MESSAGES as number)) {
-            return;
+        const channel = message.guild.channels.find(x => x.name == 'about-this-server') as GuildTextChannel;
+        await channel.bulkDelete(20);
+        const permissions = channel.permissionsFor(this.bot.client.user);
+        if (!permissions || !permissions.has(Permissions.FLAGS.SEND_MESSAGES as number)) {
+            message.channel.send('Unable to send about message. Insufficient permissions.');
+            return false;
         }
         if (fs.existsSync('./docs/about-this-server.md')) {
             try {
-                fs.readFile('./docs/about-this-server.md', function (err, data: Buffer) {
+                fs.readFile('./docs/about-this-server.md', async (err, data: Buffer) => {
                     if (err) throw err;
-                    this.msg.react('✅');
+                    message.react('✅');
                     let str = data.toString();
                     let formattedStr = str.split('\\split');
                     if (formattedStr.length > 0) {
@@ -40,33 +40,39 @@ export default class SendAboutMessage extends Command {
                             formattedStr[i] = formattedStr[i].replace(/\\t/g, '    ');
                             if (formattedStr[i].startsWith('\\')) {
                                 let match = formattedStr[i].match(/^\\(.+)(?:\n|\r\n)/) as RegExpMatchArray;
-                                this.q(formattedStr[i].replace(`\\${match[1]}`, ''), `./src/resources/about-this-server/${match[1]}`);
+                                this.enqueueForSend(formattedStr[i].replace(`\\${match[1]}`, ''), `./src/resources/about-this-server/${match[1]}`);
                             }
-                            else this.q(formattedStr[i]);
+                            else this.enqueueForSend(formattedStr[i]);
                         }
-                        this.s(this.channel);
+                        await this.send(channel);
                     }
                     else {
-                        this.channel.send('Could not read file');
+                        channel.send('Could not read file');
+                        return false;
                     }
-                }.bind({ msg: message, channel: channel, q: this.enqueueForSend, send: this.send, queue: this.queue, i: this.i }));
+                });
             } catch (err) {
                 this.logger.error(err);
+                return false;
             }
+        } else {
+            return false;
         }
+        return true;
     }
 
-    enqueueForSend(message: string, file: BufferResolvable | undefined) {
+    enqueueForSend(message: string, file: BufferResolvable | undefined = undefined) {
         this.queue.push({ message: message, file: file });
     }
 
-    send(chan: TextChannel) {
-        if (this.queue[this.i]) {
-            const file = this.queue[this.i].file;
-            chan.send(this.queue[this.i].message, file !== undefined ? new Attachment(file) : undefined ).then(() => {
-                this.i++;
-                this.send(chan);
-            });
+    async send(chan: TextChannel): Promise<void> {
+        for (let i = 0; i < this.queue.length; i++) {
+            const obj = this.queue[i];
+            if(!obj) break;
+
+            const file = obj.file !== undefined ? new Attachment(obj.file) : undefined;
+            await chan.send(obj.message, file);
+            i++;
         }
     }
 }

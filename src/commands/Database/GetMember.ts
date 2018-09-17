@@ -21,89 +21,88 @@ export default class GetMember extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent) {
         const messageMatch = message.strippedContent.match(this.regex);
-        if(!this._tsoverrideregex(messageMatch)) return;
+        if(!this._tsoverrideregex(messageMatch)) return false;
         let verbose = messageMatch[2];
         if (!messageMatch[1]) {
             message.channel.send('Syntax incorrect');
-        } else {
-            let iVerbose = verbose === '-v' || verbose === '--verbose';
-            this.bot.db.getMember(messageMatch[1]).then((member: Member) => {
-                this.bot.client.fetchUser(messageMatch[1]).then((user: User) => {
-                    type Field = {
-                        name: string,
-                        value: string,
-                        inline: boolean
-                    };
-                    var embedOpts: RichEmbedOptions = {
-                        description: 'foo',
-                        author: {
-                            icon_url: user.avatarURL,
-                            name: member.Name,
-                        },
-                        fields: [
-                            {
-                                name: 'Rank',
-                                value: Ranks[member.Rank].name,
-                                inline: true,
-                            },
-                            {
-                                name: 'Last Rankup',
-                                value: '...',
-                                inline: true,
-                            }
-                        ],
-                    };
-                    if (iVerbose) {
-                        if (member.WarframeName) {
-                            (embedOpts.fields as Field[]).push({
-                                name: 'Warframe',
-                                value: member.WarframeName,
-                                inline: true,
-                            });
-                        }
-                        if (member.SpiralKnightsName) {
-                            (embedOpts.fields as Field[]).push({
-                                name: 'Spiral Knights',
-                                value: member.SpiralKnightsName,
-                                inline: true,
-                            });
-                        }
+            return false;
+        }
+        let iVerbose = verbose === '-v' || verbose === '--verbose';
+        try {
+            const member = await this.bot.db.getMember(messageMatch[1]);
+            const user = await this.bot.client.fetchUser(messageMatch[1]);
+            type Field = {
+                name: string,
+                value: string,
+                inline: boolean
+            };
+            var embedOpts: RichEmbedOptions = {
+                description: 'foo',
+                author: {
+                    icon_url: user.avatarURL,
+                    name: member.Name,
+                },
+                fields: [
+                    {
+                        name: 'Rank',
+                        value: Ranks[member.Rank].name,
+                        inline: true,
+                    },
+                    {
+                        name: 'Last Rankup',
+                        value: '...',
+                        inline: true,
                     }
-                    if(member.Banned) {
-                        (embedOpts.fields as Field[]).push({
-                            name: 'BANNED',
-                            value: 'BANNED',
-                            inline: member.Ally,
-                        });
-                    }
-                    if(member.Ally) {
-                        (embedOpts.fields as Field[]).push({
-                            name: 'ALLY',
-                            value: 'ALLY',
-                            inline: member.Banned
-                        });
-                    }
-                    let embed = new RichEmbed(embedOpts);
-                    let color = Ranks[member.Rank].color;
-                    if(color !== undefined) embed.setColor(color);
-
-                    new Promise<null | string>((resolve) => {
-                        let rank = Ranks[member.Rank].name;
-                        if (member[rank] === null) {
-                            resolve(null);
-                        }
-                        (embed.fields as Field[])[1].value = new Date(member[rank]).toDateString();
-                        resolve(member[rank]);
-                    }).then((date) => this.checkReadyForRankup(date, member, embed))
-                        .then(() => message.channel.send('', { embed: embed }));
+                ],
+            };
+            if (iVerbose) {
+                if (member.WarframeName) {
+                    (embedOpts.fields as Field[]).push({
+                        name: 'Warframe',
+                        value: member.WarframeName,
+                        inline: true,
+                    });
+                }
+                if (member.SpiralKnightsName) {
+                    (embedOpts.fields as Field[]).push({
+                        name: 'Spiral Knights',
+                        value: member.SpiralKnightsName,
+                        inline: true,
+                    });
+                }
+            }
+            if(member.Banned) {
+                (embedOpts.fields as Field[]).push({
+                    name: 'BANNED',
+                    value: 'BANNED',
+                    inline: member.Ally,
                 });
-            })
-            .catch((err) => {
-                this.logger.error(err);
-                message.channel.send(`\`Error: ${err}\``);
-            });
+            }
+            if(member.Ally) {
+                (embedOpts.fields as Field[]).push({
+                    name: 'ALLY',
+                    value: 'ALLY',
+                    inline: member.Banned
+                });
+            }
+            let embed = new RichEmbed(embedOpts);
+            let color = Ranks[member.Rank].color;
+            if(color !== undefined) embed.setColor(color);
+            const rank = Ranks[member.Rank].name;
+            if(member[rank] === null) {
+                return false;
+            } else {
+                (embed.fields as Field[])[1].value = new Date(member[rank]).toDateString();
+                await this.checkReadyForRankup(member[rank], member, embed);
+                message.channel.send('', { embed: embed });
+                return true;
+            }
+        } catch (err) {
+            this.logger.error(err);
+            message.channel.send(`\`Error: ${err}\``);
+            return false;
         }
     }
 
