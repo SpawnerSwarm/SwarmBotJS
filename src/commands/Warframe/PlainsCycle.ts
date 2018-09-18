@@ -9,18 +9,20 @@ export default class PlainsCycle extends Command {
         this.regex = /^(?:cycle|plains)$/i;
     }
 
-    run(message: MessageWithStrippedContent) {
-        message.react('✅');
+    async run(message: MessageWithStrippedContent) {
         //From Genesis: https://github.com/wfcd/genesis/blob/master/src/commands/Worldstate/EarthCycle.js
-        this.bot.wfws.getData()
-        .then((ws) => {
+        try {
+            const ws = await this.bot.wfws.getData();
             const cycle = ws.cetusCycle;
             const ostrons = ws.syndicateMissions.filter(mission => mission.syndicate === 'Ostrons')[0];
             if(ostrons) {
                 cycle.expiry = ostrons.expiry;
             }
             message.channel.send('', {embed: new PlainsCycleEmbed(this.bot, cycle)});
-        })
-        .catch((err) => this.logger.error(err));
+            return true;
+        } catch (err) {
+            this.logger.error(err);
+            return false;
+        }
     }
 }

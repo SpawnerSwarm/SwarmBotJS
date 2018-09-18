@@ -12,11 +12,15 @@ export default class Alerts extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent) {
-        this.bot.wfws.getData().then((ws) => {
+    async run(message: MessageWithStrippedContent) {
+        try {
+            const ws = await this.bot.wfws.getData();
             const alerts = ws.alerts.filter(a => !a.expired);
             message.channel.send('', {embed: new AlertsEmbed(this.bot, alerts)});
-        })
-        .catch((err) => this.logger.error(err));
+            return true;
+        } catch (err) { 
+            this.logger.error(err);
+            return false;
+        }
     }
 }

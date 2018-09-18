@@ -12,9 +12,9 @@ export default class Fissures extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent) {
-        this.bot.wfws.getData()
-        .then((ws) => {
+    async run(message: MessageWithStrippedContent) {
+        try {
+            const ws = await this.bot.wfws.getData();
             const fissures = ws.fissures.sort((a, b) => {
                 if(a.tierNum > b.tierNum) {
                     return 1;
@@ -27,7 +27,10 @@ export default class Fissures extends Command {
                 } 
             });
             message.channel.send('', {embed: new FissuresEmbed(this.bot, fissures)});
-        })
-        .catch((err) => this.logger.error(err));
+            return true;
+        } catch (err) {
+            this.logger.error(err);
+            return false;
+        }
     }
 }
