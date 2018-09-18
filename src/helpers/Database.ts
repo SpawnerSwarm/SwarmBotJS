@@ -404,7 +404,7 @@ ORDER BY -Rank`,
 
     getModule(Name: string): Promise<any> { //Won't allow DBModule assignment
         return new Promise((resolve, reject) => {
-            this.db.query(SQL`SELECT * FROM MODULES WHERE Name=${Name}`, function (err, results: RowDataPacket[]) {
+            this.db.execute(SQL`SELECT * FROM MODULES WHERE Name=${Name}`, function (err, results: RowDataPacket[]) {
                 //if (err) reject(err);
                 if (results.length !== 0) {
                     resolve(results);

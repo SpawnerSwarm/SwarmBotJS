@@ -40,7 +40,6 @@ export default class Module {
         this.name = name;
 
         this.client = new Client({
-            fetchAllMembers: true,
             ws: {
                 compress: true,
                 large_threshold: 1000,

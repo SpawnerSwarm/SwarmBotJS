@@ -13,7 +13,7 @@ export default class Bazaar extends Module {
         this.regex = /[[(](WTS|WTB)[\])] ?([[(]NN[\])] ?)?[[(]([$0-9]+)((?: ?[kmbtq])?(?: ?(?:CR|CE|Plat|Platinum|p|<:Crown:318234064941350912>|<:Platinum:230528518147145731>|<:Energy:318527974557089792>|<:CrownFlat:318536338934857728>) ?)?)[\])]([^[(\])]+)/i;
         
         this.bot.db.getModule(this.shortName).then((settings: DBModule) => {
-            this.settings = settings;
+            this.settings = settings[0];
         });
     }
 
@@ -142,15 +142,15 @@ This message is being sent to inform you that the listing price has been marked 
         }
     }
 
-    public onReadyExtra(): void {
+    public onReadyExtra() {
         let guild = this.client.guilds.get(this.settings.Guild) as Guild;
         let channel = guild.channels.get(this.settings.Channel) as TextChannel;
         channel.fetchMessages({ limit: 100 })
-            .then((messages) => {
+            .then(async (messages) => {
                 this.logger.debug(`Received ${messages.size} messages from ${this.name}`);
                 if (messages.size < 2) {
                     this.logger.debug(`Under 2 messages found in ${this.name}. Deleting and re-sending info text.`);
-                    messages.deleteAll();
+                    await messages.deleteAll();
                     const path = './docs/bazaar.md';
                     if (fs.existsSync(path)) {
                         try {
