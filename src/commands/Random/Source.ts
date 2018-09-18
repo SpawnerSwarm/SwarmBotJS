@@ -11,7 +11,8 @@ export default class Source extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent) {
         message.channel.send(process.env.SOURCE || "no source listed in dockerfile");
+        return true;
     }
 }

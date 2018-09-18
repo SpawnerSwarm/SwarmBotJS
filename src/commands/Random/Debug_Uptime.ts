@@ -11,7 +11,8 @@ export default class Uptime extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent) {
         message.channel.send(`${this.bot.client.user.username} has been online continuously for ${Math.ceil(this.bot.client.uptime / 3600000 * 100) / 100} hours.`);
+        return true;
     }
 }

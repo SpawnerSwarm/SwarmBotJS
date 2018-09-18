@@ -11,7 +11,8 @@ export default class GuildMail extends Command {
         this.requiredRank = 0;
     }
 
-    run(message: MessageWithStrippedContent) {
+    async run(message: MessageWithStrippedContent) {
         message.channel.send(this.bot.guildMailUrl);
+        return true;
     }
 }

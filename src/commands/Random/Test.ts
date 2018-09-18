@@ -9,9 +9,9 @@ export default class Test extends Command {
         this.ownerOnly = true;
     }
 
-    run(message: MessageWithStrippedContent) {
-        const member = this.bot.db.getMember(message.author.id).then((member) => {
-            message.channel.send(`
+    async run(message: MessageWithStrippedContent) {
+        const member = await this.bot.db.getMember(message.author.id);
+        message.channel.send(`
 ${member.ID}
 ${member.Name}
 ${member.Rank}
@@ -19,6 +19,6 @@ ${member.WarframeName}
 ${member.SpiralKnightsName}
 ${member.Ally}
 ${member.Banned}`);
-        });
+        return true;
     }
 }
