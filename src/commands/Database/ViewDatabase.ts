@@ -1,6 +1,6 @@
 import Command from "../../objects/Command";
 import * as fs from "fs";
-import * as request from "request-promise";
+import * as request from "request-promise-native";
 import { MessageWithStrippedContent } from "../../objects/Types";
 import Cephalon from "../../Cephalon";
 
