@@ -117,15 +117,15 @@ export default class Cephalon {
         this.client.on('warning', this.logger.warning.bind(this));
     }
     
-    public start(): void {
-        this.client.login(this.token)
-            .then(() => {
-                this.logger.info('Logged in!');
-            }).catch((e) => {
-                this.logger.error(e.message);
-                this.logger.fatal(e);
-                process.exit(1);
-            })
+    public async start() {
+        try {
+            await this.client.login(this.token)
+            this.logger.info('Logged in!');
+        } catch (e) {
+            await this.logger.error(e.message);
+            await this.logger.fatal(e);
+            process.exit(1);
+        }
     }
     
     private onReady(): void {
@@ -148,7 +148,7 @@ export default class Cephalon {
         }
     }
 
-    private onMessage(message: Message): void {
+    private async onMessage(message: Message) {
         if (this.ready && !message.author.bot) {
             if (Cephalon._checkChannelIsText(message.channel, '137991656547811328') || Cephalon._checkChannelIsText(message.channel, '165649798551175169') || Cephalon._checkChannelIsText(message.channel, '157978818466807808')) {
                 if (message.attachments.array().length > 0 || message.embeds.length > 0) {
@@ -216,35 +216,32 @@ export default class Cephalon {
             }
             if (message.content.match(/<@&438837282783363092>|@wfhere/i)) {
                 if (message.guild && message.guild.roles.has('138054399950848000')) {
-                    message.guild.fetchMembers().then((guild) => {
-                        let members = (guild.roles.get('138054399950848000') as Role).members
-                            .filter(member => member.presence.status == 'online' || member.presence.status == 'idle');
-                        let memberMap = members.map(member => ` <@${member.id}>`);
-                        let reducer = (accumulator: string, currentValue: string) => {
-                            return accumulator.concat(currentValue);
-                        };
-                        let msg = `Mentioning currently-online Warframe members${memberMap.reduce(reducer, ':')}`;
-                        message.channel.send(msg);
-                    });
+                    const guild = await message.guild.fetchMembers();
+                    let members = (guild.roles.get('138054399950848000') as Role).members
+                        .filter(member => member.presence.status == 'online' || member.presence.status == 'idle');
+                    let memberMap = members.map(member => ` <@${member.id}>`);
+                    let reducer = (accumulator: string, currentValue: string) => {
+                        return accumulator.concat(currentValue);
+                    };
+                    let msg = `Mentioning currently-online Warframe members${memberMap.reduce(reducer, ':')}`;
+                    message.channel.send(msg);
                 }
             }
             else if (message.content.toLowerCase() === 'needs more jpeg') {
-                message.react('🔄').then(reaction => {
-                    NeedsMoreJpeg.handleMessage(message, this.logger).then(x => {
-                        if(x) {
-                            reaction.remove();
-                            message.react('✅');
-                        } else {
-                            message.react('🆘');
-                        }
-                        this.logger.debug('===end jpeg===')
-                    });
-                });
+                const reaction = await message.react('🔄');
+                const x = await NeedsMoreJpeg.handleMessage(message, this.logger);
+                this.logger.debug('===end jpeg===');
+                if(x) {
+                    await reaction.remove();
+                    message.react('✅');
+                } else {
+                    message.react('🆘');
+                }
             }
             else if (message.content.startsWith('/')) {
                 let msg = message.cleanContent.substring(1);
                 try {
-                    SKEmotes.forEach(function (x: SKEmote) {
+                    SKEmotes.forEach((x: SKEmote) => {
                         let regex = new RegExp(`^(?:${x.command})(?: (.+)|$)`, 'i');
                         let match = msg.match(regex);
                         if (!match) {
@@ -257,7 +254,7 @@ export default class Cephalon {
                             }
                             message.delete();
                         }
-                    }.bind(this));
+                    });
                 }
                 catch (e) {
                     this.logger.error(e);
@@ -267,7 +264,7 @@ export default class Cephalon {
         }
     }
 
-    private onPresenceUpdate(oldMember: GuildMember, newMember: GuildMember): void {
+    private async onPresenceUpdate(oldMember: GuildMember, newMember: GuildMember) {
         if (process.env.SHOULD_PESTER != '0' && oldMember.presence.status == 'offline' && newMember.presence.status == 'online' && newMember.guild.id == '137991656547811328') {
             let checkReadyForRankup = (dateStr: string | Date, compDate: number | undefined, breakOnNull: boolean, member) => {
                 if (dateStr === null && breakOnNull) {
@@ -288,7 +285,8 @@ export default class Cephalon {
                     return false;
                 }
             };
-            this.db.getMember(newMember.id).then((member) => {
+            try {
+                const member = await this.db.getMember(newMember.id);
                 if (member.Rank > 3 || member.Ally || member.Banned) { return; }
                 if (checkReadyForRankup(member[Ranks[member.Rank].name], Ranks[member.Rank].last, true, member)) {
                     if (checkReadyForRankup(member.LastPestered, 7, false, member)) {
@@ -300,7 +298,7 @@ export default class Cephalon {
                         }
                     }
                 }
-            }).catch(() => null);
+            } catch (e) {}
         }
         /*let r = Math.floor(Math.random() * Math.floor(200));
         if(r == 0) {

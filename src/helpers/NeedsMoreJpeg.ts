@@ -1,6 +1,6 @@
 import { Message, Collection } from 'discord.js';
 import Cephalon from '../Cephalon';
-import * as request from 'request-promise';
+import * as request from 'request-promise-native';
 import Logger from './Logger';
 
 export default class NeedsMoreJpeg {
@@ -37,7 +37,8 @@ export default class NeedsMoreJpeg {
         const url = await this.getUrl(messages, logger);
         if(url === '') {
             message.channel.send('Couldn\'t find the image you wanted to JPEG. Send this sooner next time (within 10 messages)');
-            return logger.debug(`No URL found for ${message.cleanContent} sent by ${message.author.id} (${message.author.username}`);
+            logger.debug(`No URL found for ${message.cleanContent} sent by ${message.author.id} (${message.author.username}`);
+            return;
         }
         logger.debug(`Found url: ${url}`);
         try {
@@ -50,13 +51,15 @@ export default class NeedsMoreJpeg {
             });
             logger.debug(`Got response from nmj.com: ${JSON.stringify(body)}`);
             if (body.error) {
-                return logger.error(body.error)
+                logger.error(body.error);
+                return;
             }
             return message.channel.send({
                 files: [`https://static.needsmorejpeg.com${body.url}.jpg`]
             });
         } catch(e) {
-            return logger.error(e);
+            logger.error(e);
+            return;
         }
     }
 }

@@ -3,7 +3,7 @@ import * as io from 'socket.io-client';
 
 export default class Logger {
     public useMagnify: boolean = false;
-    protected socket: any;
+    protected socket: SocketIOClient.Socket;
 
     constructor(magnify: string | boolean | Falsey | Truthy = false) {
         console.log(magnify);
@@ -17,7 +17,7 @@ export default class Logger {
         }
     }
 
-    private _doLog(level: Level, message: string): void {
+    private async _doLog(level: Level, message: string): Promise<Logger> {
         console.log(`[${level}] ${message}`);
         if(this.useMagnify) {
             this.socket.emit('console log', {
@@ -25,26 +25,27 @@ export default class Logger {
                 level: level
             });
         }
+        return this;
     }
 
-    public debug(message: string): Promise<void> {
-        return new Promise(() => this._doLog(Level.DEBUG, message));
+    public debug(message: string): Promise<Logger> {
+        return this._doLog(Level.DEBUG, message);
     }
     
-    public info(message: string): Promise<void> {
-        return new Promise(() => this._doLog(Level.INFO, message));
+    public info(message: string): Promise<Logger> {
+        return this._doLog(Level.INFO, message);
     }
 
-    public warning(message: string): Promise<void> {
-        return new Promise(() => this._doLog(Level.WARNING, message));
+    public warning(message: string): Promise<Logger> {
+        return this._doLog(Level.WARNING, message);
     }
 
-    public error(message: string): Promise<void> {
-        return new Promise(() => this._doLog(Level.ERROR, message));
+    public error(message: string): Promise<Logger> {
+        return this._doLog(Level.ERROR, message);
     }
 
-    public fatal(message: string): Promise<void> {
-        return new Promise(() => this._doLog(Level.FATAL, message));
+    public fatal(message: string): Promise<Logger> {
+        return this._doLog(Level.FATAL, message);
     }
 }
 enum Level {
