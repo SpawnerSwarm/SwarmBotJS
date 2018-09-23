@@ -4,7 +4,7 @@ import decache from "decache";
 import Cephalon from "../Cephalon";
 import Logger from "./Logger";
 import Command from "../objects/Command";
-import { Message } from "discord.js";
+import { Message, MessageReaction } from "discord.js";
 import { MessageWithStrippedContent } from "../objects/Types";
 
 export default class CommandHandler {
@@ -74,20 +74,31 @@ export default class CommandHandler {
                 const canAct: boolean = await this.checkCanAct(command, messageWithStrippedContent);
                 if (canAct) {
                     this.logger.debug(`Matched ${command.id}`);
-                    const reaction = await message.react('🔄');
-                    message.channel.startTyping();
+                    let reaction: MessageReaction;
                     let result: boolean;
-                    try {
-                        result = await command.run(messageWithStrippedContent);
+                    if(command.useStatusReactions) {
+                        reaction = await message.react('🔄');
+                        message.channel.startTyping();
+                        result = await this.execCommand(command, messageWithStrippedContent);
+                        await reaction.remove();
                         message.channel.stopTyping();
-                    } catch (e) {
-                        result = false;
+                        message.react(result ? '✅' : '🆘');
+                    } else {
+                        result = await this.execCommand(command, messageWithStrippedContent);
                     }
-                    await reaction.remove();
-                    message.react(result ? '✅' : '🆘');
                 }
             }
         });
+    }
+
+    async execCommand(command: Command, message: MessageWithStrippedContent): Promise<boolean> {
+        let result;
+        try {
+            result = await command.run(message);
+        } catch (e) {
+            result = false;
+        }
+        return result;
     }
 
     async checkCanAct(command: Command, message: Message): Promise<boolean> {

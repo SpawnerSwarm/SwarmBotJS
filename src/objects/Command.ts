@@ -23,6 +23,7 @@ export default class Command {
     public ownerOnly: boolean = false;
     public requiredRank: 0 | RankNum;
     public allowDM: boolean = true;
+    public useStatusReactions: boolean = true;
 
     public mandatoryWords: RegExp | undefined = undefined;
 
