@@ -25,8 +25,8 @@ export default class UpdateSK extends Command {
             case 'wf': await this.bot.db.updateWF(match[2], match[3]); name = 'Warframe';
         }
 
-        this.logger.info(`${message.author.username} updated ${name} ID of ${match[1]} to ${match[2]}`);
-        message.channel.send(`Changed ${name} ID of ${message.author.username}!`);
+        this.logger.info(`${message.author.username} updated ${name} ID of ${match[2]} to ${match[3]}`);
+        message.channel.send(`Changed ${name} ID of ${match[2]}!`);
         return true;
     }
 }
