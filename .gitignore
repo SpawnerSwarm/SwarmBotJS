@@ -1,5 +1,9 @@
 swarmbot.json
 docs
+env.js
+env.list
+dist
+etc/*.js
 
 # Logs
 logs
