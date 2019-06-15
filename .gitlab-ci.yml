@@ -1,17 +1,11 @@
-lint:
+lint-build:
   image: node:10.16
   stage: build
   before_script:
     - npm install
     - npm install -g gulp
   script:
-    - gulp lint
-
-typescript:
-  image: node:10.16
-  stage: build
-  script:
-    - gulp build
+    - gulp lint-build
 
 docker:
   image: docker:latest
