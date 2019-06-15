@@ -5,7 +5,7 @@ lint-build:
     - npm install
     - npm install -g gulp
   script:
-    - gulp build
+    - gulp build #skipping lint for now cos it's broken
 
 docker:
   image: docker:latest

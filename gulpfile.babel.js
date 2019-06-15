@@ -54,6 +54,8 @@ export function start() {
 
 export const docker_all = gulp.series(docker, docker_arm32v7);
 
+gulp.task('build', build);
+
 export const bs = gulp.series(tsc, clean, start);
 gulp.task('build-start', bs);
 
