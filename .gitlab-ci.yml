@@ -25,6 +25,5 @@ docker:
     - docker build --pull -t "$CI_REGISTRY_IMAGE" -f Dockerfile .
     - docker push "$CI_REGISTRY_IMAGE"
   only:
-    - master
     - tags
     
