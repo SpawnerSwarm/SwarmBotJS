@@ -6,6 +6,13 @@ lint-build:
     - npm install -g gulp
   script:
     - gulp build #skipping lint for now cos it's broken
+  artifacts:
+    name: "$CI_PROJECT_PATH_SLUG-$CI_COMMIT_REF_SLUG"
+    paths:
+      - dist/
+  cache:
+    paths:
+      - dist/
 
 docker:
   image: docker:latest
