@@ -1,19 +1,33 @@
 {
     "extends": "tslint:recommended",
     "rules": {
+        "interface-over-type-literal": false,
+        "object-literal-sort-keys": false,
+        "trailing-comma": false,
+        "ordered-imports": false,
         "adjacent-overload-signatures": true,
         "align": true,
         "member-access": true,
+        "quotemark": {
+            "options": "single"
+        },
+        "one-line": {
+            "options": "check-open-brace"
+        },
         "typedef": {
             "options": [
                 "call-signature",
                 "parameter",
                 "property-declaration",
-                "variable-declaration",
-                "member-variable-declaration",
+                "member-variable-declaration"
             ],
             "severity": "error"
         },
+        "max-line-length": {
+            "options": 360
+        },
+        "radix": false,
+        "one-variable-per-declaration": false,
         "typedef-whitespace": {
             "options": [
                 {
